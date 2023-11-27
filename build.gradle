@@ -105,6 +105,10 @@ subprojects {
     }
 }
 
+bootJar {
+    mainClass.set('com.firstone.greenjangteo.GreenJangteoApplication')
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
