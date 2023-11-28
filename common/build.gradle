@@ -21,9 +21,7 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation project(':common')
-}
+dependencies {}
 
 bootJar {
     enabled = false
