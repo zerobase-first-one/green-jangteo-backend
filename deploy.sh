@@ -31,7 +31,7 @@ echo "Starting Docker container with image tag..."
 docker run -d \
     --name $PROJECT_NAME \
     --network=docker-network \
-    -p 8080:8080 \
+    -p 8443:8080 \
     -e PROJECT_NAME=$PROJECT_NAME \
     -e PROJECT_VERSION=$PROJECT_VERSION \
     -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql-container:3306/$PROJECT_NAME \
@@ -39,6 +39,7 @@ docker run -d \
     -e SPRING_DATASOURCE_PASSWORD=$DB_USER_PASSWORD \
     -e EC2_IP_FOR_GREEN_JANGTEO=$EC2_IP_FOR_GREEN_JANGTEO \
     -e SPRING_REDIS_PASSWORD=$REDIS_PASSWORD \
+    -e SSL_KEY_STORE_PASSWORD=$SSL_KEY_STORE_PASSWORD \
     $DOCKER_HUB_USER_NAME/${PROJECT_NAME}:${PROJECT_VERSION} > log.out 2> err.out
 echo "5. Starting server complete"
 
