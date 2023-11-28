@@ -65,7 +65,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        sshUserPrivateKey(credentialsId: 'EC2_DEPLOY_KEY', keyFileVariable: 'EC2_DEPLOY_KEY'),
+                        sshUserPrivateKey(credentialsId: 'EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO', keyFileVariable: 'EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO'),
                         string(credentialsId: 'DB_ROOT_PASSWORD', variable: 'DB_ROOT_PASSWORD'),
                         string(credentialsId: 'DB_USER_NAME', variable: 'DB_USER_NAME'),
                         string(credentialsId: 'DB_USER_PASSWORD', variable: 'DB_USER_PASSWORD'),
@@ -73,12 +73,12 @@ pipeline {
                         string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_KEY')
                     ]) {
                         sh '''
-                        scp -i "$EC2_DEPLOY_KEY" set-up-docker.sh ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
-                        scp -i "$EC2_DEPLOY_KEY" "$JAR_PATH" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
-                        scp -i "$EC2_DEPLOY_KEY" "${WORKSPACE}/deploy.sh" "${WORKSPACE}/check-and-restart.sh" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
-                        ssh -i "$EC2_DEPLOY_KEY" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "chmod +x ${EC2_DEPLOY_PATH}/deploy.sh"
-                        ssh -i "$EC2_DEPLOY_KEY" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "chmod +x ${EC2_DEPLOY_PATH}/set-up-docker.sh && PROJECT_NAME='$PROJECT_NAME' ${EC2_DEPLOY_PATH}/set-up-docker.sh $DB_ROOT_PASSWORD $DB_USER_NAME $DB_USER_PASSWORD"
-                        ssh -i "$EC2_DEPLOY_KEY" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "export DOCKER_HUB_USER_NAME='$DOCKER_HUB_USER_NAME'; export DB_USER_NAME='$DB_USER_NAME'; export DB_USER_PASSWORD='$DB_USER_PASSWORD'; export EC2_IP_FOR_GREEN_JANGTEO='$EC2_IP_FOR_GREEN_JANGTEO'; export REDIS_PASSWORD='$REDIS_PASSWORD'; export JWT_SECRET_KEY='$JWT_SECRET_KEY'; export PROJECT_NAME='$PROJECT_NAME'; export PROJECT_VERSION='$PROJECT_VERSION'; ${EC2_DEPLOY_PATH}/deploy.sh"
+                        scp -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" set-up-docker.sh ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
+                        scp -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" "$JAR_PATH" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
+                        scp -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" "${WORKSPACE}/deploy.sh" "${WORKSPACE}/check-and-restart.sh" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
+                        ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "chmod +x ${EC2_DEPLOY_PATH}/deploy.sh"
+                        ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "chmod +x ${EC2_DEPLOY_PATH}/set-up-docker.sh && PROJECT_NAME='$PROJECT_NAME' ${EC2_DEPLOY_PATH}/set-up-docker.sh $DB_ROOT_PASSWORD $DB_USER_NAME $DB_USER_PASSWORD"
+                        ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "export DOCKER_HUB_USER_NAME='$DOCKER_HUB_USER_NAME'; export DB_USER_NAME='$DB_USER_NAME'; export DB_USER_PASSWORD='$DB_USER_PASSWORD'; export EC2_IP_FOR_GREEN_JANGTEO='$EC2_IP_FOR_GREEN_JANGTEO'; export REDIS_PASSWORD='$REDIS_PASSWORD'; export JWT_SECRET_KEY='$JWT_SECRET_KEY'; export PROJECT_NAME='$PROJECT_NAME'; export PROJECT_VERSION='$PROJECT_VERSION'; ${EC2_DEPLOY_PATH}/deploy.sh"
                         '''
                     }
                 }
