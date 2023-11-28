@@ -32,6 +32,7 @@ docker run -d \
     --name $PROJECT_NAME \
     --network=docker-network \
     -p 8443:8080 \
+    -v /home/ubuntu/keystore.p12:/app/keystore.p12 \
     -e PROJECT_NAME=$PROJECT_NAME \
     -e PROJECT_VERSION=$PROJECT_VERSION \
     -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql-container:3306/$PROJECT_NAME \
