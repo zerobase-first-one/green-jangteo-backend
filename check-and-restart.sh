@@ -11,7 +11,7 @@ if [ -z "$CONTAINER_RUNNING" ]; then
 
         # start a new container
         docker run -d --name ${PROJECT_NAME} \
-            -p 8443:8080 \
+            -p 8443:8443 \
             -e SSL_KEY_STORE_PASSWORD=$SSL_KEY_STORE_PASSWORD \
             ${DOCKER_HUB_USER_NAME}/${PROJECT_NAME}:${PROJECT_VERSION}
 
