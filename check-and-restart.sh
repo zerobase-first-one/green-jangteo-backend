@@ -10,7 +10,10 @@ if [ -z "$CONTAINER_RUNNING" ]; then
         docker rm -f ${PROJECT_NAME}
 
         # start a new container
-        docker run -d --name ${PROJECT_NAME} -p 8080:8080 ${DOCKER_HUB_USER_NAME}/${PROJECT_NAME}:${PROJECT_VERSION}
+        docker run -d --name ${PROJECT_NAME} \
+            -p 8443:8443 \
+            -e SSL_KEY_STORE_PASSWORD=$SSL_KEY_STORE_PASSWORD \
+            ${DOCKER_HUB_USER_NAME}/${PROJECT_NAME}:${PROJECT_VERSION}
 
         echo "Container restarted successfully."
 else

@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+    // module
+    implementation project(':user-api')
+
     // spring boot
     implementation 'org.springframework.boot:spring-boot-starter-web:2.7.12'
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.8'
@@ -103,6 +106,10 @@ subprojects {
         // health check
         implementation 'org.springframework.boot:spring-boot-starter-actuator'
     }
+}
+
+bootJar {
+    mainClass.set('com.firstone.greenjangteo.GreenJangteoApplication')
 }
 
 tasks.named('test') {

@@ -1,12 +1,17 @@
 server:
-  port: 8080
+  port: 8443
+  ssl:
+    key-store: file:/app/keystore.p12
+    key-store-password: ${SSL_KEY_STORE_PASSWORD}
+    keyStoreType: PKCS12
+    keyAlias: tomcat
 
 spring:
   application:
     name: ${PROJECT_NAME}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql-container:3306/users?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://mysql-container:3306/${PROJECT_NAME}?serverTimezone=UTC&characterEncoding=UTF-8
     username: ${DB_USER_NAME}
     password: ${DB_USER_PASSWORD}
   jpa:
