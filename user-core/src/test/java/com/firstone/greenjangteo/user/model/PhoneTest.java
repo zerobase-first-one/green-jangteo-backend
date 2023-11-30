@@ -22,6 +22,7 @@ class PhoneTest {
 
         // then
         assertThat(phone1).isEqualTo(phone2);
+        assertThat(phone1.hashCode()).isEqualTo(phone2.hashCode());
     }
 
     @DisplayName("다른 전화번호를 전송하면 동등하지 않은 Phone 인스턴스를 생성한다.")
@@ -33,6 +34,7 @@ class PhoneTest {
 
         // then
         assertThat(phone1).isNotEqualTo(phone2);
+        assertThat(phone1.hashCode()).isNotEqualTo(phone2.hashCode());
     }
 
     @DisplayName("전화번호를 전송하지 않으면 IllegalArgumentException이 발생한다.")

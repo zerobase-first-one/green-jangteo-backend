@@ -28,6 +28,7 @@ class AddressTest {
 
         // then
         assertThat(address1).isEqualTo(address2);
+        assertThat(address1.hashCode()).isEqualTo(address2.hashCode());
     }
 
     @DisplayName("다른 주소를 전송하면 동등하지 않은 Address 인스턴스를 생성한다.")
@@ -54,6 +55,7 @@ class AddressTest {
 
         // then
         assertThat(address1).isNotEqualTo(address2);
+        assertThat(address1.hashCode()).isNotEqualTo(address2.hashCode());
     }
 
     @DisplayName("주소의 일부를 전송하지 않으면 IllegalArgumentException이 발생한다.")

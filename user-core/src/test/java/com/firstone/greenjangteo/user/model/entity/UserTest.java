@@ -8,6 +8,7 @@ import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.embedment.Roles;
 import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
+import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
+import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
@@ -47,5 +50,39 @@ class UserTest {
         assertThat(user.getFullName()).isEqualTo(FullName.of(fullName));
         assertThat(user.getPhone()).isEqualTo(Phone.of(phone));
         assertThat(user.getRoles()).isEqualTo(Roles.from(List.of(role)));
+    }
+
+    @DisplayName("동일한 내부 값들을 전송하면 동등한 User 인스턴스를 생성한다.")
+    @Test
+    void fromSameValue() {
+        // given, when
+        User user1 = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        User user2 = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        // then
+        assertThat(user1).isEqualTo(user2);
+        assertThat(user1.hashCode()).isEqualTo(user2.hashCode());
+    }
+
+    @DisplayName("다른 내부 값들을 전송하면 동등하지 않은 User 인스턴스를 생성한다.")
+    @Test
+    void fromDifferentValue() {
+        // given, when
+        User user1 = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        User user2 = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME2, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        // then
+        assertThat(user1).isNotEqualTo(user2);
+        assertThat(user1.hashCode()).isNotEqualTo(user2.hashCode());
     }
 }
