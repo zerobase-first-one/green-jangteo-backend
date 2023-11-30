@@ -22,7 +22,8 @@ repositories {
 }
 
 dependencies {
-    implementation project(':common')
+    implementation project(':user-core')
+    implementation project(':user-trans')
 }
 
 bootJar {
