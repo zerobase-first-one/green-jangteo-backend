@@ -35,13 +35,13 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("user")
+                .groupName("green-jangteo")
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("personal.yeongyulgori.user"))
+                .apis(RequestHandlerSelectors.basePackage("com.firstone.greenjangteo"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo())
-                .securityContexts(Arrays.asList(securityContext())) // Security Context 추가
+                .securityContexts(Arrays.asList(securityContext()))
                 .securitySchemes(Arrays.asList(apiKey()));
     }
 
@@ -63,8 +63,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("연결고리 프로젝트 user API")
-                .description("소셜 미디어 서비스(SNS) 연결고리 프로젝트의 user 서버 API입니다.")
+                .title("그린장터 서버 API")
+                .description("친환경 마켓플레이스 프로젝트 그린장터의 서버 API입니다.")
                 .version("1.0")
                 .build();
     }
