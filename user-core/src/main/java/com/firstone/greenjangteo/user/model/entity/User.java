@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity(name = "users")
 @Getter
@@ -71,5 +72,21 @@ public class User extends BaseEntity {
                 .address(Address.from(signUpForm.getAddressDto()))
                 .roles(Roles.from(signUpForm.getRoles()))
                 .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(
+                email, user.email) && Objects.equals(username, user.username)
+                && Objects.equals(fullName, user.fullName) && Objects.equals(phone, user.phone)
+                && Objects.equals(address, user.address) && Objects.equals(roles, user.roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, username, fullName, phone, address, roles);
     }
 }

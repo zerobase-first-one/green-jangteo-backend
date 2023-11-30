@@ -41,6 +41,7 @@ class PasswordTest {
 
         // then
         assertThat(password1).isNotEqualTo(password2);
+        assertThat(password1.hashCode()).isNotEqualTo(password2.hashCode());
     }
 
     @DisplayName("같은 비밀번호를 전송해 인코딩하면 동등하지 않은 Password 인스턴스를 생성한다.")
@@ -52,6 +53,7 @@ class PasswordTest {
 
         // then
         assertThat(password1).isNotEqualTo(password2);
+        assertThat(password1.hashCode()).isNotEqualTo(password2.hashCode());
     }
 
     @DisplayName("비밀번호를 전송해 인코딩한 후 원래 비밀번호의 일치 여부를 확인할 수 있다.")

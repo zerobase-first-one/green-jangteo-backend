@@ -22,6 +22,7 @@ class UsernameTest {
 
         // then
         assertThat(username1).isEqualTo(username2);
+        assertThat(username1.hashCode()).isEqualTo(username2.hashCode());
     }
 
     @DisplayName("다른 사용자 이름을 전송하면 동등하지 않은 Username 인스턴스를 생성한다.")
@@ -33,6 +34,7 @@ class UsernameTest {
 
         // then
         assertThat(username1).isNotEqualTo(username2);
+        assertThat(username1.hashCode()).isNotEqualTo(username2.hashCode());
     }
 
     @DisplayName("사용자 이름을 전송하지 않으면 IllegalArgumentException이 발생한다.")

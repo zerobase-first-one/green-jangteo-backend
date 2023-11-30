@@ -1,6 +1,5 @@
-package com.firstone.greenjangteo.user.model.entity;
+package com.firstone.greenjangteo.user.model.embedment;
 
-import com.firstone.greenjangteo.user.model.embedment.Roles;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,6 +37,30 @@ class RolesTest {
         assertThat(roles3.get(0)).isEqualTo(ROLE_ADMIN);
         assertThat(roles3.get(1)).isEqualTo(ROLE_SELLER);
         assertThat(roles3.get(2)).isEqualTo(ROLE_BUYER);
+    }
+
+    @DisplayName("동일한 회원 분류를 전송하면 동등한 Roles 인스턴스를 생성한다.")
+    @Test
+    void fromSameValue() {
+        // given, when
+        Roles roles1 = Roles.from(List.of(ROLE_ADMIN.toString(), ROLE_BUYER.toString()));
+        Roles roles2 = Roles.from(List.of(ROLE_ADMIN.toString(), ROLE_BUYER.toString()));
+
+        // then
+        assertThat(roles1).isEqualTo(roles2);
+        assertThat(roles1.hashCode()).isEqualTo(roles2.hashCode());
+    }
+
+    @DisplayName("다른 회원 분류를 전송하면 동등하지 않은 Roles 인스턴스를 생성한다.")
+    @Test
+    void fromDifferentValue() {
+        // given, when
+        Roles roles1 = Roles.from(List.of(ROLE_ADMIN.toString(), ROLE_BUYER.toString()));
+        Roles roles2 = Roles.from(List.of(ROLE_ADMIN.toString(), ROLE_SELLER.toString()));
+
+        // then
+        assertThat(roles1).isNotEqualTo(roles2);
+        assertThat(roles1.hashCode()).isNotEqualTo(roles2.hashCode());
     }
 
     @DisplayName("회원 분류를 전송하지 않으면 IllegalArgumentException이 발생한다.")

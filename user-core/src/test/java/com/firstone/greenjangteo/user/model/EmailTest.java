@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.EMAIL_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_EMAIL_EXCEPTION;
 import static com.firstone.greenjangteo.user.testutil.TestConstant.EMAIL1;
+import static com.firstone.greenjangteo.user.testutil.TestConstant.EMAIL2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -21,6 +22,19 @@ class EmailTest {
 
         // then
         assertThat(email).isEqualTo(email2);
+        assertThat(email.hashCode()).isEqualTo(email2.hashCode());
+    }
+
+    @DisplayName("다른 이메일 주소를 전송하면 동등하지 않은 Email 인스턴스를 생성한다.")
+    @Test
+    void ofDifferentValue() {
+        // given, when
+        Email email = Email.of(EMAIL1);
+        Email email2 = Email.of(EMAIL2);
+
+        // then
+        assertThat(email).isNotEqualTo(email2);
+        assertThat(email.hashCode()).isNotEqualTo(email2.hashCode());
     }
 
     @DisplayName("이메일 주소를 전송하지 않으면 IllegalArgumentException이 발생한다.")

@@ -22,6 +22,7 @@ class FullNameTest {
 
         // then
         assertThat(fullName1).isEqualTo(fullName2);
+        assertThat(fullName1.hashCode()).isEqualTo(fullName2.hashCode());
     }
 
     @DisplayName("다른 성명을 전송하면 동등하지 않은 FullName 인스턴스를 생성한다.")
@@ -33,6 +34,7 @@ class FullNameTest {
 
         // then
         assertThat(fullName1).isNotEqualTo(fullName2);
+        assertThat(fullName1.hashCode()).isNotEqualTo(fullName2.hashCode());
     }
 
     @DisplayName("성명을 전송하지 않으면 IllegalArgumentException이 발생한다.")
