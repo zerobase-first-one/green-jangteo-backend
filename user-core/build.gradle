@@ -22,8 +22,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation project(':common')
-    implementation project(':user-core')
+    implementation project(':common')
     implementation project(':user-trans')
 }
 

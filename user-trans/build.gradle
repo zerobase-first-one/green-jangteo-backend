@@ -21,11 +21,7 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation project(':common')
-    implementation project(':user-core')
-    implementation project(':user-trans')
-}
+dependencies {}
 
 bootJar {
     enabled = false
