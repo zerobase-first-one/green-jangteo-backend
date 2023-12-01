@@ -16,13 +16,16 @@ import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 
+import static com.firstone.greenjangteo.common.exception.message.ExceptionLogMessage.*;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(AbstractGeneralException.class)
-    private ResponseEntity<ErrorResponse> handleGeneralExceptions(AbstractGeneralException e) {
-        log.info("Exception occurred: {}", e.getMessage(), e);
+    @ExceptionHandler(AbstractSeriousException.class)
+    private ResponseEntity<ErrorResponse> handleSeriousExceptions
+            (AbstractSeriousException e) {
+        log.error(LOG_ERROR_MESSAGE, e.getMessage(), e);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode(e.getStatusCode())
@@ -35,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AbstractSignificantException.class)
     private ResponseEntity<ErrorResponse> handleSignificantExceptions
             (AbstractSignificantException e) {
-        log.warn("Warning exception occurred: {}", e.getMessage(), e);
+        log.warn(LOG_WARN_MESSAGE, e.getMessage(), e);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode(e.getStatusCode())
@@ -45,116 +48,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
     }
 
-    @ExceptionHandler(AbstractSeriousException.class)
-    private ResponseEntity<ErrorResponse> handleSeriousExceptions
-            (AbstractSeriousException e) {
-        log.error("Error exception occurred: {}", e.getMessage(), e);
+    @ExceptionHandler(AbstractGeneralException.class)
+    private ResponseEntity<ErrorResponse> handleGeneralExceptions(AbstractGeneralException e) {
+        log.info(LOG_INFO_MESSAGE, e.getMessage(), e);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode(e.getStatusCode())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    private ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException
-            (MethodArgumentNotValidException e) {
-        log.info("Exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    private ResponseEntity<ErrorResponse> handleIllegalArgumentException
-            (IllegalArgumentException e) {
-        log.info("Exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(ExpiredJwtException.class)
-    private ResponseEntity<ErrorResponse> handleExpiredJwtException
-            (ExpiredJwtException e) {
-        log.info("Exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.UNAUTHORIZED.value())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    private ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException
-            (HttpMessageNotReadableException e) {
-        log.info("Exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    private ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException
-            (HttpMediaTypeNotSupportedException e) {
-        log.info("Exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
-                .message(e.getMessage())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    private ResponseEntity<ErrorResponse> handleEntityNotFoundException
-            (EntityNotFoundException e) {
-        log.warn("Warning exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    private ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException
-            (HttpRequestMethodNotSupportedException e) {
-        log.warn("Warning exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
-                .message(e.getMessage())
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    private ResponseEntity<ErrorResponse> handleAccessDeniedException
-            (AccessDeniedException e) {
-        log.warn("Warning exception occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .statusCode(HttpStatus.FORBIDDEN.value())
                 .message(e.getMessage())
                 .build();
 
@@ -164,7 +63,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IOException.class)
     private ResponseEntity<ErrorResponse> handleIOException
             (IOException e) {
-        log.error("Error exception occurred: {}", e.getMessage(), e);
+        log.error(LOG_ERROR_MESSAGE, e.getMessage(), e);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -177,13 +76,116 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     private ResponseEntity<ErrorResponse> handleNullPointerException
             (NullPointerException e) {
-        log.error("Error exception occurred: {}", e.getMessage(), e);
+        log.error(LOG_ERROR_MESSAGE, e.getMessage(), e);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(e.getMessage())
                 .build();
 
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    private ResponseEntity<ErrorResponse> handleEntityNotFoundException
+            (EntityNotFoundException e) {
+        log.warn(LOG_WARN_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    private ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException
+            (HttpRequestMethodNotSupportedException e) {
+        log.warn(LOG_WARN_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    private ResponseEntity<ErrorResponse> handleAccessDeniedException
+            (AccessDeniedException e) {
+        log.warn(LOG_WARN_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    private ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException
+            (MethodArgumentNotValidException e) {
+        log.info(LOG_INFO_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    private ResponseEntity<ErrorResponse> handleIllegalArgumentException
+            (IllegalArgumentException e) {
+        log.info(LOG_INFO_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    private ResponseEntity<ErrorResponse> handleExpiredJwtException
+            (ExpiredJwtException e) {
+        log.info(LOG_INFO_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    private ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException
+            (HttpMessageNotReadableException e) {
+        log.info(LOG_INFO_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    private ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException
+            (HttpMediaTypeNotSupportedException e) {
+        log.info(LOG_INFO_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
+                .message(e.getMessage())
+                .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
     }
 }
