@@ -3,6 +3,7 @@ package com.firstone.greenjangteo.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.user.dto.UserResponseDto;
 import com.firstone.greenjangteo.user.form.SignUpForm;
+import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
 import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,6 +42,9 @@ class AuthenticationControllerTest {
     @MockBean
     private AuthenticationService authenticationService;
 
+    @MockBean
+    private PasswordEncoder passwordEncoder;
+
     @DisplayName("사용자가 올바른 회원 가입 양식을 입력하면 회원 가입을 할 수 있다.")
     @Test
     @WithMockUser
@@ -49,9 +54,11 @@ class AuthenticationControllerTest {
                 EMAIL, USERNAME, PASSWORD, FULL_NAME,
                 PHONE, List.of(ROLE_BUYER.toString()));
 
-        UserResponseDto userResponseDto = UserResponseDto.of(1L, LocalDateTime.now());
+        User user = TestObjectFactory.createUser(
+                EMAIL, USERNAME, PASSWORD, passwordEncoder, FULL_NAME, PHONE, List.of(ROLE_BUYER.toString())
+        );
 
-        when(authenticationService.signUpUser(any(SignUpForm.class))).thenReturn(userResponseDto);
+        when(authenticationService.signUpUser(any(SignUpForm.class))).thenReturn(user);
 
         // when, then
         mockMvc.perform(post("/users/signup")
