@@ -1,6 +1,5 @@
 package com.firstone.greenjangteo.user.service;
 
-import com.firstone.greenjangteo.user.dto.UserResponseDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
 import com.firstone.greenjangteo.user.form.SignUpForm;
@@ -57,15 +56,15 @@ class AuthenticationServiceTest {
                 (email, username, password, fullName, phone, List.of(role));
 
         // when
-        UserResponseDto userResponseDto = authenticationService.signUpUser(signUpForm);
-        User user = userRepository.findByEmail(Email.of(email)).get();
+        User signedUpuser = authenticationService.signUpUser(signUpForm);
+        User foundUser = userRepository.findByEmail(Email.of(email)).get();
 
         // then
-        assertThat(user.getEmail()).isEqualTo(Email.of(email));
-        assertThat(user.getUsername()).isEqualTo(Username.of(username));
-        assertThat(user.getRoles().get(0).toString()).isEqualTo(role);
-        assertThat(user.getPhone()).isEqualTo(Phone.of(phone));
-        assertThat(userResponseDto.getCreatedAt()).isEqualTo(user.getCreatedAt());
+        assertThat(foundUser.getEmail()).isEqualTo(Email.of(email));
+        assertThat(foundUser.getUsername()).isEqualTo(Username.of(username));
+        assertThat(foundUser.getRoles().get(0).toString()).isEqualTo(role);
+        assertThat(foundUser.getPhone()).isEqualTo(Phone.of(phone));
+        assertThat(foundUser.getCreatedAt()).isEqualTo(signedUpuser.getCreatedAt());
     }
 
     @DisplayName("올바른 회원 가입 양식을 전송하면 여러 권한을 가진 회원으로 가입할 수 있다.")
@@ -82,16 +81,16 @@ class AuthenticationServiceTest {
                 (email, username, password, fullName, phone, List.of(role1, role2));
 
         // when
-        UserResponseDto userResponseDto = authenticationService.signUpUser(signUpForm);
-        User user = userRepository.findByEmail(Email.of(email)).get();
+        User signedUpuser = authenticationService.signUpUser(signUpForm);
+        User foundUser = userRepository.findByEmail(Email.of(email)).get();
 
         // then
-        assertThat(user.getEmail()).isEqualTo(Email.of(email));
-        assertThat(user.getUsername()).isEqualTo(Username.of(username));
-        assertThat(user.getRoles().get(0).toString()).isEqualTo(role1);
-        assertThat(user.getRoles().get(1).toString()).isEqualTo(role2);
-        assertThat(user.getPhone()).isEqualTo(Phone.of(phone));
-        assertThat(userResponseDto.getCreatedAt()).isEqualTo(user.getCreatedAt());
+        assertThat(foundUser.getEmail()).isEqualTo(Email.of(email));
+        assertThat(foundUser.getUsername()).isEqualTo(Username.of(username));
+        assertThat(foundUser.getRoles().get(0).toString()).isEqualTo(role1);
+        assertThat(foundUser.getRoles().get(1).toString()).isEqualTo(role2);
+        assertThat(foundUser.getPhone()).isEqualTo(Phone.of(phone));
+        assertThat(signedUpuser.getCreatedAt()).isEqualTo(foundUser.getCreatedAt());
     }
 
     @DisplayName("회원 가입 시 비밀번호를 암호화 해 저장할 수 있다.")
