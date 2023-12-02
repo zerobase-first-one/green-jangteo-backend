@@ -1,8 +1,9 @@
 package com.firstone.greenjangteo.user.service;
 
-import com.firstone.greenjangteo.user.dto.UserResponseDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
+import com.firstone.greenjangteo.user.excpeption.significant.IncorrectPasswordException;
+import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.Email;
 import com.firstone.greenjangteo.user.model.Phone;
@@ -21,12 +22,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
+import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
+import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.EMAIL_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USERNAME_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUserForm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -57,15 +63,15 @@ class AuthenticationServiceTest {
                 (email, username, password, fullName, phone, List.of(role));
 
         // when
-        UserResponseDto userResponseDto = authenticationService.signUpUser(signUpForm);
-        User user = userRepository.findByEmail(Email.of(email)).get();
+        User signedUpuser = authenticationService.signUpUser(signUpForm);
+        User foundUser = userRepository.findByEmail(Email.of(email)).get();
 
         // then
-        assertThat(user.getEmail()).isEqualTo(Email.of(email));
-        assertThat(user.getUsername()).isEqualTo(Username.of(username));
-        assertThat(user.getRoles().get(0).toString()).isEqualTo(role);
-        assertThat(user.getPhone()).isEqualTo(Phone.of(phone));
-        assertThat(userResponseDto.getCreatedAt()).isEqualTo(user.getCreatedAt());
+        assertThat(foundUser.getEmail()).isEqualTo(Email.of(email));
+        assertThat(foundUser.getUsername()).isEqualTo(Username.of(username));
+        assertThat(foundUser.getRoles().get(0).toString()).isEqualTo(role);
+        assertThat(foundUser.getPhone()).isEqualTo(Phone.of(phone));
+        assertThat(foundUser.getCreatedAt()).isEqualTo(signedUpuser.getCreatedAt());
     }
 
     @DisplayName("올바른 회원 가입 양식을 전송하면 여러 권한을 가진 회원으로 가입할 수 있다.")
@@ -82,16 +88,16 @@ class AuthenticationServiceTest {
                 (email, username, password, fullName, phone, List.of(role1, role2));
 
         // when
-        UserResponseDto userResponseDto = authenticationService.signUpUser(signUpForm);
-        User user = userRepository.findByEmail(Email.of(email)).get();
+        User signedUpuser = authenticationService.signUpUser(signUpForm);
+        User foundUser = userRepository.findByEmail(Email.of(email)).get();
 
         // then
-        assertThat(user.getEmail()).isEqualTo(Email.of(email));
-        assertThat(user.getUsername()).isEqualTo(Username.of(username));
-        assertThat(user.getRoles().get(0).toString()).isEqualTo(role1);
-        assertThat(user.getRoles().get(1).toString()).isEqualTo(role2);
-        assertThat(user.getPhone()).isEqualTo(Phone.of(phone));
-        assertThat(userResponseDto.getCreatedAt()).isEqualTo(user.getCreatedAt());
+        assertThat(foundUser.getEmail()).isEqualTo(Email.of(email));
+        assertThat(foundUser.getUsername()).isEqualTo(Username.of(username));
+        assertThat(foundUser.getRoles().get(0).toString()).isEqualTo(role1);
+        assertThat(foundUser.getRoles().get(1).toString()).isEqualTo(role2);
+        assertThat(foundUser.getPhone()).isEqualTo(Phone.of(phone));
+        assertThat(signedUpuser.getCreatedAt()).isEqualTo(foundUser.getCreatedAt());
     }
 
     @DisplayName("회원 가입 시 비밀번호를 암호화 해 저장할 수 있다.")
@@ -125,7 +131,7 @@ class AuthenticationServiceTest {
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME2,
+        SignUpForm signUpForm2 = enterUserForm(EMAIL1, USERNAME2,
                 PASSWORD2, FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -143,7 +149,7 @@ class AuthenticationServiceTest {
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME2,
+        SignUpForm signUpForm2 = enterUserForm(EMAIL2, USERNAME2,
                 PASSWORD2, FULL_NAME2, PHONE1, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -161,7 +167,7 @@ class AuthenticationServiceTest {
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, FULL_NAME2,
+        SignUpForm signUpForm2 = enterUserForm(EMAIL2, USERNAME1, PASSWORD2, FULL_NAME2,
                 PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -169,4 +175,110 @@ class AuthenticationServiceTest {
                 .isInstanceOf(DuplicateUsernameException.class)
                 .hasMessage(DUPLICATE_USERNAME_EXCEPTION + signUpForm2.getUsername());
     }
+
+    @DisplayName("가입된 이메일 주소 또는 사용자 이름과 올바른 비밀번호를 전송하면 로그인을 할 수 있다.")
+    @Test
+    void signInUser() {
+        // given
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+
+        authenticationService.signUpUser(signUpForm);
+
+        SignInForm signInForm1 = new SignInForm(EMAIL1, PASSWORD1);
+        SignInForm signInForm2 = new SignInForm(USERNAME1, PASSWORD1);
+
+        // when
+        User user1 = authenticationService.signInUser(signInForm1);
+        User user2 = authenticationService.signInUser(signInForm2);
+
+        // then
+        assertThat(user1.getUsername()).isEqualTo(Username.of(USERNAME1));
+        assertThat(user2.getUsername()).isEqualTo(Username.of(USERNAME1));
+    }
+
+    @DisplayName("존재하지 않는 이메일이나 사용자 이름으로 로그인하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void signInUserWithNonExistentEmailOrUsername() {
+        // given
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+
+        authenticationService.signUpUser(signUpForm);
+
+        SignInForm signInForm1 = new SignInForm(EMAIL2, PASSWORD1);
+        SignInForm signInForm2 = new SignInForm(USERNAME2, PASSWORD1);
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.signInUser(signInForm1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(EMAIL_NOT_FOUND_EXCEPTION + signInForm1.getEmailOrUsername());
+
+        assertThatThrownBy(() -> authenticationService.signInUser(signInForm2))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(USERNAME_NOT_FOUND_EXCEPTION + signInForm2.getEmailOrUsername());
+    }
+
+    @DisplayName("잘못된 비밀번호를 통해 로그인하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void signInUserWithWrongPassword() {
+        // given
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+
+        authenticationService.signUpUser(signUpForm);
+
+        SignInForm signInForm1 = new SignInForm(EMAIL1, PASSWORD2);
+        SignInForm signInForm2 = new SignInForm(USERNAME1, PASSWORD3);
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.signInUser(signInForm1))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+
+        assertThatThrownBy(() -> authenticationService.signInUser(signInForm2))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
+/*    @DisplayName("사용자 이름을 통해 회원 개인 정보를 조회할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abcd@abc.com, person1, 1234, 홍길동, 2000-01-01, 01012345678, ROLE_GENERAL_USER",
+            "abcd@abcd.com, person2, 12345, 고길동, 2000-02-02, 01012345679, ROLE_BUSINESS_USER",
+            "abcd@abcde.com, person3, 123456, 김길동, 2000-03-03, 01012345680, ROLE_GENERAL_USER"
+    })
+    void getUserDetails(String email, String username, String password, String fullName,
+                        LocalDate birthDate, String phoneNumber, Role role) {
+
+        // given
+        User user = createUser(email, username, password, fullName, birthDate, phoneNumber, List.of(role));
+
+        userRepository.save(user);
+
+        // when
+        UserResponseDto userResponseDto = authenticationService.getUserDetails(username);
+
+        // then
+        assertThat(userResponseDto.getEmail()).isEqualTo(email);
+        assertThat(userResponseDto.getUsername()).isEqualTo(username);
+        assertThat(userResponseDto.getPhoneNumber()).isEqualTo(phoneNumber);
+        assertThat(userResponseDto.getRoles()).isEqualTo(user.getRoles());
+
+    }*/
+
+/*    @DisplayName("잘못된 ID로 회원 개인 정보를 조회하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void getUserDetailsByWrongUserId() {
+        // given
+        User user = createUser(EMAIL1, USERNAME1, PASSWORD1, , passwordEncoder, FULL_NAME1,
+                PHONE1, List.of(ROLE_BUYER.toString()));
+
+        userRepository.save(user);
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.getUserDetails(USERNAME2))
+                .isInstanceOf(NonExistentUserException.class)
+                .hasMessage(USER_ID_NOT_FOUND_EXCEPTION + USERNAME2);
+    }*/
 }

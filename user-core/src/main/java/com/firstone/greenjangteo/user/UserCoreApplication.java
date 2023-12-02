@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo;
+package com.firstone.greenjangteo.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

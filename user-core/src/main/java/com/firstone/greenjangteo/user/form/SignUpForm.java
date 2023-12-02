@@ -29,6 +29,6 @@ public class SignUpForm {
     @ApiModelProperty("주소")
     private AddressDto addressDto;
 
-    @ApiModelProperty(value = "분류", example = "[ROLE_GENERAL_USER, ROLE_BUSINESS_USER]")
+    @ApiModelProperty(value = "분류", example = "[ROLE_BUYER, ROLE_SELLER]")
     private List<String> roles;
 }
