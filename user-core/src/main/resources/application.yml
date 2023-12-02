@@ -49,3 +49,9 @@ management:
   endpoint:
     health:
       show-details: always
+
+productImageLocation:
+  ${productImageLocation}
+
+uploadPath:
+  ${uploadPath}
