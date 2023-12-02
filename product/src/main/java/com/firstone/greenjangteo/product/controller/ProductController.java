@@ -23,6 +23,7 @@ public class ProductController {
     @PostMapping(value = "/products")
     public ResponseEntity<Map<String, Object>> addProduct(
             ProductDto productDto,
+            @RequestParam String productImageLocation,
             @RequestParam List<String> productImageList,
             @RequestParam List<String> categoryList,
             BindingResult bindingResult
@@ -31,7 +32,7 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
 
-        Map<String, Object> productInfo = productService.saveProduct(productDto, productImageList);
+        Map<String, Object> productInfo = productService.saveProduct(productDto, productImageList, productImageLocation);
         categoryService.saveCategory(Long.parseLong(productInfo.get("productId").toString()), categoryList);
         return ResponseEntity.ok().body(productInfo);
     }
@@ -54,13 +55,14 @@ public class ProductController {
     public ResponseEntity<Object> productUpdate(
             @PathVariable("productId") Long productId,
             ProductDto productDto,
+            @RequestParam String productImageLocation,
             @RequestParam List<String> productImageList,
             @RequestParam List<String> categoryList,
             BindingResult bindingResult) throws Exception {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.notFound().build();
         }
-        productService.updateProduct(productId, productDto, productImageList, categoryList);
+        productService.updateProduct(productId, productDto, productImageList, categoryList, productImageLocation);
         return ResponseEntity.ok(204);
     }
 
