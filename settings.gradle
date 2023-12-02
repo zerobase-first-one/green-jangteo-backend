@@ -2,5 +2,3 @@ rootProject.name = 'green-jangteo'
 include 'common'
 include 'user-api'
 include 'user-core'
-include 'user-trans'
-

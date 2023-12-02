@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.user.controller;
 
 import com.firstone.greenjangteo.user.dto.UserResponseDto;
 import com.firstone.greenjangteo.user.form.SignUpForm;
+import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,9 +35,11 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signUpUser
             (@RequestBody @ApiParam(value = SIGN_UP_FORM) SignUpForm signUpForm) {
-        UserResponseDto userResponseDto = authenticationService.signUpUser(signUpForm);
+        User user = authenticationService.signUpUser(signUpForm);
 
-        return buildResponse(userResponseDto);
+        return buildResponse(UserResponseDto.of(user.getId(), user.getCreatedAt()));
+    }
+
     }
 
     private ResponseEntity<UserResponseDto> buildResponse(UserResponseDto userResponseDto) {

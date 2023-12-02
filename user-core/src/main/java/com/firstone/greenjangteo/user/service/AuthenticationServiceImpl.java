@@ -1,7 +1,6 @@
 package com.firstone.greenjangteo.user.service;
 
 
-import com.firstone.greenjangteo.user.dto.UserResponseDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
 import com.firstone.greenjangteo.user.form.SignUpForm;
@@ -29,14 +28,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional(isolation = REPEATABLE_READ, timeout = 20)
-    public UserResponseDto signUpUser(SignUpForm signUpForm) {
+    public User signUpUser(SignUpForm signUpForm) {
         User user = User.from(signUpForm, passwordEncoder);
 
         validateNotDuplicateUser(signUpForm.getUsername(), signUpForm.getEmail(), signUpForm.getPhone());
 
         User savedUser = userRepository.save(user);
+        User signedUpUser = getUserFromEmailOrUsername(signInForm.getEmailOrUsername());
 
-        return UserResponseDto.of(savedUser.getId(), savedUser.getCreatedAt());
+        signedUpUser.getPassword().matchOriginalPassword(passwordEncoder, signInForm.getPassword());
+
+        return signedUpUser;
     }
 
     private void validateNotDuplicateUser(String username, String email, String phone) {
