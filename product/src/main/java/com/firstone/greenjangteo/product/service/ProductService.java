@@ -28,7 +28,7 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
 
-    public Map<String, Object> saveProduct(ProductDto productDto, List<String> productImageUrlList) throws Exception {
+    public Map<String, Object> saveProduct(ProductDto productDto, List<String> productImageUrlList, String productImageLocation) throws Exception {
 
         //상품 등록
         Product product = Product.builder()
@@ -51,7 +51,7 @@ public class ProductService {
                     .url(productImageUrlList.get(i))
                     .position(i)
                     .build();
-            productImageService.saveProductImage(product, productImage, productImageUrlList.get(i), i);
+            productImageService.saveProductImage(product, productImage, productImageUrlList.get(i), i, productImageLocation);
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -115,14 +115,14 @@ public class ProductService {
         return productListDto.of(products, urlList, categoryList);
     }
 
-    public ResponseEntity.BodyBuilder updateProduct(Long productId, ProductDto productDto, List<String> productImageUrlList, List<String> categoryList) throws Exception {
+    public ResponseEntity.BodyBuilder updateProduct(Long productId, ProductDto productDto, List<String> productImageUrlList, List<String> categoryList, String productImageLocation) throws Exception {
         //product
         Product product = productRepository.findById(productId).orElseThrow(Exception::new); //EntityNotFound
         product.setModifiedAt(LocalDateTime.now());
         product.updateProduct(productDto);
 
         //image
-        productImageService.updateProductImage(productId, product, productImageUrlList);
+        productImageService.updateProductImage(productId, product, productImageUrlList, productImageLocation);
 
         //category
         categoryService.updateCategory(productId, product, categoryList);

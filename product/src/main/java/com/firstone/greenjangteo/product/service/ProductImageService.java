@@ -20,10 +20,8 @@ public class ProductImageService {
 
     private final ProductImageRepository productImageRepository;
     private final FileService fileService;
-    @Value("${productImageLocation}")
-    private String productImageLocation;
 
-    public void saveProductImage(Product product, ProductImage productImage, String productImageUrl, int position) throws Exception {
+    public void saveProductImage(Product product, ProductImage productImage, String productImageUrl, int position, String productImageLocation) throws Exception {
         //파일 업로드
         if (!StringUtils.isEmpty(productImageUrl)) {
             String imageName = fileService.uploadFile(productImageLocation, productImageUrl, productImageUrl.getBytes());
@@ -34,7 +32,7 @@ public class ProductImageService {
         }
     }
 
-    public void updateProductImage(Long productId, Product product, List<String> productImageUrlList) throws Exception {
+    public void updateProductImage(Long productId, Product product, List<String> productImageUrlList, String productImageLocation) throws Exception {
         if (!productImageUrlList.get(0).isEmpty()) {
             List<ProductImage> savedProductImage = productImageRepository.findByProductId(productId);
 
