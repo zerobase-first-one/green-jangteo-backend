@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.user.model;
+package com.firstone.greenjangteo.user.model.security;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -11,7 +11,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.InvalidException
 public class Password {
     private final String password;
 
-    protected Password(String password) {
+    Password(String password) {
         this.password = password;
     }
 
@@ -19,6 +19,10 @@ public class Password {
         validate(password);
 
         return new Password(passwordEncoder.encode(password));
+    }
+
+    protected String getValue() {
+        return password;
     }
 
     @Override
@@ -39,11 +43,11 @@ public class Password {
     }
 
     private static void validate(String password) {
-        checkPasswordIsNotEmpty(password);
+        checkPasswordIsNotBlank(password);
         checkPasswordPattern(password);
     }
 
-    private static void checkPasswordIsNotEmpty(String password) {
+    private static void checkPasswordIsNotBlank(String password) {
         if (password == null || password.isEmpty()) {
             throw new IllegalArgumentException(PASSWORD_NO_VALUE_EXCEPTION);
         }

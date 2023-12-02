@@ -1,7 +1,8 @@
 package com.firstone.greenjangteo.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firstone.greenjangteo.user.dto.UserResponseDto;
+import com.firstone.greenjangteo.common.security.JwtTokenProvider;
+import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
@@ -17,11 +18,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
+import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUserForm;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -45,12 +47,15 @@ class AuthenticationControllerTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
 
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
     @DisplayName("사용자가 올바른 회원 가입 양식을 입력하면 회원 가입을 할 수 있다.")
     @Test
     @WithMockUser
     void signUpUser() throws Exception {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+        SignUpForm signUpForm = enterUserForm(
                 EMAIL, USERNAME, PASSWORD, FULL_NAME,
                 PHONE, List.of(ROLE_BUYER.toString()));
 
@@ -67,5 +72,30 @@ class AuthenticationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated());
+    }
+
+    @DisplayName("올바른 로그인 양식을 입력하면 로그인을 할 수 있다.")
+    @Test
+    @WithMockUser
+    void signInUser() throws Exception {
+        // given
+        SignUpForm signUpForm = enterUserForm
+                (EMAIL, USERNAME, PASSWORD, FULL_NAME,
+                        PHONE, List.of(ROLE_SELLER.toString()));
+
+        User user = TestObjectFactory.createUser(
+                EMAIL, USERNAME, PASSWORD, passwordEncoder, FULL_NAME, PHONE, List.of(ROLE_SELLER.toString())
+        );
+
+        when(authenticationService.signInUser(any(SignInForm.class)))
+                .thenReturn(user);
+
+        // when, then
+        mockMvc.perform(post("/users/login")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(signUpForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }

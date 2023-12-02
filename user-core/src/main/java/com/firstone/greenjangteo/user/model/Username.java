@@ -19,6 +19,10 @@ public class Username {
         return new Username(username);
     }
 
+    String getValue() {
+        return username;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

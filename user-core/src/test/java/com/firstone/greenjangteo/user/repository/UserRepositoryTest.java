@@ -126,4 +126,38 @@ class UserRepositoryTest {
         // then
         assertThat(foundUser).isEmpty();
     }
+
+    @DisplayName("저장된 사용자 이름을 통해 회원을 찾을 수 있다.")
+    @Test
+    void findByUsernameByExistent() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        User savedUser = userRepository.save(user);
+
+        // when
+        Optional<User> foundUser = userRepository.findByUsername(Username.of(USERNAME1));
+
+        // then
+        assertThat(foundUser.get().getId()).isEqualTo(savedUser.getId());
+        assertThat(foundUser.get().getUsername()).isEqualTo(Username.of(USERNAME1));
+        assertThat(foundUser.get().getPassword().matchOriginalPassword(passwordEncoder, PASSWORD1)).isTrue();
+    }
+
+    @DisplayName("저장되지 않은 사용자 이름으로 회원을 검색하면 회원을 반환하지 않는다.")
+    @Test
+    void findByUsernameByNotExistent() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        // when
+        Optional<User> foundUser = userRepository.findByUsername(Username.of(USERNAME1));
+
+        // then
+        assertThat(foundUser).isEmpty();
+    }
 }
