@@ -33,11 +33,11 @@ public class FullName {
     }
 
     private static void validate(String fullName) {
-        checkFullNameIsNotEmpty(fullName);
+        checkFullNameIsNotBlank(fullName);
         checkFullnamePattern(fullName);
     }
 
-    private static void checkFullNameIsNotEmpty(String fullName) {
+    private static void checkFullNameIsNotBlank(String fullName) {
         if (fullName == null || fullName.isEmpty()) {
             throw new IllegalArgumentException(FULL_NAME_NO_VALUE_EXCEPTION);
         }

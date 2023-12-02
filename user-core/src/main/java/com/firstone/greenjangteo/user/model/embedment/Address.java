@@ -57,37 +57,37 @@ public class Address {
     }
 
     private static void validate(String city, String street, String zipcode, String detailedAddress) {
-        checkAddressIsNotEmpty(city, street, zipcode, detailedAddress);
+        checkAddressIsNotBlank(city, street, zipcode, detailedAddress);
         checkAddressPattern(city, street, zipcode, detailedAddress);
     }
 
-    private static void checkAddressIsNotEmpty(String city, String street, String zipcode, String detailedAddress) {
-        checkCityIsNotEmpty(city);
-        checkStreetIsNotEmpty(street);
-        checkZipcodeIsNotEmpty(zipcode);
-        checkDetailedAddressIsNotEmpty(detailedAddress);
+    private static void checkAddressIsNotBlank(String city, String street, String zipcode, String detailedAddress) {
+        checkCityIsNotBlank(city);
+        checkStreetIsNotBlank(street);
+        checkZipcodeIsNotBlank(zipcode);
+        checkDetailedAddressIsNotBlank(detailedAddress);
     }
 
 
-    private static void checkCityIsNotEmpty(String city) {
+    private static void checkCityIsNotBlank(String city) {
         if (city == null || city.isEmpty()) {
             throw new IllegalArgumentException(CITY_NO_VALUE_EXCEPTION);
         }
     }
 
-    private static void checkStreetIsNotEmpty(String street) {
+    private static void checkStreetIsNotBlank(String street) {
         if (street == null || street.isEmpty()) {
             throw new IllegalArgumentException(STREET_NO_VALUE_EXCEPTION);
         }
     }
 
-    private static void checkZipcodeIsNotEmpty(String zipcode) {
+    private static void checkZipcodeIsNotBlank(String zipcode) {
         if (zipcode == null || zipcode.isEmpty()) {
             throw new IllegalArgumentException(ZIPCODE_NO_VALUE_EXCEPTION);
         }
     }
 
-    private static void checkDetailedAddressIsNotEmpty(String detailedAddress) {
+    private static void checkDetailedAddressIsNotBlank(String detailedAddress) {
         if (detailedAddress == null || detailedAddress.isEmpty()) {
             throw new IllegalArgumentException(DETAILED_ADDRESS_NO_VALUE_EXCEPTION);
         }

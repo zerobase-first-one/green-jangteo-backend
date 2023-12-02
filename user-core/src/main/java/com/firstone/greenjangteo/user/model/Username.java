@@ -33,11 +33,11 @@ public class Username {
     }
 
     private static void validate(String username) {
-        checkUsernameIsNotEmpty(username);
+        checkUsernameIsNotBlank(username);
         checkUsernamePattern(username);
     }
 
-    private static void checkUsernameIsNotEmpty(String username) {
+    private static void checkUsernameIsNotBlank(String username) {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException(USERNAME_NO_VALUE_EXCEPTION);
         }
