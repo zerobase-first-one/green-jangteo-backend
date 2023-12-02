@@ -1,24 +1,10 @@
-package com.firstone.greenjangteo.user.model.embedment;
+package com.firstone.greenjangteo.common.security;
 
-import com.firstone.greenjangteo.user.model.Role;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.ROLE_NO_VALUE_EXCEPTION;
-import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_ROLE_EXCEPTION;
-
-@Embeddable
-@NoArgsConstructor
 public class Roles {
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
     private List<Role> roles;
 
     private Roles(List<Role> roles) {
@@ -34,10 +20,6 @@ public class Roles {
         }
 
         return new Roles(parsedRoles);
-    }
-
-    public List<String> toStrings() {
-        return roles.stream().map(Role::toString).collect(Collectors.toList());
     }
 
     @Override
@@ -59,7 +41,7 @@ public class Roles {
 
     private static void validate(List<String> roles) {
         if (roles == null || roles.isEmpty()) {
-            throw new IllegalArgumentException(ROLE_NO_VALUE_EXCEPTION);
+            throw new IllegalArgumentException("회원 분류가 조재하지 않습니다.");
         }
     }
 
@@ -67,7 +49,7 @@ public class Roles {
         try {
             return Role.valueOf(role);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(INVALID_ROLE_EXCEPTION + role);
+            throw new IllegalArgumentException("잘못된 형식의 회원 분류입니다. 전송된 회원 분류: " + role);
         }
     }
 }

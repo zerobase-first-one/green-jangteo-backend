@@ -2,9 +2,13 @@ package com.firstone.greenjangteo.user.model.entity;
 
 import com.firstone.greenjangteo.common.audit.BaseEntity;
 import com.firstone.greenjangteo.user.form.SignUpForm;
-import com.firstone.greenjangteo.user.model.*;
+import com.firstone.greenjangteo.user.model.Email;
+import com.firstone.greenjangteo.user.model.FullName;
+import com.firstone.greenjangteo.user.model.Phone;
+import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.embedment.Address;
 import com.firstone.greenjangteo.user.model.embedment.Roles;
+import com.firstone.greenjangteo.user.model.security.Password;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +16,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity(name = "users")
@@ -48,6 +53,9 @@ public class User extends BaseEntity {
 
     @Embedded
     private Roles roles;
+
+    @Column
+    private LocalDateTime lastLoggedInAt;
 
     @Builder
     private User(Long id, Email email, Username username, Password password,
@@ -88,5 +96,9 @@ public class User extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, email, username, fullName, phone, address, roles);
+    }
+
+    public void updateLoginTime() {
+        lastLoggedInAt = LocalDateTime.now();
     }
 }
