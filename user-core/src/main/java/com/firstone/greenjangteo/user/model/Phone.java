@@ -33,11 +33,11 @@ public class Phone {
     }
 
     private static void validate(String phone) {
-        checkPhoneIsNotEmpty(phone);
+        checkPhoneIsNotBlank(phone);
         checkPhonePattern(phone);
     }
 
-    private static void checkPhoneIsNotEmpty(String phone) {
+    private static void checkPhoneIsNotBlank(String phone) {
         if (phone == null || phone.isEmpty()) {
             throw new IllegalArgumentException(PHONE_NO_VALUE_EXCEPTION);
         }
