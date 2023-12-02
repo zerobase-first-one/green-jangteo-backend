@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.user.model;
+package com.firstone.greenjangteo.user.model.security;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
