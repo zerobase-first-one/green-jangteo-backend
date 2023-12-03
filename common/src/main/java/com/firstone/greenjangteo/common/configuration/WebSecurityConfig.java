@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.configuration;
+package com.firstone.greenjangteo.common.configuration;
 
 import com.firstone.greenjangteo.common.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.common.security.JwtAuthenticationFilter;
