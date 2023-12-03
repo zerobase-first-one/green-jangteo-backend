@@ -7,9 +7,7 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource("classpath:application-test.properties")
 @ContextConfiguration(classes = GreenJangteoApplication.class)
 class GreenJangteoApplicationTests {
-
     @Test
     void contextLoads() {
     }
-
 }
