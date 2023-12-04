@@ -110,4 +110,8 @@ public class User extends BaseEntity {
     public void updateEmail(String email) {
         this.email = Email.of(email);
     }
+
+    public void updatePhone(String phone) {
+        this.phone = Phone.of(phone);
+    }
 }
