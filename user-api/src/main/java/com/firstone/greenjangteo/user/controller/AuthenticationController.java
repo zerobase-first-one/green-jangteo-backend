@@ -49,6 +49,10 @@ public class AuthenticationController {
     private static final String UPDATE_PHONE_DESCRIPTION = "변경할 전화번호를 입력해 주소를 수정할 수 있습니다.";
     private static final String UPDATE_PHONE_FORM = "전화번호 변경 양식";
 
+    private static final String UPDATE_PASSWORD = "비밀번호 변경";
+    private static final String UPDATE_PASSWORD_DESCRIPTION = "변경할 비밀번호를 입력해 주소를 수정할 수 있습니다.";
+    private static final String UPDATE_PASSWORD_FORM = "비밀번호 변경 양식";
+
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signUpUser
@@ -89,6 +93,17 @@ public class AuthenticationController {
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_PHONE_FORM) PhoneRequestDto phoneRequestDto) {
         authenticationService.updatePhone(Long.parseLong(userId), phoneRequestDto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @ApiOperation(value = UPDATE_PASSWORD, notes = UPDATE_PASSWORD_DESCRIPTION)
+    @PreAuthorize(PRINCIPAL_POINTCUT)
+    @PatchMapping("/{userId}/password")
+    public ResponseEntity<UserResponseDto> updatePassword
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+             @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM) PasswordRequestDto passwordRequestDto) {
+        authenticationService.updatePassword(Long.parseLong(userId), passwordRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

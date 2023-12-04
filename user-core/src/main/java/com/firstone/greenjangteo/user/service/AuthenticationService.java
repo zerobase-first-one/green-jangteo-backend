@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.service;
 
 import com.firstone.greenjangteo.user.dto.EmailRequestDto;
+import com.firstone.greenjangteo.user.dto.PasswordRequestDto;
 import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
@@ -17,4 +18,6 @@ public interface AuthenticationService {
     void updateEmail(Long id, EmailRequestDto emailRequestDto);
 
     void updatePhone(Long id, PhoneRequestDto phoneRequestDto);
+
+    void updatePassword(Long id, PasswordRequestDto passwordRequestDto);
 }
