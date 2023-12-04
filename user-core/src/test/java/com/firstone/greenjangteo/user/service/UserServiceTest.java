@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.repository.UserRepository;
 import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
@@ -66,8 +67,9 @@ class UserServiceTest {
     @Test
     void getUserDetailsByWrongUserId() {
         // given
-        User user = TestObjectFactory.createUser(EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1,
-                PHONE1, List.of(ROLE_BUYER.toString()));
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
 
         userRepository.save(user);
 
@@ -75,5 +77,32 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.getUser(user.getId() + 1))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(USER_ID_NOT_FOUND_EXCEPTION + (user.getId() + 1));
+    }
+
+    @DisplayName("변경할 주소를 입력해 주소를 변경할 수 있다.")
+    @Test
+    void updateAddress() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        userRepository.save(user);
+        AddressDto addressDto1 = AddressDto.builder()
+                .city(CITY2)
+                .street(STREET2)
+                .zipcode(ZIPCODE2)
+                .detailedAddress(DETAILED_ADDRESS2)
+                .build();
+
+        // when
+        userService.updateAddress(user.getId(), addressDto1);
+        AddressDto addressDto2 = user.getAddress().toDto();
+
+        // then
+        assertThat(addressDto2.getCity()).isEqualTo(addressDto1.getCity());
+        assertThat(addressDto2.getStreet()).isEqualTo(addressDto1.getStreet());
+        assertThat(addressDto2.getZipcode()).isEqualTo(addressDto1.getZipcode());
+        assertThat(addressDto2.getDetailedAddress()).isEqualTo(addressDto1.getDetailedAddress());
     }
 }
