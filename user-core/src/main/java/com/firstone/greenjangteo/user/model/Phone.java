@@ -32,6 +32,10 @@ public class Phone {
         return Objects.hash(phone);
     }
 
+    String getValue() {
+        return phone;
+    }
+
     private static void validate(String phone) {
         checkPhoneIsNotBlank(phone);
         checkPhonePattern(phone);

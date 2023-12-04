@@ -35,17 +35,13 @@ import static org.springframework.transaction.annotation.Isolation.REPEATABLE_RE
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService, UserDetailsService {
+    private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        return new CustomUserDetails(getUser(Long.parseLong(userId)));
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다. userId: " + userId));
+        return new CustomUserDetails(userService.getUser(Long.parseLong(userId)));
     }
 
     @Override

@@ -123,4 +123,13 @@ public class Address {
             throw new IllegalArgumentException(INVALID_DETAILED_ADDRESS_EXCEPTION);
         }
     }
+
+    public AddressDto toDto() {
+        return AddressDto.builder()
+                .city(city)
+                .street(street)
+                .zipcode(zipcode)
+                .detailedAddress(detailedAddress)
+                .build();
+    }
 }

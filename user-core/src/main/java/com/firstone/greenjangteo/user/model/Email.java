@@ -33,6 +33,10 @@ public class Email {
         return Objects.hash(email);
     }
 
+    String getValue() {
+        return email;
+    }
+
     private static void validate(String email) {
         checkEmailIsNotBlank(email);
         checkEmailPattern(email);

@@ -37,11 +37,4 @@ public class UserResponseDto {
                 .createdAt(createdAt)
                 .build();
     }
-
-    public static UserResponseDto of(Long userId, List<String> roles) {
-        return UserResponseDto.builder()
-                .userId(userId)
-                .roles(roles)
-                .build();
-    }
 }
