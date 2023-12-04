@@ -114,4 +114,8 @@ public class User extends BaseEntity {
     public void updatePhone(String phone) {
         this.phone = Phone.of(phone);
     }
+
+    public void updatePassword(String passwordToChange, PasswordEncoder passwordEncoder) {
+        password = Password.from(passwordToChange, passwordEncoder);
+    }
 }
