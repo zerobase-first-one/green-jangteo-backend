@@ -9,8 +9,6 @@ server:
 spring:
   application:
     name: ${PROJECT_NAME}
-  main:
-    allow-bean-definition-overriding: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://mysql-container:3306/${PROJECT_NAME}?serverTimezone=UTC&characterEncoding=UTF-8
