@@ -10,6 +10,8 @@ import static com.firstone.greenjangteo.user.excpeption.message.InvalidException
 
 public class Password {
     private final String password;
+    private static final String PASSWORD_PATTERN
+            = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
 
     Password(String password) {
         this.password = password;
@@ -21,7 +23,7 @@ public class Password {
         return new Password(passwordEncoder.encode(password));
     }
 
-    protected String getValue() {
+    String getValue() {
         return password;
     }
 
@@ -54,7 +56,7 @@ public class Password {
     }
 
     private static void checkPasswordPattern(String password) {
-        if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")) {
+        if (!password.matches(PASSWORD_PATTERN)) {
             throw new IllegalArgumentException(INVALID_PASSWORD_EXCEPTION);
         }
     }

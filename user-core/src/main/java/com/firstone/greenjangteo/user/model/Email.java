@@ -9,6 +9,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.InvalidException
 
 public class Email {
     private final String email;
+    private static final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     private Email(String email) {
         this.email = email;
@@ -49,7 +50,7 @@ public class Email {
     }
 
     private static void checkEmailPattern(String email) {
-        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+        if (!email.matches(EMAIL_PATTERN)) {
             throw new IllegalArgumentException(INVALID_EMAIL_EXCEPTION);
         }
     }
