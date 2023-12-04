@@ -240,4 +240,26 @@ class AuthenticationServiceTest {
                 .isInstanceOf(IncorrectPasswordException.class)
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
+
+    @DisplayName("비밀번호와 변경할 이메일 주소를 입력해 이메일 주소를 변경할 수 있다.")
+    @Test
+    void updateEmail() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        EmailRequestDto emailRequestDto = EmailRequestDto.builder()
+                .password(PASSWORD1)
+                .email(EMAIL2)
+                .build();
+
+        // when
+        authenticationService.updateEmail(user.getId(), emailRequestDto);
+
+        // then
+        assertThat(user.getEmail()).isNotEqualTo(Email.of(EMAIL1));
+        assertThat(user.getEmail()).isEqualTo(Email.of(EMAIL2));
+    }
 }

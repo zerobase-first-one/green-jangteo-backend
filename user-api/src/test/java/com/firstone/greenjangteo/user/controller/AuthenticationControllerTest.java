@@ -2,6 +2,8 @@ package com.firstone.greenjangteo.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.common.security.JwtTokenProvider;
+import com.firstone.greenjangteo.user.dto.AddressDto;
+import com.firstone.greenjangteo.user.dto.EmailRequestDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -27,6 +29,7 @@ import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUse
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -96,5 +99,27 @@ class AuthenticationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("비밀번호와 변경할 이메일 주소를 입력해 이메일 주소를 변경할 수 있다.")
+    @Test
+    @WithMockUser
+    void updateEmail() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        EmailRequestDto emailRequestDto = EmailRequestDto.builder()
+                .password(PASSWORD)
+                .email(EMAIL)
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(emailRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 }
