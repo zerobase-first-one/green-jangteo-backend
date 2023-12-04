@@ -56,4 +56,20 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @DisplayName("회원 ID를 입력하면 회원 정보를 조회할 수 있다.")
+    @Test
+    @WithMockUser
+    void getUser() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        when(userService.getUser(user.getId())).thenReturn(user);
+
+        // when, then
+        mockMvc.perform(get("/users/{userId}", user.getId()))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }

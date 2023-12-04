@@ -16,4 +16,13 @@ public class EntityToDtoMapper {
                 .modifiedAt(user.getModifiedAt())
                 .build();
     }
+
+    public static UserResponseDto toOthers(User user) {
+        return UserResponseDto.builder()
+                .username(user.getUsername().getValue())
+                .roles(user.getRoles().toStrings())
+                .createdAt(user.getCreatedAt())
+                .modifiedAt(user.getModifiedAt())
+                .build();
+    }
 }
