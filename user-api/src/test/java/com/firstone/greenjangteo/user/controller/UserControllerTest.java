@@ -80,7 +80,7 @@ class UserControllerTest {
     @DisplayName("변경할 주소를 입력해 주소를 변경할 수 있다.")
     @Test
     @WithMockUser
-    void updateUserInformationWithOneVariable() throws Exception {
+    void updateAddress() throws Exception {
         // given
         User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
                 FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
