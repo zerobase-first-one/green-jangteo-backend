@@ -307,4 +307,46 @@ class AuthenticationServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(INVALID_EMAIL_EXCEPTION);
     }
+
+    @DisplayName("비밀번호와 변경할 전화번호를 입력해 전화번호를 변경할 수 있다.")
+    @Test
+    void updatePhone() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PhoneRequestDto phoneRequestDto = PhoneRequestDto.builder()
+                .password(PASSWORD1)
+                .phone(PHONE2)
+                .build();
+
+        // when
+        authenticationService.updatePhone(user.getId(), phoneRequestDto);
+
+        // then
+        assertThat(user.getPhone()).isNotEqualTo(Phone.of(PHONE1));
+        assertThat(user.getPhone()).isEqualTo(Phone.of(PHONE2));
+    }
+
+    @DisplayName("잘못된 비밀번호를 통해 전화번호를 변경하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void updatePhoneWithWrongPassword() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PhoneRequestDto phoneRequestDto = PhoneRequestDto.builder()
+                .password(PASSWORD2)
+                .phone(PHONE2)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updatePhone(user.getId(), phoneRequestDto))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
 }
