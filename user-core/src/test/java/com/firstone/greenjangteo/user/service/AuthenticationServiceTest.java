@@ -1,6 +1,8 @@
 package com.firstone.greenjangteo.user.service;
 
 import com.firstone.greenjangteo.user.dto.EmailRequestDto;
+import com.firstone.greenjangteo.user.dto.PasswordRequestDto;
+import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
 import com.firstone.greenjangteo.user.excpeption.significant.IncorrectPasswordException;
@@ -371,5 +373,70 @@ class AuthenticationServiceTest {
         assertThatThrownBy(() -> authenticationService.updatePhone(user.getId(), phoneRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(INVALID_PHONE_EXCEPTION);
+    }
+
+    @DisplayName("현재 비밀번호와 변경할 비밀번호를 입력해 비밀번호를 변경할 수 있다.")
+    @Test
+    void updatePassword() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+                .currentPassword(PASSWORD1)
+                .passwordToChange(PASSWORD2)
+                .build();
+
+        // when
+        authenticationService.updatePassword(user.getId(), passwordRequestDto);
+
+        // then
+        assertThat(user.getPassword().matchOriginalPassword(passwordEncoder, PASSWORD1)).isFalse();
+        assertThat(user.getPassword().matchOriginalPassword(passwordEncoder, PASSWORD2)).isTrue();
+    }
+
+    @DisplayName("잘못된 현재 비밀번호를 통해 비밀번호를 변경하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void updatePasswordWithWrongCurrentPassword() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+                .currentPassword(PASSWORD2)
+                .passwordToChange(PASSWORD2)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordRequestDto))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
+    @DisplayName("유효하지 비밃번호를 통해 비밀번호를 변경하려 하면 IllegalArgumentException이 발생한다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abcD1!", "1234!abcde", "AbCdE12345", "!@1234ABCDE"
+    })
+    void updatePasswordWithInvalidPassword(String password) {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+                .currentPassword(PASSWORD1)
+                .passwordToChange(password)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_PASSWORD_EXCEPTION);
     }
 }
