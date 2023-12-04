@@ -32,7 +32,6 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final JwtTokenProvider jwtTokenProvider;
 
-
     private static final String SIGN_UP = "회원 가입";
     private static final String SIGN_UP_DESCRIPTION = "회원 가입 양식을 입력해 회원 가입을 할 수 있습니다.";
     private static final String SIGN_UP_FORM = "회원 가입 양식";
@@ -42,15 +41,17 @@ public class AuthenticationController {
     private static final String SIGN_IN_FORM = "로그인 양식";
 
     private static final String UPDATE_EMAIL = "이메일 주소 변경";
-    private static final String UPDATE_UPDATE_EMAIL_DESCRIPTION = "변경할 이메일 주소를 입력해 주소를 수정할 수 있습니다.";
+    private static final String UPDATE_UPDATE_EMAIL_DESCRIPTION
+            = "비밀번호와 변경할 이메일 주소를 입력해 이메일 주소를 수정할 수 있습니다.";
     private static final String UPDATE_UPDATE_EMAIL_FORM = "이메일 주소 변경 양식";
 
     private static final String UPDATE_PHONE = "전화번호 변경";
-    private static final String UPDATE_PHONE_DESCRIPTION = "변경할 전화번호를 입력해 주소를 수정할 수 있습니다.";
+    private static final String UPDATE_PHONE_DESCRIPTION = "비밀번호와 변경할 전화번호를 입력해 전화번호를 수정할 수 있습니다.";
     private static final String UPDATE_PHONE_FORM = "전화번호 변경 양식";
 
     private static final String UPDATE_PASSWORD = "비밀번호 변경";
-    private static final String UPDATE_PASSWORD_DESCRIPTION = "변경할 비밀번호를 입력해 주소를 수정할 수 있습니다.";
+    private static final String UPDATE_PASSWORD_DESCRIPTION
+            = "현재 비밀번호와 변경할 비밀번호를 입력해 비밀번호를 수정할 수 있습니다.";
     private static final String UPDATE_PASSWORD_FORM = "비밀번호 변경 양식";
 
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
