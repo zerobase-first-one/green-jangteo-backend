@@ -240,45 +240,4 @@ class AuthenticationServiceTest {
                 .isInstanceOf(IncorrectPasswordException.class)
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
-
-/*    @DisplayName("사용자 이름을 통해 회원 개인 정보를 조회할 수 있다.")
-    @ParameterizedTest
-    @CsvSource({
-            "abcd@abc.com, person1, 1234, 홍길동, 2000-01-01, 01012345678, ROLE_GENERAL_USER",
-            "abcd@abcd.com, person2, 12345, 고길동, 2000-02-02, 01012345679, ROLE_BUSINESS_USER",
-            "abcd@abcde.com, person3, 123456, 김길동, 2000-03-03, 01012345680, ROLE_GENERAL_USER"
-    })
-    void getUserDetails(String email, String username, String password, String fullName,
-                        LocalDate birthDate, String phoneNumber, Role role) {
-
-        // given
-        User user = createUser(email, username, password, fullName, birthDate, phoneNumber, List.of(role));
-
-        userRepository.save(user);
-
-        // when
-        UserResponseDto userResponseDto = authenticationService.getUserDetails(username);
-
-        // then
-        assertThat(userResponseDto.getEmail()).isEqualTo(email);
-        assertThat(userResponseDto.getUsername()).isEqualTo(username);
-        assertThat(userResponseDto.getPhoneNumber()).isEqualTo(phoneNumber);
-        assertThat(userResponseDto.getRoles()).isEqualTo(user.getRoles());
-
-    }*/
-
-/*    @DisplayName("잘못된 ID로 회원 개인 정보를 조회하면 EntityNotFoundException이 발생한다.")
-    @Test
-    void getUserDetailsByWrongUserId() {
-        // given
-        User user = createUser(EMAIL1, USERNAME1, PASSWORD1, , passwordEncoder, FULL_NAME1,
-                PHONE1, List.of(ROLE_BUYER.toString()));
-
-        userRepository.save(user);
-
-        // when, then
-        assertThatThrownBy(() -> authenticationService.getUserDetails(USERNAME2))
-                .isInstanceOf(NonExistentUserException.class)
-                .hasMessage(USER_ID_NOT_FOUND_EXCEPTION + USERNAME2);
-    }*/
 }
