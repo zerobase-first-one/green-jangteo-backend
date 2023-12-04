@@ -1,5 +1,7 @@
 package com.firstone.greenjangteo.product.service;
 
+import com.firstone.greenjangteo.product.exception.ErrorCode;
+import com.firstone.greenjangteo.product.exception.ProductException;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +24,14 @@ public class FileService {
         return savedFileName;
     }
 
-    public void deleteFile(String filePath) throws Exception{
-        File deleteFile = new File(filePath);
+    public void deleteFile(String path, String filePath){
+        File deleteFile = new File(path + "\\/" + filePath);
         if(deleteFile.exists()) {
             deleteFile.delete();
             log.info("파일을 삭제하였습니다.");
         } else {
             log.info("파일이 존재하지 않습니다.");
+            throw new ProductException(ErrorCode.FILE_IS_NOT_FOUND);
         }
     }
 }

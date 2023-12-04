@@ -38,7 +38,7 @@ public class ProductController {
     }
 
     @GetMapping(value = "/products")
-    public ResponseEntity<List<ProductListDto>> productListAll() throws Exception {
+    public ResponseEntity<List<ProductListDto>> productListAll() {
         List<ProductListDto> productList = productService.getProductList();
         return ResponseEntity.ok().body(productList);
     }

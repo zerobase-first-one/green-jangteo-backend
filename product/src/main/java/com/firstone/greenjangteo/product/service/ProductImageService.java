@@ -39,7 +39,8 @@ public class ProductImageService {
             //기존 이미지 파일 삭제
             if (!StringUtils.isEmpty(savedProductImage.get(0))) {
                 for (int i = 0; i < savedProductImage.size(); i++) {
-                    fileService.deleteFile(savedProductImage.get(i).getUrl());
+                    String fileName = savedProductImage.get(i).getUrl().split("\\/")[3];
+                    fileService.deleteFile(productImageLocation, fileName);
                 }
             }
 

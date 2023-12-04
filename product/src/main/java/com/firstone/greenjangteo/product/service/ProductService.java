@@ -5,6 +5,8 @@ import com.firstone.greenjangteo.product.domain.dto.ProductListDto;
 import com.firstone.greenjangteo.product.domain.model.Category;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.ProductImage;
+import com.firstone.greenjangteo.product.exception.ErrorCode;
+import com.firstone.greenjangteo.product.exception.ProductException;
 import com.firstone.greenjangteo.product.repository.CategoryRepository;
 import com.firstone.greenjangteo.product.repository.ProductImageRepository;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
@@ -45,7 +47,7 @@ public class ProductService {
         productRepository.save(product);
 
         //이미지 등록
-        for(int i=0; i<productImageUrlList.size(); i++){
+        for (int i = 0; i < productImageUrlList.size(); i++) {
             ProductImage productImage = ProductImage.builder()
                     .product(product)
                     .url(productImageUrlList.get(i))
@@ -62,9 +64,9 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductListDto> getProductList() throws Exception {
+    public List<ProductListDto> getProductList() {
         if (productRepository.findAll().isEmpty()) {
-            throw new Exception("상품이 존재하지 않습니다.");
+            return new ArrayList<>();
         }
 
         List<Product> products = productRepository.findAll();
@@ -92,12 +94,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductListDto getProductDetail(Long productId) throws Exception {
-        if (productRepository.findById(productId).isEmpty()) {
-            throw new Exception("상품이 존재하지 않습니다.");
-        }
-
-        Product products = productRepository.findById(productId).orElseThrow(Exception::new);
+    public ProductListDto getProductDetail(Long productId) {
+        Product products = productRepository.findById(productId).orElseThrow(()-> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
         ProductListDto productListDto = new ProductListDto();
 
         List<ProductImage> productImage = productImageRepository.findByProductId(productId);
@@ -117,7 +115,7 @@ public class ProductService {
 
     public ResponseEntity.BodyBuilder updateProduct(Long productId, ProductDto productDto, List<String> productImageUrlList, List<String> categoryList, String productImageLocation) throws Exception {
         //product
-        Product product = productRepository.findById(productId).orElseThrow(Exception::new); //EntityNotFound
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
         product.setModifiedAt(LocalDateTime.now());
         product.updateProduct(productDto);
 
@@ -129,8 +127,8 @@ public class ProductService {
         return ResponseEntity.status(204);
     }
 
-    public ResponseEntity.BodyBuilder removeProduct(Long productId) throws Exception {
-        Product product = productRepository.findById(productId).orElseThrow(Exception::new);
+    public ResponseEntity.BodyBuilder removeProduct(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
 
         categoryRepository.deleteByProductId(product.getId());
         productImageRepository.deleteByProductId(product.getId());
