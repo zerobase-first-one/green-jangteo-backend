@@ -1,8 +1,7 @@
 package com.firstone.greenjangteo.user.controller;
 
 import com.firstone.greenjangteo.common.security.JwtTokenProvider;
-import com.firstone.greenjangteo.user.dto.SignInResponseDto;
-import com.firstone.greenjangteo.user.dto.UserResponseDto;
+import com.firstone.greenjangteo.user.dto.*;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -13,14 +12,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+
+import static com.firstone.greenjangteo.user.controller.ApiConstant.PRINCIPAL_POINTCUT;
+import static com.firstone.greenjangteo.user.controller.ApiConstant.USER_ID_FORM;
 
 /**
  * 인증이 필요한 API
@@ -32,13 +32,18 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final JwtTokenProvider jwtTokenProvider;
 
+
     private static final String SIGN_UP = "회원 가입";
     private static final String SIGN_UP_DESCRIPTION = "회원 가입 양식을 입력해 회원 가입을 할 수 있습니다.";
     private static final String SIGN_UP_FORM = "회원 가입 양식";
+
     private static final String SIGN_IN = "로그인";
     private static final String SIGN_IN_DESCRIPTION = "email 또는 username과 비밀번호를 입력해 로그인을 할 수 있습니다.";
     private static final String SIGN_IN_FORM = "로그인 양식";
 
+    private static final String UPDATE_EMAIL = "이메일 주소 변경";
+    private static final String UPDATE_UPDATE_EMAIL_DESCRIPTION = "변경할 이메일 주소를 입력해 주소를 수정할 수 있습니다.";
+    private static final String UPDATE_UPDATE_EMAIL_FORM = "이메일 주소 변경 양식";
 
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
@@ -60,6 +65,17 @@ public class AuthenticationController {
         ;
 
         return ResponseEntity.status(HttpStatus.OK).body(new SignInResponseDto(userId, loggedInTime, token));
+    }
+
+    @ApiOperation(value = UPDATE_EMAIL, notes = UPDATE_UPDATE_EMAIL_DESCRIPTION)
+    @PreAuthorize(PRINCIPAL_POINTCUT)
+    @PatchMapping("/{userId}/email")
+    public ResponseEntity<UserResponseDto> updateEmail
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+             @RequestBody @ApiParam(value = UPDATE_UPDATE_EMAIL_FORM) EmailRequestDto emailRequestDto) {
+        authenticationService.updateEmail(Long.parseLong(userId), emailRequestDto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private ResponseEntity<UserResponseDto> buildResponse(UserResponseDto userResponseDto) {

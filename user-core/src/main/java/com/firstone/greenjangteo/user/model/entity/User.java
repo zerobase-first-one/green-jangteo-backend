@@ -106,4 +106,8 @@ public class User extends BaseEntity {
     public void updateAddress(AddressDto addressDto) {
         address = Address.from(addressDto);
     }
+
+    public void updateEmail(String email) {
+        this.email = Email.of(email);
+    }
 }
