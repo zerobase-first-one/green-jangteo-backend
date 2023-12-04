@@ -26,6 +26,8 @@ public class UserController {
 
     private static final String GET_USER_DETAILS = "회원 개인정보 조회";
     private static final String GET_USER_DETAILS_DESCRIPTION = "회원 개인정보를 조회할 수 있습니다.";
+    private static final String GET_USER = "회원 프로필 조회";
+    private static final String GET_USER_DESCRIPTION = "다른 회원의 정보를 조회할 수 있습니다.";
     private static final String GET_USER_FORM = "회원 ID";
 
     private static final String PRINCIPAL_POINTCUT
@@ -39,5 +41,14 @@ public class UserController {
         User user = userService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toPrincipal(user));
+    }
+
+    @ApiOperation(value = GET_USER, notes = GET_USER_DESCRIPTION)
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseDto> getUser
+            (@PathVariable("userId") @ApiParam(value = GET_USER_FORM, example = "1") String userId) {
+        User user = userService.getUser(Long.parseLong(userId));
+
+        return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toOthers(user));
     }
 }
