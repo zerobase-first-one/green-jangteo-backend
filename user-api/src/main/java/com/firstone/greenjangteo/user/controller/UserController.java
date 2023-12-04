@@ -57,7 +57,7 @@ public class UserController {
 
     @ApiOperation(value = UPDATE_ADDRESS, notes = UPDATE_ADDRESS_DESCRIPTION)
     @PreAuthorize(PRINCIPAL_POINTCUT)
-    @PatchMapping("{userId}/address")
+    @PatchMapping("/{userId}/address")
     public ResponseEntity<UserResponseDto> updateAddress
             (@PathVariable("userId") @ApiParam(value = GET_USER_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_ADDRESS_FORM) AddressDto addressDto) {
