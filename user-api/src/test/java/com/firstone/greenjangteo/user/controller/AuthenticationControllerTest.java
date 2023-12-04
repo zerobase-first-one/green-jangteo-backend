@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.common.security.JwtTokenProvider;
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.dto.EmailRequestDto;
+import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -118,6 +119,28 @@ class AuthenticationControllerTest {
         mockMvc.perform(patch("/users/{userId}/email", user.getId())
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(emailRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("비밀번호와 변경할 전화번호를 입력해 전화번호를 변경할 수 있다.")
+    @Test
+    @WithMockUser
+    void updatePhone() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        PhoneRequestDto phoneRequestDto = PhoneRequestDto.builder()
+                .password(PASSWORD)
+                .phone(PHONE)
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(phoneRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNoContent());
