@@ -37,6 +37,9 @@ spring:
     password: ${REDIS_PASSWORD}
   jwt:
     secret: ${JWT_SECRET_KEY}
+  frontend:
+    url: http://${FRONTEND_IP_FOR_GREEN_JANGTEO}
+    port: ${FRONTEND_PORT_FOR_GREEN_JANGTEO}
 
 logging:
   config: classpath:logback-spring.xml

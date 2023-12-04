@@ -1,5 +1,8 @@
-package com.firstone.greenjangteo.common.security;
+package com.firstone.greenjangteo.common.configuration;
 
+import com.firstone.greenjangteo.common.security.CustomAuthenticationEntryPoint;
+import com.firstone.greenjangteo.common.security.JwtAuthenticationFilter;
+import com.firstone.greenjangteo.common.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +30,9 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint) // 인증되지 않았을 시 custom entry point 사용
                 .and()
                 .httpBasic().disable() // JWT 사용
-                .csrf().disable() // 프론트엔드 연동 시 활성화
+                .cors()
+                .and()
+                .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
