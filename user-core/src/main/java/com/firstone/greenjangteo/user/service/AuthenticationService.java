@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.user.dto.EmailRequestDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -11,4 +12,6 @@ public interface AuthenticationService {
     User signUpUser(SignUpForm signUpForm);
 
     User signInUser(SignInForm signInForm);
+
+    void updateEmail(Long id, EmailRequestDto emailRequestDto);
 }

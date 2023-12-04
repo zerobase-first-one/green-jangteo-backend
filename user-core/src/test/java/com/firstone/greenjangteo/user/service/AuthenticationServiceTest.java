@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.user.dto.EmailRequestDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
 import com.firstone.greenjangteo.user.excpeption.significant.IncorrectPasswordException;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
+import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_EMAIL_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.EMAIL_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USERNAME_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
@@ -239,5 +241,70 @@ class AuthenticationServiceTest {
         assertThatThrownBy(() -> authenticationService.signInUser(signInForm2))
                 .isInstanceOf(IncorrectPasswordException.class)
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
+    @DisplayName("비밀번호와 변경할 이메일 주소를 입력해 이메일 주소를 변경할 수 있다.")
+    @Test
+    void updateEmail() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        EmailRequestDto emailRequestDto = EmailRequestDto.builder()
+                .password(PASSWORD1)
+                .email(EMAIL2)
+                .build();
+
+        // when
+        authenticationService.updateEmail(user.getId(), emailRequestDto);
+
+        // then
+        assertThat(user.getEmail()).isNotEqualTo(Email.of(EMAIL1));
+        assertThat(user.getEmail()).isEqualTo(Email.of(EMAIL2));
+    }
+
+    @DisplayName("잘못된 비밀번호를 통해 이메일 주소를 변경하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void updateEmailWithWrongPassword() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        EmailRequestDto emailRequestDto = EmailRequestDto.builder()
+                .password(PASSWORD2)
+                .email(EMAIL2)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updateEmail(user.getId(), emailRequestDto))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
+    @DisplayName("유효하지 않은 이메일 주소를 통해 이메일 주소를 변경하려 하면 IllegalArgumentException이 발생한다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abcD1!", "1234!abcde", "AbCdE12345", "!@1234ABCDE"
+    })
+    void updateEmailWithInvalidEmail(String email) {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        EmailRequestDto emailRequestDto = EmailRequestDto.builder()
+                .password(PASSWORD1)
+                .email(email)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updateEmail(user.getId(), emailRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_EMAIL_EXCEPTION);
     }
 }
