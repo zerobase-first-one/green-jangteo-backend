@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import static com.firstone.greenjangteo.user.model.Role.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+@ActiveProfiles("test")
 class RolesTest {
     @DisplayName("유효한 값을 전송하면 여러 회원 분류를 가진 일급 컬렉션을 생성할 수 있다.")
     @Test

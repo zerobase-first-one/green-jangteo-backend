@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.test.context.ActiveProfiles;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.FULL_NAME_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_FULL_NAME_EXCEPTION;
@@ -12,6 +13,7 @@ import static com.firstone.greenjangteo.user.testutil.TestConstant.FULL_NAME2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+@ActiveProfiles("test")
 class FullNameTest {
     @DisplayName("동일한 성명을 전송하면 동등한 FullName 인스턴스를 생성한다.")
     @Test
