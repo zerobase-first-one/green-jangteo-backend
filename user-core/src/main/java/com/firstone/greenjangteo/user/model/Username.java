@@ -19,10 +19,6 @@ public class Username {
         return new Username(username);
     }
 
-    String getValue() {
-        return username;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -34,6 +30,10 @@ public class Username {
     @Override
     public int hashCode() {
         return Objects.hash(username);
+    }
+
+    String getValue() {
+        return username;
     }
 
     private static void validate(String username) {

@@ -50,4 +50,24 @@ public class TestObjectFactory {
                 .roles(Roles.from(roles))
                 .build();
     }
+
+    public static User createUser(Long userId, String email, String username, String password,
+                                  PasswordEncoder passwordEncoder, String fullName,
+                                  String phone, List<String> roles) {
+        return User.builder()
+                .id(userId)
+                .email(Email.of(email))
+                .username(Username.of(username))
+                .password(Password.from(password, passwordEncoder))
+                .fullName(FullName.of(fullName))
+                .phone(Phone.of(phone))
+                .address(Address.from(AddressDto.builder()
+                        .city(CITY)
+                        .street(STREET)
+                        .zipcode(ZIPCODE)
+                        .detailedAddress(DETAILED_ADDRESS)
+                        .build()))
+                .roles(Roles.from(roles))
+                .build();
+    }
 }
