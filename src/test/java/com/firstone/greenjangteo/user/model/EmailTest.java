@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.test.context.ActiveProfiles;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.EMAIL_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_EMAIL_EXCEPTION;
@@ -13,7 +12,6 @@ import static com.firstone.greenjangteo.user.testutil.TestConstant.EMAIL2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-@ActiveProfiles("test")
 class EmailTest {
     @DisplayName("동일한 이메일 주소를 전송하면 동등한 Email 인스턴스를 생성한다.")
     @Test

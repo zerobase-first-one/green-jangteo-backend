@@ -5,13 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.test.context.ActiveProfiles;
 
 import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-@ActiveProfiles("test")
 class AddressTest {
     @DisplayName("동일한 주소를 전송하면 동등한 Address 인스턴스를 생성한다.")
     @Test
