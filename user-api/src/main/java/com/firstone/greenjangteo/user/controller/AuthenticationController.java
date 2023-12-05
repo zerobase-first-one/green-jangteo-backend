@@ -50,7 +50,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = SIGN_IN, notes = SIGN_IN_DESCRIPTION)
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<SignInResponseDto> signInUser(@RequestBody @ApiParam(value = SIGN_IN_FORM) SignInForm signInForm) {
         User user = authenticationService.signInUser(signInForm);
 

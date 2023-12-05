@@ -19,6 +19,10 @@ public class Address {
     private String street;
     private String zipcode;
     private String detailedAddress;
+    private static final String CITY_PATTERN = "^[가-힣]{1,5}$";
+    private static final String STREET_PATTERN = "^[가-힣0-9 ]+$";
+    private static final String ZIPCODE_PATTERN = "^\\d{5}$";
+    private static final String DETAILED_ADDRESS_PATTERN = "^[가-힣0-9 ]+$";
 
     private Address(String city, String street, String zipcode, String detailedAddress) {
         this.city = city;
@@ -101,25 +105,25 @@ public class Address {
     }
 
     private static void checkCityPattern(String city) {
-        if (!city.matches("^[가-힣]{1,5}$")) {
+        if (!city.matches(CITY_PATTERN)) {
             throw new IllegalArgumentException(INVALID_CITY_EXCEPTION);
         }
     }
 
     private static void checkStreetPattern(String street) {
-        if (!street.matches("^[가-힣0-9 ]+$")) {
+        if (!street.matches(STREET_PATTERN)) {
             throw new IllegalArgumentException(INVALID_STREET_EXCEPTION);
         }
     }
 
     private static void checkZipcodePattern(String zipcode) {
-        if (!zipcode.matches("^\\d{5}$")) {
+        if (!zipcode.matches(ZIPCODE_PATTERN)) {
             throw new IllegalArgumentException(INVALID_ZIPCODE_EXCEPTION);
         }
     }
 
     private static void checkDetailedAddressPattern(String detailedAddress) {
-        if (!detailedAddress.matches("^[가-힣0-9 ]+$")) {
+        if (!detailedAddress.matches(DETAILED_ADDRESS_PATTERN)) {
             throw new IllegalArgumentException(INVALID_DETAILED_ADDRESS_EXCEPTION);
         }
     }
