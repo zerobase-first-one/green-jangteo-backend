@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.user.service;
 
 
 import com.firstone.greenjangteo.user.dto.EmailRequestDto;
+import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
 import com.firstone.greenjangteo.user.excpeption.significant.IncorrectPasswordException;
@@ -72,6 +73,14 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         validatePassword(user.getPassword(), emailRequestDto.getPassword());
         user.updateEmail(emailRequestDto.getEmail());
+    }
+
+    @Override
+    public void updatePhone(Long id, PhoneRequestDto phoneRequestDto) {
+        User user = userService.getUser(id);
+
+        validatePassword(user.getPassword(), phoneRequestDto.getPassword());
+        user.updatePhone(phoneRequestDto.getPhone());
     }
 
     private void validateNotDuplicateUser(String username, String email, String phone) {
