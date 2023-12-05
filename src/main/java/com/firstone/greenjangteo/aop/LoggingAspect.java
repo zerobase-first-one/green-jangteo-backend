@@ -10,16 +10,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
+import static com.firstone.greenjangteo.aop.LogConstant.PERFORMANCE_MEASUREMENT;
+
 @Component
 @Aspect
 public class LoggingAspect {
     private static final Logger log = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @Around("execution(* com.firstone.greenjangteo..service.*.*(..)) && args(stringValue, ..)")
+    private static final String STRING_VALUE_POINTCUT
+            = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(stringValue, ..)";
+
+    private static final String LONG_VALUE_POINTCUT
+            = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(longValue, ..)";
+
+    private static final String START
+            = "Beginning to '{}.{}' task by {}: '{}'";
+    private static final String END
+            = "'{}.{}' task was executed successfully by '{}: {}', ";
+
+    @Around(STRING_VALUE_POINTCUT)
     public Object logAroundForStringValue(ProceedingJoinPoint joinPoint, String stringValue) throws Throwable {
         String parameterName = ((CodeSignature) joinPoint.getSignature()).getParameterNames()[0];
 
-        log.info("Beginning to '{}.{}' task by {}: '{}'",
+        log.info(START,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), parameterName, stringValue);
 
@@ -32,7 +45,7 @@ public class LoggingAspect {
         stopWatch.stop();
         long memoryUsage = MemoryUtil.usedMemory() - beforeMemory;
 
-        log.info("'{}.{}' task was executed successfully by '{}: {}', estimated time: {} ms, used memory: {} bytes",
+        log.info(END + PERFORMANCE_MEASUREMENT,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), parameterName, stringValue,
                 stopWatch.getTotalTimeMillis(), memoryUsage);
@@ -40,11 +53,11 @@ public class LoggingAspect {
         return process;
     }
 
-    @Around("execution(* com.firstone.greenjangteo..service.*.*(..)) && args(longValue, ..)")
+    @Around(LONG_VALUE_POINTCUT)
     public Object logAroundForLongValue(ProceedingJoinPoint joinPoint, Long longValue) throws Throwable {
         String parameterName = ((CodeSignature) joinPoint.getSignature()).getParameterNames()[0];
 
-        log.info("Beginning to '{}.{}' task by {}: '{}'",
+        log.info(START,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), parameterName, longValue);
 
@@ -57,7 +70,7 @@ public class LoggingAspect {
         stopWatch.stop();
         long memoryUsage = MemoryUtil.usedMemory() - beforeMemory;
 
-        log.info("'{}.{}' task was executed successfully by '{}: {}', estimated time: {} ms, used memory: {} bytes",
+        log.info(END + PERFORMANCE_MEASUREMENT,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), parameterName, longValue,
                 stopWatch.getTotalTimeMillis(), memoryUsage);
