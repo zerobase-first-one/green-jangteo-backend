@@ -54,6 +54,11 @@ public class AuthenticationController {
             = "현재 비밀번호와 변경할 비밀번호를 입력해 비밀번호를 수정할 수 있습니다.";
     private static final String UPDATE_PASSWORD_FORM = "비밀번호 변경 양식";
 
+    private static final String DELETE_USER = "회원 탈퇴";
+    private static final String DELETE_USER_DESCRIPTION
+            = "비밀번호를 입력해 회원을 탈퇴할 수 있습니다.";
+    private static final String DELETE_USER_FORM = "비밀번호 변경 양식";
+
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signUpUser
@@ -103,8 +108,20 @@ public class AuthenticationController {
     @PatchMapping("/{userId}/password")
     public ResponseEntity<UserResponseDto> updatePassword
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
-             @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM) PasswordRequestDto passwordRequestDto) {
-        authenticationService.updatePassword(Long.parseLong(userId), passwordRequestDto);
+             @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM)
+             PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        authenticationService.updatePassword(Long.parseLong(userId), passwordUpdateRequestDto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @ApiOperation(value = DELETE_USER, notes = DELETE_USER_DESCRIPTION)
+    @PreAuthorize(PRINCIPAL_POINTCUT)
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            @RequestBody DeleteRequestDto deleteRequestDto) {
+        authenticationService.deleteUser(Long.parseLong(userId), deleteRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

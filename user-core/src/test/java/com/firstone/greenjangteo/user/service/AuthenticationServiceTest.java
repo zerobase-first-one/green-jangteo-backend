@@ -1,7 +1,8 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.user.dto.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.EmailRequestDto;
-import com.firstone.greenjangteo.user.dto.PasswordRequestDto;
+import com.firstone.greenjangteo.user.dto.PasswordUpdateRequestDto;
 import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
@@ -31,8 +32,7 @@ import java.util.List;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.*;
-import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.EMAIL_NOT_FOUND_EXCEPTION;
-import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USERNAME_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
@@ -384,13 +384,13 @@ class AuthenticationServiceTest {
         );
         userRepository.save(user);
 
-        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD1)
                 .passwordToChange(PASSWORD2)
                 .build();
 
         // when
-        authenticationService.updatePassword(user.getId(), passwordRequestDto);
+        authenticationService.updatePassword(user.getId(), passwordUpdateRequestDto);
 
         // then
         assertThat(user.getPassword().matchOriginalPassword(passwordEncoder, PASSWORD1)).isFalse();
@@ -406,13 +406,13 @@ class AuthenticationServiceTest {
         );
         userRepository.save(user);
 
-        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD2)
                 .passwordToChange(PASSWORD2)
                 .build();
 
         // when, then
-        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordRequestDto))
+        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordUpdateRequestDto))
                 .isInstanceOf(IncorrectPasswordException.class)
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
@@ -429,14 +429,82 @@ class AuthenticationServiceTest {
         );
         userRepository.save(user);
 
-        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD1)
                 .passwordToChange(password)
                 .build();
 
         // when, then
-        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordRequestDto))
+        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordUpdateRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(INVALID_PASSWORD_EXCEPTION);
+    }
+
+    @DisplayName("비밀번호 인증을 통해 회원을 탈퇴할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abcd@abc.com, person1, Abcd1234!, 홍길동, 01012345678, ROLE_BUYER",
+            "abcd@abcd.com, person2, Abcd12345!, 고길동, 01012345679, ROLE_SELLER",
+            "abcd@abcde.com, person3, Abcd123456!, 김길동, 01012345680, ROLE_ADMIN"
+    })
+    void deleteUser(
+            String email, String username, String password,
+            String fullName, String phone, String role
+    ) {
+        // given
+        User user = TestObjectFactory.createUser(
+                email, username, password, passwordEncoder, fullName, phone, List.of(role)
+        );
+        userRepository.save(user);
+
+        Long userId = user.getId();
+
+        DeleteRequestDto deleteRequestDto = new DeleteRequestDto(password);
+
+        // when
+        authenticationService.deleteUser(userId, deleteRequestDto);
+
+        // then
+        assertThat(userRepository.findById(userId).isPresent()).isFalse();
+    }
+
+    @DisplayName("존재하지 않는 회원 ID로 회원을 탈퇴하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void deleteUserByNonExistentId() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        Long userId = user.getId() + 1;
+
+        DeleteRequestDto deleteRequestDto = new DeleteRequestDto(PASSWORD1);
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService
+                .deleteUser(userId, deleteRequestDto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(USER_ID_NOT_FOUND_EXCEPTION + userId);
+    }
+
+    @DisplayName("일치하지 않는 비밀번호로 회원을 탈퇴하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void deleteUserWithWrongPassword() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        Long userId = user.getId();
+
+        DeleteRequestDto deleteRequestDto = new DeleteRequestDto(PASSWORD2);
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService
+                .deleteUser(userId, deleteRequestDto))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
 }
