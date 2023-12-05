@@ -24,6 +24,8 @@ repositories {
 dependencies {
     // module
     implementation project(':user-api')
+    implementation project(':product')
+    implementation project(':cart')
 
     // spring boot
     implementation 'org.springframework.boot:spring-boot-starter-web:2.7.12'

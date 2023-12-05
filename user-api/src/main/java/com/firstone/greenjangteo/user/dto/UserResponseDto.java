@@ -11,9 +11,9 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
 @AllArgsConstructor
 @Builder
+@Getter
 public class UserResponseDto {
     private Long userId;
     private String email;
