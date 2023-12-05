@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.user.controller;
 
+import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.dto.UserResponseDto;
 import com.firstone.greenjangteo.user.model.EntityToDtoMapper;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -10,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 회원 API
@@ -26,9 +24,14 @@ public class UserController {
 
     private static final String GET_USER_DETAILS = "회원 개인정보 조회";
     private static final String GET_USER_DETAILS_DESCRIPTION = "회원 개인정보를 조회할 수 있습니다.";
+
     private static final String GET_USER = "회원 프로필 조회";
     private static final String GET_USER_DESCRIPTION = "다른 회원의 정보를 조회할 수 있습니다.";
     private static final String GET_USER_FORM = "회원 ID";
+
+    private static final String UPDATE_ADDRESS = "주소 수정";
+    private static final String UPDATE_ADDRESS_DESCRIPTION = "수정할 주소를 입력해 주소를 수정할 수 있습니다.";
+    private static final String UPDATE_ADDRESS_FORM = "주소 수정 양식";
 
     private static final String PRINCIPAL_POINTCUT
             = "isAuthenticated() and (( #userId == principal.username ) or hasRole('ROLE_ADMIN'))";
@@ -50,5 +53,16 @@ public class UserController {
         User user = userService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toOthers(user));
+    }
+
+    @ApiOperation(value = UPDATE_ADDRESS, notes = UPDATE_ADDRESS_DESCRIPTION)
+    @PreAuthorize(PRINCIPAL_POINTCUT)
+    @PatchMapping("/{userId}/address")
+    public ResponseEntity<UserResponseDto> updateAddress
+            (@PathVariable("userId") @ApiParam(value = GET_USER_FORM, example = "1") String userId,
+             @RequestBody @ApiParam(value = UPDATE_ADDRESS_FORM) AddressDto addressDto) {
+        userService.updateAddress(Long.parseLong(userId), addressDto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

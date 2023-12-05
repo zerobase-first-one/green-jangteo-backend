@@ -27,9 +27,9 @@ public class TestObjectFactory {
                 .phone(phone)
                 .addressDto(AddressDto.builder()
                         .city(CITY1)
-                        .street(STREET)
-                        .zipcode(ZIPCODE)
-                        .detailedAddress(DETAILED_ADDRESS)
+                        .street(STREET1)
+                        .zipcode(ZIPCODE1)
+                        .detailedAddress(DETAILED_ADDRESS1)
                         .build())
                 .roles(roles)
                 .build();
