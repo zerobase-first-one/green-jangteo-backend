@@ -2,9 +2,9 @@ package com.firstone.greenjangteo.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.common.security.JwtTokenProvider;
-import com.firstone.greenjangteo.user.dto.AddressDto;
+import com.firstone.greenjangteo.user.dto.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.EmailRequestDto;
-import com.firstone.greenjangteo.user.dto.PasswordRequestDto;
+import com.firstone.greenjangteo.user.dto.PasswordUpdateRequestDto;
 import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
@@ -31,8 +31,7 @@ import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUse
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -139,7 +138,7 @@ class AuthenticationControllerTest {
                 .build();
 
         // when, then
-        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+        mockMvc.perform(patch("/users/{userId}/phone", user.getId())
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(phoneRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -155,15 +154,34 @@ class AuthenticationControllerTest {
         User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
                 FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
 
-        PasswordRequestDto passwordRequestDto = PasswordRequestDto.builder()
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD)
                 .passwordToChange(PASSWORD)
                 .build();
 
         // when, then
-        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+        mockMvc.perform(patch("/users/{userId}/password", user.getId())
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(passwordRequestDto))
+                        .content(objectMapper.writeValueAsString(passwordUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("비밀번호 인증을 통해 회원을 탈퇴할 수 있다.")
+    @Test
+    @WithMockUser
+    void deleteUser() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        DeleteRequestDto deleteRequestDto = new DeleteRequestDto(PASSWORD);
+
+        // when, then
+        mockMvc.perform(delete("/users/{userId}", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(deleteRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNoContent());
