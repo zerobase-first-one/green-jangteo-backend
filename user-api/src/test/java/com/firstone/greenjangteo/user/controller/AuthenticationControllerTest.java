@@ -138,7 +138,7 @@ class AuthenticationControllerTest {
                 .build();
 
         // when, then
-        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+        mockMvc.perform(patch("/users/{userId}/phone", user.getId())
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(phoneRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -160,7 +160,7 @@ class AuthenticationControllerTest {
                 .build();
 
         // when, then
-        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+        mockMvc.perform(patch("/users/{userId}/password", user.getId())
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(passwordUpdateRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
