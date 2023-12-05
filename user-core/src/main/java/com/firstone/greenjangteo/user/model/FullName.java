@@ -8,6 +8,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.InvalidException
 
 public class FullName {
     private final String fullName;
+    private static final String FULL_NAME_PATTERN = "^[가-힣]{2,5}$";
 
     private FullName(String fullName) {
         this.fullName = fullName;
@@ -32,6 +33,10 @@ public class FullName {
         return Objects.hash(fullName);
     }
 
+    String getValue() {
+        return fullName;
+    }
+
     private static void validate(String fullName) {
         checkFullNameIsNotBlank(fullName);
         checkFullnamePattern(fullName);
@@ -44,7 +49,7 @@ public class FullName {
     }
 
     private static void checkFullnamePattern(String fullName) {
-        if (!fullName.matches("^[가-힣]{2,5}$")) {
+        if (!fullName.matches(FULL_NAME_PATTERN)) {
             throw new IllegalArgumentException(INVALID_FULL_NAME_EXCEPTION);
         }
     }

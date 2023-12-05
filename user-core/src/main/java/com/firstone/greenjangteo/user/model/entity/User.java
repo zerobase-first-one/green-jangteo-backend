@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.model.entity;
 
 import com.firstone.greenjangteo.common.audit.BaseEntity;
+import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.Email;
 import com.firstone.greenjangteo.user.model.FullName;
@@ -100,5 +101,21 @@ public class User extends BaseEntity {
 
     public void updateLoginTime() {
         lastLoggedInAt = LocalDateTime.now();
+    }
+
+    public void updateAddress(AddressDto addressDto) {
+        address = Address.from(addressDto);
+    }
+
+    public void updateEmail(String email) {
+        this.email = Email.of(email);
+    }
+
+    public void updatePhone(String phone) {
+        this.phone = Phone.of(phone);
+    }
+
+    public void updatePassword(String passwordToChange, PasswordEncoder passwordEncoder) {
+        password = Password.from(passwordToChange, passwordEncoder);
     }
 }

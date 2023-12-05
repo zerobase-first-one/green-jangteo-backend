@@ -8,6 +8,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.InvalidException
 
 public class Phone {
     private final String phone;
+    private static final String PHONE_PATTERN = "^010\\d{8}$";
 
     private Phone(String phone) {
         this.phone = phone;
@@ -32,6 +33,10 @@ public class Phone {
         return Objects.hash(phone);
     }
 
+    String getValue() {
+        return phone;
+    }
+
     private static void validate(String phone) {
         checkPhoneIsNotBlank(phone);
         checkPhonePattern(phone);
@@ -44,7 +49,7 @@ public class Phone {
     }
 
     private static void checkPhonePattern(String phone) {
-        if (!phone.matches("^010\\d{8}$")) {
+        if (!phone.matches(PHONE_PATTERN)) {
             throw new IllegalArgumentException(INVALID_PHONE_EXCEPTION);
         }
     }

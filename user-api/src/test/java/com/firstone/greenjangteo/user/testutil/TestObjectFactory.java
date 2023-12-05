@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
+import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+
 public class TestObjectFactory {
     public static SignUpForm enterUserForm(String email, String username, String password, String fullName,
                                            String phone, List<String> roles) {
@@ -24,10 +26,10 @@ public class TestObjectFactory {
                 .fullName(fullName)
                 .phone(phone)
                 .addressDto(AddressDto.builder()
-                        .city("서울")
-                        .street("테헤란로 2길 5")
-                        .zipcode("12345")
-                        .detailedAddress("101동 102호")
+                        .city(CITY)
+                        .street(STREET)
+                        .zipcode(ZIPCODE)
+                        .detailedAddress(DETAILED_ADDRESS)
                         .build())
                 .roles(roles)
                 .build();
@@ -42,10 +44,30 @@ public class TestObjectFactory {
                 .fullName(FullName.of(fullName))
                 .phone(Phone.of(phone))
                 .address(Address.from(AddressDto.builder()
-                        .city("서울")
-                        .street("테헤란로 2길 5")
-                        .zipcode("12345")
-                        .detailedAddress("101동 102호")
+                        .city(CITY)
+                        .street(STREET)
+                        .zipcode(ZIPCODE)
+                        .detailedAddress(DETAILED_ADDRESS)
+                        .build()))
+                .roles(Roles.from(roles))
+                .build();
+    }
+
+    public static User createUser(Long userId, String email, String username, String password,
+                                  PasswordEncoder passwordEncoder, String fullName,
+                                  String phone, List<String> roles) {
+        return User.builder()
+                .id(userId)
+                .email(Email.of(email))
+                .username(Username.of(username))
+                .password(Password.from(password, passwordEncoder))
+                .fullName(FullName.of(fullName))
+                .phone(Phone.of(phone))
+                .address(Address.from(AddressDto.builder()
+                        .city(CITY)
+                        .street(STREET)
+                        .zipcode(ZIPCODE)
+                        .detailedAddress(DETAILED_ADDRESS)
                         .build()))
                 .roles(Roles.from(roles))
                 .build();

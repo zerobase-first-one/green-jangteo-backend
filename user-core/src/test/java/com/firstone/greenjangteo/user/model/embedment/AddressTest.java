@@ -17,9 +17,9 @@ class AddressTest {
         // given
         AddressDto addressDto = AddressDto.builder()
                 .city(CITY1)
-                .street(STREET)
-                .zipcode(ZIPCODE)
-                .detailedAddress(DETAILED_ADDRESS)
+                .street(STREET1)
+                .zipcode(ZIPCODE1)
+                .detailedAddress(DETAILED_ADDRESS1)
                 .build();
 
         // when
@@ -37,16 +37,16 @@ class AddressTest {
         // given
         AddressDto addressDto1 = AddressDto.builder()
                 .city(CITY1)
-                .street(STREET)
-                .zipcode(ZIPCODE)
-                .detailedAddress(DETAILED_ADDRESS)
+                .street(STREET1)
+                .zipcode(ZIPCODE1)
+                .detailedAddress(DETAILED_ADDRESS1)
                 .build();
 
         AddressDto addressDto2 = AddressDto.builder()
                 .city(CITY2)
-                .street(STREET)
-                .zipcode(ZIPCODE)
-                .detailedAddress(DETAILED_ADDRESS)
+                .street(STREET1)
+                .zipcode(ZIPCODE1)
+                .detailedAddress(DETAILED_ADDRESS1)
                 .build();
 
         // when

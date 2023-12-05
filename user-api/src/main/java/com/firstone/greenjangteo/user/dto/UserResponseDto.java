@@ -11,9 +11,9 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
 @AllArgsConstructor
 @Builder
+@Getter
 public class UserResponseDto {
     private Long userId;
     private String email;
@@ -35,13 +35,6 @@ public class UserResponseDto {
         return UserResponseDto.builder()
                 .userId(userId)
                 .createdAt(createdAt)
-                .build();
-    }
-
-    public static UserResponseDto of(Long userId, List<String> roles) {
-        return UserResponseDto.builder()
-                .userId(userId)
-                .roles(roles)
                 .build();
     }
 }

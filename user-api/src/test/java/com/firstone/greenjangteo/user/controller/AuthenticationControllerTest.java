@@ -2,6 +2,10 @@ package com.firstone.greenjangteo.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.common.security.JwtTokenProvider;
+import com.firstone.greenjangteo.user.dto.DeleteRequestDto;
+import com.firstone.greenjangteo.user.dto.EmailRequestDto;
+import com.firstone.greenjangteo.user.dto.PasswordUpdateRequestDto;
+import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -27,14 +31,13 @@ import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUse
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(controllers = AuthenticationController.class)
 class AuthenticationControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -97,5 +100,90 @@ class AuthenticationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("비밀번호와 변경할 이메일 주소를 입력해 이메일 주소를 변경할 수 있다.")
+    @Test
+    @WithMockUser
+    void updateEmail() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        EmailRequestDto emailRequestDto = EmailRequestDto.builder()
+                .password(PASSWORD)
+                .email(EMAIL)
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/users/{userId}/email", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(emailRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("비밀번호와 변경할 전화번호를 입력해 전화번호를 변경할 수 있다.")
+    @Test
+    @WithMockUser
+    void updatePhone() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        PhoneRequestDto phoneRequestDto = PhoneRequestDto.builder()
+                .password(PASSWORD)
+                .phone(PHONE)
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/users/{userId}/phone", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(phoneRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("현재 비밀번호와 변경할 비밀번호를 입력해 비밀번호를 변경할 수 있다.")
+    @Test
+    @WithMockUser
+    void updatePassword() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword(PASSWORD)
+                .passwordToChange(PASSWORD)
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/users/{userId}/password", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(passwordUpdateRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("비밀번호 인증을 통해 회원을 탈퇴할 수 있다.")
+    @Test
+    @WithMockUser
+    void deleteUser() throws Exception {
+        // given
+        User user = TestObjectFactory.createUser(1L, EMAIL, USERNAME, PASSWORD, passwordEncoder,
+                FULL_NAME, PHONE, List.of(ROLE_BUYER.toString()));
+
+        DeleteRequestDto deleteRequestDto = new DeleteRequestDto(PASSWORD);
+
+        // when, then
+        mockMvc.perform(delete("/users/{userId}", user.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(deleteRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 }

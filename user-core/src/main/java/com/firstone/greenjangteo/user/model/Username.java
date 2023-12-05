@@ -8,6 +8,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.InvalidException
 
 public class Username {
     private final String username;
+    private static final String USERNAME_PATTERN = "^[a-z0-9]{4,16}$";
 
     private Username(String username) {
         this.username = username;
@@ -17,10 +18,6 @@ public class Username {
         validate(username);
 
         return new Username(username);
-    }
-
-    String getValue() {
-        return username;
     }
 
     @Override
@@ -36,6 +33,10 @@ public class Username {
         return Objects.hash(username);
     }
 
+    String getValue() {
+        return username;
+    }
+
     private static void validate(String username) {
         checkUsernameIsNotBlank(username);
         checkUsernamePattern(username);
@@ -48,7 +49,7 @@ public class Username {
     }
 
     private static void checkUsernamePattern(String username) {
-        if (!username.matches("^[a-z0-9]{4,16}$")) {
+        if (!username.matches(USERNAME_PATTERN)) {
             throw new IllegalArgumentException(INVALID_USERNAME_EXCEPTION);
         }
     }

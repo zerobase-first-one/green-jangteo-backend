@@ -21,9 +21,13 @@ public class TestConstant {
     public static final String PHONE2 = "01012345679";
     public static final String PHONE3 = "01012345680";
     public static final String PHONE4 = "01012345681";
+
     public static final String CITY1 = "서울";
     public static final String CITY2 = "부산";
-    public static final String STREET = "테헤란로 231";
-    public static final String ZIPCODE = "12345";
-    public static final String DETAILED_ADDRESS = "길동아파트 101동 102호";
+    public static final String STREET1 = "테헤란로 231";
+    public static final String STREET2 = "테헤란로 232";
+    public static final String ZIPCODE1 = "12345";
+    public static final String ZIPCODE2 = "12346";
+    public static final String DETAILED_ADDRESS1 = "길동아파트 101동 102호";
+    public static final String DETAILED_ADDRESS2 = "길동아파트 102동 103호";
 }

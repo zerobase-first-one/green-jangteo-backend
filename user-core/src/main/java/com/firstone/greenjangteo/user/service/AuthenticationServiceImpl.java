@@ -1,6 +1,10 @@
 package com.firstone.greenjangteo.user.service;
 
 
+import com.firstone.greenjangteo.user.dto.DeleteRequestDto;
+import com.firstone.greenjangteo.user.dto.EmailRequestDto;
+import com.firstone.greenjangteo.user.dto.PasswordUpdateRequestDto;
+import com.firstone.greenjangteo.user.dto.PhoneRequestDto;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUserException;
 import com.firstone.greenjangteo.user.excpeption.general.DuplicateUsernameException;
 import com.firstone.greenjangteo.user.excpeption.significant.IncorrectPasswordException;
@@ -35,17 +39,13 @@ import static org.springframework.transaction.annotation.Isolation.REPEATABLE_RE
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService, UserDetailsService {
+    private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        return new CustomUserDetails(getUser(Long.parseLong(userId)));
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다. userId: " + userId));
+        return new CustomUserDetails(userService.getUser(Long.parseLong(userId)));
     }
 
     @Override
@@ -67,6 +67,38 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         signedUpUser.updateLoginTime();
 
         return signedUpUser;
+    }
+
+    @Override
+    public void updateEmail(Long id, EmailRequestDto emailRequestDto) {
+        User user = userService.getUser(id);
+
+        validatePassword(user.getPassword(), emailRequestDto.getPassword());
+        user.updateEmail(emailRequestDto.getEmail());
+    }
+
+    @Override
+    public void updatePhone(Long id, PhoneRequestDto phoneRequestDto) {
+        User user = userService.getUser(id);
+
+        validatePassword(user.getPassword(), phoneRequestDto.getPassword());
+        user.updatePhone(phoneRequestDto.getPhone());
+    }
+
+    @Override
+    public void updatePassword(Long id, PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        User user = userService.getUser(id);
+
+        validatePassword(user.getPassword(), passwordUpdateRequestDto.getCurrentPassword());
+        user.updatePassword(passwordUpdateRequestDto.getPasswordToChange(), passwordEncoder);
+    }
+
+    @Override
+    public void deleteUser(long id, DeleteRequestDto deleteRequestDto) {
+        User user = userService.getUser(id);
+
+        validatePassword(user.getPassword(), deleteRequestDto.getPassword());
+        userRepository.delete(user);
     }
 
     private void validateNotDuplicateUser(String username, String email, String phone) {
