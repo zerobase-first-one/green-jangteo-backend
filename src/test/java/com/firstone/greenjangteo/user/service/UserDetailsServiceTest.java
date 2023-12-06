@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
 import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUserForm;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles("test")
 @SpringBootTest
 class UserDetailsServiceTest {
     @Autowired
