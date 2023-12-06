@@ -20,6 +20,9 @@ public class SignUpForm {
     @ApiModelProperty(value = "비밀번호", example = "Abc1!2@34")
     private String password;
 
+    @ApiModelProperty(value = "비밀번호 확인", example = "Abc1!2@34")
+    private String passwordConfirm;
+
     @ApiModelProperty(value = "성명", example = "홍길동")
     private String fullName;
 
