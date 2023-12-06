@@ -53,6 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     public User signUpUser(SignUpForm signUpForm) {
         User user = User.from(signUpForm, passwordEncoder);
 
+        validatePassword(user.getPassword(), signUpForm.getPasswordConfirm());
         validateNotDuplicateUser(signUpForm.getUsername(), signUpForm.getEmail(), signUpForm.getPhone());
 
         return userRepository.save(user);
@@ -69,18 +70,24 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     }
 
     @Override
+    @Transactional(isolation = REPEATABLE_READ, timeout = 10)
     public void updateEmail(Long id, EmailRequestDto emailRequestDto) {
         User user = userService.getUser(id);
 
         validatePassword(user.getPassword(), emailRequestDto.getPassword());
+        checkEmail(emailRequestDto.getEmail());
+
         user.updateEmail(emailRequestDto.getEmail());
     }
 
     @Override
+    @Transactional(isolation = REPEATABLE_READ, timeout = 10)
     public void updatePhone(Long id, PhoneRequestDto phoneRequestDto) {
         User user = userService.getUser(id);
 
         validatePassword(user.getPassword(), phoneRequestDto.getPassword());
+        checkPhone(phoneRequestDto.getPhone());
+
         user.updatePhone(phoneRequestDto.getPhone());
     }
 
