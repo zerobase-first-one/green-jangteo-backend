@@ -12,7 +12,6 @@ pipeline {
                     env.PROJECT_VERSION = projectVersion
                     env.JAR_PATH = "${WORKSPACE}/build/libs/${env.PROJECT_NAME}-${env.PROJECT_VERSION}.jar"
                 }
-                echo 'Check if changes are applied'
                 echo 'Environment variables set'
             }
         }
