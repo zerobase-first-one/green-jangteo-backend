@@ -63,7 +63,7 @@ class AuthenticationServiceTest {
                     String phone, String role) {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm
-                (email, username, password, fullName, phone, List.of(role));
+                (email, username, password, password, fullName, phone, List.of(role));
 
         // when
         User signedUpuser = authenticationService.signUpUser(signUpForm);
@@ -88,7 +88,7 @@ class AuthenticationServiceTest {
                                      String phone, String role1, String role2) {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm
-                (email, username, password, fullName, phone, List.of(role1, role2));
+                (email, username, password, password, fullName, phone, List.of(role1, role2));
 
         // when
         User signedUpuser = authenticationService.signUpUser(signUpForm);
@@ -114,7 +114,7 @@ class AuthenticationServiceTest {
                                         String phone, Role role1, Role role2) {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm
-                (email, username, password, fullName, phone, List.of(role1.toString(), role2.toString()));
+                (email, username, password, password, fullName, phone, List.of(role1.toString(), role2.toString()));
 
         // when
         authenticationService.signUpUser(signUpForm);
@@ -125,17 +125,37 @@ class AuthenticationServiceTest {
         assertThat(user.getPassword().matchOriginalPassword(passwordEncoder, password)).isTrue();
     }
 
+    @DisplayName("비밀번호와 재입력 비밀번호를 다르게 입력하는 경우 IncorrectPasswordException이 발생한다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abcd@abc.com, person1, Abcd1234!, Abcd12345!, 홍길동, 01012345678, ROLE_BUYER, ROLE_SELLER",
+            "abcd@abcd.com, person2, Abcd12345!, Abcd1234!, 고길동, 01012345679, ROLE_SELLER, ROLE_BUYER",
+            "abcd@abcde.com, person3, Abcd123456!, Abcd1234!, 김길동, 01012345680, ROLE_BUYER, ROLE_ADMIN"
+    })
+    void signUpUserWithWrongPasswordConfirm(String email, String username, String password, String passwordConfirm,
+                                            String fullName, String phone, Role role1, Role role2) {
+        // given
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+                (email, username, password, passwordConfirm,
+                        fullName, phone, List.of(role1.toString(), role2.toString()));
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.signUpUser(signUpForm))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
     @DisplayName("중복된 이메일을 전송하면 UserAlreadyExistsException이 발생한다.")
     @Test
     void signUpUserByDuplicateEmail() {
         // given
         SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
-                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+                PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
         SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME2,
-                PASSWORD2, FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
+                PASSWORD2, PASSWORD2, FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
         assertThatThrownBy(() -> authenticationService.signUpUser(signUpForm2))
@@ -148,12 +168,12 @@ class AuthenticationServiceTest {
     void signUpUserByDuplicatePhone() {
         // given
         SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
-                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+                PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
         SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME2,
-                PASSWORD2, FULL_NAME2, PHONE1, List.of(ROLE_SELLER.toString()));
+                PASSWORD2, PASSWORD2, FULL_NAME2, PHONE1, List.of(ROLE_SELLER.toString()));
 
         // when, then
         assertThatThrownBy(() -> authenticationService.signUpUser(signUpForm2))
@@ -166,12 +186,12 @@ class AuthenticationServiceTest {
     void signUpUserByDuplicateUsername() {
         // given
         SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
-                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+                PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, FULL_NAME2,
-                PHONE2, List.of(ROLE_SELLER.toString()));
+        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, PASSWORD2,
+                FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
         assertThatThrownBy(() -> authenticationService.signUpUser(signUpForm2))
@@ -184,7 +204,7 @@ class AuthenticationServiceTest {
     void signInUser() {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
-                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+                PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
 
@@ -205,7 +225,7 @@ class AuthenticationServiceTest {
     void signInUserWithNonExistentEmailOrUsername() {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
-                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+                PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
 
@@ -227,7 +247,7 @@ class AuthenticationServiceTest {
     void signInUserWithWrongPassword() {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
-                PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
+                PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
 

@@ -41,16 +41,16 @@ class UserDetailsServiceTest {
         List<String> roles4 = List.of(ROLE_SELLER.toString(), ROLE_BUYER.toString());
 
         SignUpForm signUpForm1 = enterUserForm
-                (EMAIL1, USERNAME1, PASSWORD1, FULL_NAME1, PHONE1, roles1);
+                (EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, roles1);
 
         SignUpForm signUpForm2 = enterUserForm
-                (EMAIL2, USERNAME2, PASSWORD2, FULL_NAME2, PHONE2, roles2);
+                (EMAIL2, USERNAME2, PASSWORD2, PASSWORD2, FULL_NAME2, PHONE2, roles2);
 
         SignUpForm signUpForm3 = enterUserForm
-                (EMAIL3, USERNAME3, PASSWORD3, FULL_NAME3, PHONE3, roles3);
+                (EMAIL3, USERNAME3, PASSWORD3, PASSWORD3, FULL_NAME3, PHONE3, roles3);
 
         SignUpForm signUpForm4 = enterUserForm
-                (EMAIL4, USERNAME4, PASSWORD4, FULL_NAME4, PHONE4, roles4);
+                (EMAIL4, USERNAME4, PASSWORD4, PASSWORD4, FULL_NAME4, PHONE4, roles4);
 
         authenticationService.signUpUser(signUpForm1);
         authenticationService.signUpUser(signUpForm2);
