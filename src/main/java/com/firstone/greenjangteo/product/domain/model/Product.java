@@ -2,8 +2,11 @@ package com.firstone.greenjangteo.product.domain.model;
 
 import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,20 +15,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "product")
-public class Product extends BaseEntity {
+public class Product {
 
-    /**
-     * `id`	BIGINT	NOT NULL,
-     * `seller_id`	BIGINT	NOT NULL,
-     * `name`	VARCHAR(20)	NOT NULL, >> itemName(?)
-     * `price`	INT	NOT NULL,
-     * `description`	MEDIUMTEXT	NULL,
-     * `average_score`	INT	NULL,
-     * `count`	INT	NOT NULL,
-     * `sales_rate`	INT	NOT NULL,
-     * `created_at`	DATETIME	NOT NULL,
-     * `modified_at`	DATETIME	NOT NULL
-     */
     @Id
     @Column(name = "product_id") //product_id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,6 +39,25 @@ public class Product extends BaseEntity {
 
     @Column(nullable = false)
     private int salesRate; //할인율
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedAt;
+
+    public static Product addProduct(ProductDto productDto) {
+        return Product.builder()
+                .storeId(productDto.getSellerId())
+                .name(productDto.getName())
+                .averageScore(productDto.getAverageScore())
+                .description(productDto.getDescription())
+                .price(productDto.getPrice())
+                .inventory(productDto.getInventory())
+                .salesRate(productDto.getSalesRate())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 
     public void updateProduct(ProductDto productDto) {
         this.name = productDto.getName();
