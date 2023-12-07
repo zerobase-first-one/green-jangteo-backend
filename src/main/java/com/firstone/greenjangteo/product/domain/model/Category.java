@@ -1,16 +1,12 @@
 package com.firstone.greenjangteo.product.domain.model;
 
 
+import com.firstone.greenjangteo.product.domain.dto.CategoryDto;
+import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import lombok.*;
 
 import javax.persistence.*;
 
-/**
- * `id`	BIGINT	NOT NULL,
- * `product_id`	BIGINT	NOT NULL,
- * `name`	VARCHAR(20)	NOT NULL,
- * `level`	INT	NOT NULL
- */
 @Getter
 @Setter
 @Builder
@@ -34,9 +30,11 @@ public class Category {
     @Column(name = "level", nullable = false)
     private int level; // category level
 
-    public void saveCategory(Product product, String categoryName, int level) {
-        this.product = product;
-        this.categoryName = categoryName;
-        this.level = level;
+    public static Category of(Product product, String categoryName, int level) {
+        return Category.builder()
+                .product(product)
+                .categoryName(categoryName)
+                .level(level)
+                .build();
     }
 }
