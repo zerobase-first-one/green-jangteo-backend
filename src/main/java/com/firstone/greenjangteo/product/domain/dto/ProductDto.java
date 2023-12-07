@@ -22,15 +22,14 @@ public class ProductDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public ProductDto of(Product product) {
+    public static ProductDto of(Product product) {
         return ProductDto.builder()
-                .sellerId(product.getStoreId())
+                .productId(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
-                .description(product.getDescription())
-                .averageScore(product.getAverageScore())
                 .inventory(product.getInventory())
-                .salesRate(product.getSalesRate())
+                .createdAt(product.getCreatedAt())
+                .modifiedAt(product.getModifiedAt())
                 .build();
     }
 }

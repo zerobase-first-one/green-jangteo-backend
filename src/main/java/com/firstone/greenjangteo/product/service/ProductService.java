@@ -34,28 +34,11 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     public Map<String, Object> saveProduct(ProductDto productDto, List<String> productImageUrlList, String productImageLocation) throws Exception {
-
-        //상품 등록
-        Product product = Product.builder()
-                .storeId(productDto.getSellerId())
-                .name(productDto.getName())
-                .averageScore(productDto.getAverageScore())
-                .description(productDto.getDescription())
-                .price(productDto.getPrice())
-                .inventory(productDto.getInventory())
-                .salesRate(productDto.getSalesRate())
-                .build();
-
-        product.setCreatedAt(LocalDateTime.now());
+        Product product = Product.addProduct(productDto);
         productRepository.save(product);
 
-        //이미지 등록
         for (int i = 0; i < productImageUrlList.size(); i++) {
-            ProductImage productImage = ProductImage.builder()
-                    .product(product)
-                    .url(productImageUrlList.get(i))
-                    .position(i)
-                    .build();
+            ProductImage productImage = ProductImage.saveProductImage(product, productImageUrlList.get(i), i);
             productImageService.saveProductImage(product, productImage, productImageUrlList.get(i), i, productImageLocation);
         }
 
@@ -81,7 +64,9 @@ public class ProductService {
 
             List<ProductImage> productImage = productImageRepository.findByProductId(curProductId);
             List<String> urlList = new ArrayList<>();
-            urlList.add(productImage.get(0).getUrl()); // 대표 이미지
+            for (ProductImage image : productImage) {
+                urlList.add(image.getUrl());
+            }
 
             List<Category> category = categoryRepository.findByProductId(curProductId);
             List<String> categoryList = new ArrayList<>();
@@ -132,9 +117,7 @@ public class ProductService {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
 
         categoryRepository.deleteByProductId(product.getId());
-
         productImageRepository.deleteByProductId(product.getId());
-
         productRepository.deleteById(product.getId());
 
         return ResponseEntity.noContent().build();
