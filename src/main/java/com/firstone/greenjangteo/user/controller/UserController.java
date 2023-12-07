@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.firstone.greenjangteo.user.controller.ApiConstant.PRINCIPAL_POINTCUT;
+import static com.firstone.greenjangteo.user.controller.ApiConstant.USER_ID_FORM;
 
 /**
  * 회원 API
@@ -23,8 +24,6 @@ import static com.firstone.greenjangteo.user.controller.ApiConstant.PRINCIPAL_PO
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    private static final String USER_ID_FORM = "회원 ID";
 
     private static final String GET_USER_DETAILS = "회원 개인정보 조회";
     private static final String GET_USER_DETAILS_DESCRIPTION = "회원 개인정보를 조회할 수 있습니다.";
@@ -58,7 +57,7 @@ public class UserController {
     @ApiOperation(value = UPDATE_ADDRESS, notes = UPDATE_ADDRESS_DESCRIPTION)
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/address")
-    public ResponseEntity<UserResponseDto> updateAddress
+    public ResponseEntity<Void> updateAddress
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_ADDRESS_FORM) AddressDto addressDto) {
         userService.updateAddress(Long.parseLong(userId), addressDto);

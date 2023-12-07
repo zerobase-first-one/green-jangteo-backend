@@ -41,8 +41,9 @@ class PhoneTest {
     @Test
     void ofBlankValue() {
         // given
-        String phone1 = "";
-        String phone2 = null;
+        String phone1 = null;
+        String phone2 = "";
+        String phone3 = " ";
 
         // when, then
         assertThatThrownBy(() -> Phone.of(phone1))
@@ -50,6 +51,10 @@ class PhoneTest {
                 .hasMessage(PHONE_NO_VALUE_EXCEPTION);
 
         assertThatThrownBy(() -> Phone.of(phone2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(PHONE_NO_VALUE_EXCEPTION);
+
+        assertThatThrownBy(() -> Phone.of(phone3))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(PHONE_NO_VALUE_EXCEPTION);
     }

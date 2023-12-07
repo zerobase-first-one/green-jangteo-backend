@@ -44,7 +44,7 @@ public class Email {
     }
 
     private static void checkEmailIsNotBlank(String email) {
-        if (email == null || email.isEmpty()) {
+        if (email == null || email.isBlank()) {
             throw new IllegalArgumentException(EMAIL_NO_VALUE_EXCEPTION);
         }
     }
