@@ -44,7 +44,6 @@ class UserControllerTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
 
-
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
 

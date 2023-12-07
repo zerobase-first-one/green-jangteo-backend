@@ -41,8 +41,9 @@ class UsernameTest {
     @Test
     void ofBlankValue() {
         // given
-        String username1 = "";
-        String username2 = null;
+        String username1 = null;
+        String username2 = "";
+        String username3 = " ";
 
         // when, then
         assertThatThrownBy(() -> Username.of(username1))
@@ -50,6 +51,10 @@ class UsernameTest {
                 .hasMessage(USERNAME_NO_VALUE_EXCEPTION);
 
         assertThatThrownBy(() -> Username.of(username2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(USERNAME_NO_VALUE_EXCEPTION);
+
+        assertThatThrownBy(() -> Username.of(username3))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(USERNAME_NO_VALUE_EXCEPTION);
     }

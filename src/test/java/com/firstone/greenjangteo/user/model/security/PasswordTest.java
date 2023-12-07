@@ -71,8 +71,9 @@ class PasswordTest {
     @Test
     void ofBlankValue() {
         // given
-        String password1 = "";
-        String password2 = null;
+        String password1 = null;
+        String password2 = "";
+        String password3 = " ";
 
         // when, then
         assertThatThrownBy(() -> Password.from(password1, passwordEncoder))
@@ -80,6 +81,10 @@ class PasswordTest {
                 .hasMessage(PASSWORD_NO_VALUE_EXCEPTION);
 
         assertThatThrownBy(() -> Password.from(password2, passwordEncoder))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(PASSWORD_NO_VALUE_EXCEPTION);
+
+        assertThatThrownBy(() -> Password.from(password3, passwordEncoder))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(PASSWORD_NO_VALUE_EXCEPTION);
     }

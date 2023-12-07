@@ -50,7 +50,7 @@ public class Password {
     }
 
     private static void checkPasswordIsNotBlank(String password) {
-        if (password == null || password.isEmpty()) {
+        if (password == null || password.isBlank()) {
             throw new IllegalArgumentException(PASSWORD_NO_VALUE_EXCEPTION);
         }
     }

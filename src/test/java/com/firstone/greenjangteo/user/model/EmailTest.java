@@ -17,32 +17,33 @@ class EmailTest {
     @Test
     void ofSameValue() {
         // given, when
-        Email email = Email.of(EMAIL1);
+        Email email1 = Email.of(EMAIL1);
         Email email2 = Email.of(EMAIL1);
 
         // then
-        assertThat(email).isEqualTo(email2);
-        assertThat(email.hashCode()).isEqualTo(email2.hashCode());
+        assertThat(email1).isEqualTo(email2);
+        assertThat(email1.hashCode()).isEqualTo(email2.hashCode());
     }
 
     @DisplayName("다른 이메일 주소를 전송하면 동등하지 않은 Email 인스턴스를 생성한다.")
     @Test
     void ofDifferentValue() {
         // given, when
-        Email email = Email.of(EMAIL1);
+        Email email1 = Email.of(EMAIL1);
         Email email2 = Email.of(EMAIL2);
 
         // then
-        assertThat(email).isNotEqualTo(email2);
-        assertThat(email.hashCode()).isNotEqualTo(email2.hashCode());
+        assertThat(email1).isNotEqualTo(email2);
+        assertThat(email1.hashCode()).isNotEqualTo(email2.hashCode());
     }
 
     @DisplayName("이메일 주소를 전송하지 않으면 IllegalArgumentException이 발생한다.")
     @Test
     void ofBlankValue() {
         // given
-        String email1 = "";
-        String email2 = null;
+        String email1 = null;
+        String email2 = "";
+        String email3 = " ";
 
         // when, then
         assertThatThrownBy(() -> Email.of(email1))
@@ -50,6 +51,10 @@ class EmailTest {
                 .hasMessage(EMAIL_NO_VALUE_EXCEPTION);
 
         assertThatThrownBy(() -> Email.of(email2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(EMAIL_NO_VALUE_EXCEPTION);
+
+        assertThatThrownBy(() -> Email.of(email3))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(EMAIL_NO_VALUE_EXCEPTION);
     }
