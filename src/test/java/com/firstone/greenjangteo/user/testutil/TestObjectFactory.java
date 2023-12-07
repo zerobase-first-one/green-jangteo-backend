@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
+import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME1;
 import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
 
 public class TestObjectFactory {
@@ -33,6 +34,7 @@ public class TestObjectFactory {
                         .detailedAddress(DETAILED_ADDRESS1)
                         .build())
                 .roles(roles)
+                .storeName(STORE_NAME1)
                 .build();
     }
 

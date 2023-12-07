@@ -1,5 +1,8 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
+import com.firstone.greenjangteo.user.domain.store.service.model.StoreName;
+import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -28,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
+import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME1;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.*;
@@ -48,6 +53,9 @@ class AuthenticationServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StoreRepository storeRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -197,6 +205,25 @@ class AuthenticationServiceTest {
         assertThatThrownBy(() -> authenticationService.signUpUser(signUpForm2))
                 .isInstanceOf(DuplicateUsernameException.class)
                 .hasMessage(DUPLICATE_USERNAME_EXCEPTION + signUpForm2.getUsername());
+    }
+
+    @DisplayName("판매자가 회원 가입하면 가게가 함께 생성된다.")
+    @Test
+    void createStore() {
+        // given
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+                EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
+        );
+
+        StoreName enteredStoreName = StoreName.of(signUpForm.getStoreName());
+
+        // when
+        User user = authenticationService.signUpUser(signUpForm);
+        Optional<Store> store = storeRepository.findById(user.getId());
+
+        // then
+        assertThat((store).isPresent()).isTrue();
+        assertThat(store.get().getStoreName()).isEqualTo(enteredStoreName);
     }
 
     @DisplayName("가입된 이메일 주소 또는 사용자 이름과 올바른 비밀번호를 전송하면 로그인을 할 수 있다.")
@@ -477,6 +504,7 @@ class AuthenticationServiceTest {
         userRepository.save(user);
 
         Long userId = user.getId();
+        storeRepository.save(Store.of(userId, STORE_NAME1));
 
         DeleteRequestDto deleteRequestDto = new DeleteRequestDto(password);
 
@@ -525,5 +553,21 @@ class AuthenticationServiceTest {
                 .deleteUser(userId, deleteRequestDto))
                 .isInstanceOf(IncorrectPasswordException.class)
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
+    @DisplayName("판매자가 회원을 탈퇴하면 판매자의 가게가 함께 삭제된다.")
+    @Test
+    void deleteStore() {
+        // given
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+                EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
+        );
+        User user = authenticationService.signUpUser(signUpForm);
+
+        // when
+        authenticationService.deleteUser(user.getId(), new DeleteRequestDto(PASSWORD1));
+
+        // then
+        assertThat(storeRepository.findById(user.getId()).isPresent()).isFalse();
     }
 }
