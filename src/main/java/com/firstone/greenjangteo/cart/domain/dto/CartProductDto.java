@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CartProductDto {
+    private Long cartProductId;
     private Long productId;
     private ProductDto product;
     private int cartProductQuantity;
@@ -30,20 +31,41 @@ public class CartProductDto {
 
     public static CartProductDto of(CartProduct cartProduct) {
         Product product = cartProduct.getProduct();
-        ProductDto productDto = ProductDto.builder()
-                .productId(product.getId())
-                .name(product.getName())
-                .price(product.getPrice())
-                .inventory(product.getInventory())
-                .createdAt(product.getCreatedAt())
-                .modifiedAt(product.getModifiedAt())
-                .build();
+        ProductDto productDto = ProductDto.of(product);
 
         return CartProductDto.builder()
                 .product(productDto)
                 .cartProductQuantity(cartProduct.getQuantity())
                 .createdAt(cartProduct.getCreatedAt())
                 .modifiedAt(cartProduct.getModifiedAt())
+                .build();
+    }
+
+    public static CartProduct cartProductCreatedOf(Cart cart, Product product, int quantity) {
+        return CartProduct.builder()
+                .cart(cart)
+                .product(product)
+                .quantity(quantity)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static CartProduct cartProductModifiedOf(CartProduct cartProduct, int quantity) {
+        return CartProduct.builder()
+                .id(cartProduct.getId())
+                .cart(cartProduct.getCart())
+                .product(cartProduct.getProduct())
+                .quantity(quantity)
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static CartProduct cartProductModifiedOf(Cart cart, Product product, int quantity) {
+        return CartProduct.builder()
+                .cart(cart)
+                .product(product)
+                .quantity(quantity)
+                .modifiedAt(LocalDateTime.now())
                 .build();
     }
 }
