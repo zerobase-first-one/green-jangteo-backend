@@ -1,6 +1,6 @@
 package com.firstone.greenjangteo.user.domain.store.dto;
 
-import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

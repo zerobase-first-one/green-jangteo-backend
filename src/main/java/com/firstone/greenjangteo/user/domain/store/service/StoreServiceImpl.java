@@ -2,9 +2,9 @@ package com.firstone.greenjangteo.user.domain.store.service;
 
 import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
 import com.firstone.greenjangteo.user.domain.store.exception.general.DuplicateStoreNameException;
+import com.firstone.greenjangteo.user.domain.store.model.StoreName;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
-import com.firstone.greenjangteo.user.domain.store.service.model.StoreName;
-import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

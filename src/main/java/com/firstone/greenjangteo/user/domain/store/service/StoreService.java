@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.user.domain.store.service;
 
 import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
-import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 
 public interface StoreService {
     void createStore(Long userId, String storeName);

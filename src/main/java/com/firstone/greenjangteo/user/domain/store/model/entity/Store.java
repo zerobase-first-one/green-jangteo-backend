@@ -1,8 +1,8 @@
-package com.firstone.greenjangteo.user.domain.store.service.model.entity;
+package com.firstone.greenjangteo.user.domain.store.model.entity;
 
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
-import com.firstone.greenjangteo.user.domain.store.service.model.StoreName;
+import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +42,8 @@ public class Store extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Store store = (Store) o;
-        return Objects.equals(sellerId, store.sellerId) && Objects.equals(storeName, store.storeName) && Objects.equals(description, store.description) && Objects.equals(imageUrl, store.imageUrl);
+        return Objects.equals(sellerId, store.sellerId) && Objects.equals(storeName, store.storeName)
+                && Objects.equals(description, store.description) && Objects.equals(imageUrl, store.imageUrl);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.firstone.greenjangteo.user.domain.store.controller;
 
 import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
-import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
