@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.user.domain.store.repository;
 
-import com.firstone.greenjangteo.user.domain.store.service.model.StoreName;
-import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
+import com.firstone.greenjangteo.user.domain.store.model.StoreName;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

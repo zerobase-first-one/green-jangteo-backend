@@ -2,8 +2,8 @@ package com.firstone.greenjangteo.user.domain.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
-import com.firstone.greenjangteo.user.domain.store.service.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.testutil.TestObjectFactory;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;

@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.user.domain.store.service.model;
+package com.firstone.greenjangteo.user.domain.store.model;
 
 import javax.persistence.AttributeConverter;
 import java.util.Objects;
