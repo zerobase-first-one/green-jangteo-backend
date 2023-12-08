@@ -43,7 +43,7 @@ public class Phone {
     }
 
     private static void checkPhoneIsNotBlank(String phone) {
-        if (phone == null || phone.isEmpty()) {
+        if (phone == null || phone.isBlank()) {
             throw new IllegalArgumentException(PHONE_NO_VALUE_EXCEPTION);
         }
     }

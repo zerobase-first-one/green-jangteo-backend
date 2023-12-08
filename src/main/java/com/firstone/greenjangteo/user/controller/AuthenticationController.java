@@ -82,7 +82,6 @@ public class AuthenticationController {
         Long userId = user.getId();
         LocalDateTime loggedInTime = user.getLastLoggedInAt();
         String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRoles().toStrings());
-        ;
 
         return ResponseEntity.status(HttpStatus.OK).body(new SignInResponseDto(userId, loggedInTime, token));
     }
@@ -90,7 +89,7 @@ public class AuthenticationController {
     @ApiOperation(value = UPDATE_EMAIL, notes = UPDATE_UPDATE_EMAIL_DESCRIPTION)
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/email")
-    public ResponseEntity<UserResponseDto> updateEmail
+    public ResponseEntity<Void> updateEmail
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_UPDATE_EMAIL_FORM) EmailRequestDto emailRequestDto) {
         authenticationService.updateEmail(Long.parseLong(userId), emailRequestDto);
@@ -101,7 +100,7 @@ public class AuthenticationController {
     @ApiOperation(value = UPDATE_PHONE, notes = UPDATE_PHONE_DESCRIPTION)
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/phone")
-    public ResponseEntity<UserResponseDto> updatePhone
+    public ResponseEntity<Void> updatePhone
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_PHONE_FORM) PhoneRequestDto phoneRequestDto) {
         authenticationService.updatePhone(Long.parseLong(userId), phoneRequestDto);
@@ -112,7 +111,7 @@ public class AuthenticationController {
     @ApiOperation(value = UPDATE_PASSWORD, notes = UPDATE_PASSWORD_DESCRIPTION)
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/password")
-    public ResponseEntity<UserResponseDto> updatePassword
+    public ResponseEntity<Void> updatePassword
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM)
              PasswordUpdateRequestDto passwordUpdateRequestDto) {

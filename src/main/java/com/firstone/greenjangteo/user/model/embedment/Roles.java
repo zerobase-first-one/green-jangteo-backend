@@ -57,6 +57,16 @@ public class Roles {
         return roles.get(index);
     }
 
+    public boolean checkIsSeller() {
+        for (Role role : roles) {
+            if (role.isSeller()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static void validate(List<String> roles) {
         if (roles == null || roles.isEmpty()) {
             throw new IllegalArgumentException(ROLE_NO_VALUE_EXCEPTION);

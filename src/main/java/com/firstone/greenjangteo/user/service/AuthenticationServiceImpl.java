@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.service;
 
 
+import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -30,16 +31,17 @@ import javax.persistence.EntityNotFoundException;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.EMAIL_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USERNAME_NOT_FOUND_EXCEPTION;
-import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
-import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
+import static org.springframework.transaction.annotation.Isolation.*;
 
 /**
  * 인증이 필요한 서비스
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = READ_COMMITTED, timeout = 10)
 public class AuthenticationServiceImpl implements AuthenticationService, UserDetailsService {
     private final UserService userService;
+    private final StoreService storeService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -49,17 +51,23 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     }
 
     @Override
-    @Transactional(isolation = REPEATABLE_READ, timeout = 20)
+    @Transactional(isolation = SERIALIZABLE, timeout = 20)
     public User signUpUser(SignUpForm signUpForm) {
         User user = User.from(signUpForm, passwordEncoder);
 
+        validatePassword(user.getPassword(), signUpForm.getPasswordConfirm());
         validateNotDuplicateUser(signUpForm.getUsername(), signUpForm.getEmail(), signUpForm.getPhone());
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (user.getRoles().checkIsSeller()) {
+            storeService.createStore(savedUser.getId(), signUpForm.getStoreName());
+        }
+
+        return savedUser;
     }
 
     @Override
-    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
     public User signInUser(SignInForm signInForm) {
         User signedUpUser = getUserFromEmailOrUsername(signInForm.getEmailOrUsername());
 
@@ -70,18 +78,24 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     }
 
     @Override
+    @Transactional(isolation = REPEATABLE_READ, timeout = 10)
     public void updateEmail(Long id, EmailRequestDto emailRequestDto) {
         User user = userService.getUser(id);
 
         validatePassword(user.getPassword(), emailRequestDto.getPassword());
+        checkEmail(emailRequestDto.getEmail());
+
         user.updateEmail(emailRequestDto.getEmail());
     }
 
     @Override
+    @Transactional(isolation = REPEATABLE_READ, timeout = 10)
     public void updatePhone(Long id, PhoneRequestDto phoneRequestDto) {
         User user = userService.getUser(id);
 
         validatePassword(user.getPassword(), phoneRequestDto.getPassword());
+        checkPhone(phoneRequestDto.getPhone());
+
         user.updatePhone(phoneRequestDto.getPhone());
     }
 
@@ -98,6 +112,10 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         User user = userService.getUser(id);
 
         validatePassword(user.getPassword(), deleteRequestDto.getPassword());
+
+        if (user.getRoles().checkIsSeller()) {
+            storeService.deleteStore(id);
+        }
         userRepository.delete(user);
     }
 

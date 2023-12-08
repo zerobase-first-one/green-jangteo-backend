@@ -5,7 +5,6 @@ import com.firstone.greenjangteo.user.model.Phone;
 import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +124,7 @@ class UserRepositoryTest {
         Optional<User> foundUser = userRepository.findByEmail(Email.of(EMAIL1));
 
         // then
-        AssertionsForClassTypes.assertThat(foundUser).isEmpty();
+        assertThat(foundUser).isEmpty();
     }
 
     @DisplayName("저장된 사용자 이름을 통해 회원을 찾을 수 있다.")
@@ -159,6 +158,6 @@ class UserRepositoryTest {
         Optional<User> foundUser = userRepository.findByUsername(Username.of(USERNAME1));
 
         // then
-        AssertionsForClassTypes.assertThat(foundUser).isEmpty();
+        assertThat(foundUser).isEmpty();
     }
 }

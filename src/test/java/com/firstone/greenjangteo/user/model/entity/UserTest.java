@@ -37,7 +37,7 @@ class UserTest {
               String phone, String role) {
         // given
         SignUpForm signUpForm = TestObjectFactory.enterUserForm(
-                email, username, password, fullName, phone, List.of(role)
+                email, username, password, password, fullName, phone, List.of(role)
         );
 
         // when

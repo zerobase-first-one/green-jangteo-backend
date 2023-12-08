@@ -43,7 +43,7 @@ public class Username {
     }
 
     private static void checkUsernameIsNotBlank(String username) {
-        if (username == null || username.isEmpty()) {
+        if (username == null || username.isBlank()) {
             throw new IllegalArgumentException(USERNAME_NO_VALUE_EXCEPTION);
         }
     }

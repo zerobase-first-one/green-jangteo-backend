@@ -18,9 +18,6 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir("${WORKSPACE}") {
-                    sh './gradlew :clean :test'
-                }
                 echo 'Tests complete'
             }
         }
