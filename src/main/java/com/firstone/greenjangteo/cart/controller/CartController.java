@@ -23,7 +23,6 @@ public class CartController {
     @PostMapping(value = "/carts") // 장바구니 화면에서 장바구니에 추가하는 요청(개수 변경)과 상품 화면에서 추가하는 요청(1씩 증가)
     public @ResponseBody ResponseEntity<Object> addCart(
             @RequestParam Long userId,
-            @RequestParam Boolean hasMany,
             @RequestBody CartProductDto cartProductDto,
             BindingResult bindingResult
     ) throws Exception {
@@ -33,7 +32,7 @@ public class CartController {
 
         Map<String, Object> result = new HashMap<>();
         try {
-            result = cartService.addCart(userId, hasMany, cartProductDto);
+            result = cartService.addCart(userId, cartProductDto);
         } catch (Exception e) {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
