@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.product.domain.dto;
 
 import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ProductDto {
     private Long productId;
-    private Long sellerId;
+    private Store sellerId;
     private String name;
     private Integer price;
     private String description;
@@ -22,15 +23,15 @@ public class ProductDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public ProductDto of(Product product) {
+    public static ProductDto of(Product product) {
         return ProductDto.builder()
-                .sellerId(product.getStoreId())
+                .productId(product.getId())
+                .sellerId(product.getStore())
                 .name(product.getName())
                 .price(product.getPrice())
-                .description(product.getDescription())
-                .averageScore(product.getAverageScore())
                 .inventory(product.getInventory())
-                .salesRate(product.getSalesRate())
+                .createdAt(product.getCreatedAt())
+                .modifiedAt(product.getModifiedAt())
                 .build();
     }
 }

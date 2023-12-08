@@ -20,26 +20,9 @@ import java.util.Map;
 public class CartController {
     private final CartService cartService;
 
-    /**
-     * req
-     * {
-     * "cartProduct1": {
-     * "productId": Long,
-     * "quantity": int
-     * }
-     * }
-     * <p>
-     * res :
-     * statusCode : 201
-     * {
-     * "cartId": Long,
-     * "createdAt": LocalDateTime
-     * }
-     */
     @PostMapping(value = "/carts") // 장바구니 화면에서 장바구니에 추가하는 요청(개수 변경)과 상품 화면에서 추가하는 요청(1씩 증가)
     public @ResponseBody ResponseEntity<Object> addCart(
             @RequestParam Long userId,
-            @RequestParam Boolean hasMany,
             @RequestBody CartProductDto cartProductDto,
             BindingResult bindingResult
     ) throws Exception {
@@ -49,7 +32,7 @@ public class CartController {
 
         Map<String, Object> result = new HashMap<>();
         try {
-            result = cartService.addCart(userId, hasMany, cartProductDto);
+            result = cartService.addCart(userId, cartProductDto);
         } catch (Exception e) {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
@@ -57,41 +40,6 @@ public class CartController {
         return ResponseEntity.ok().body(result);
     }
 
-    /**
-     * req : {}
-     * res
-     * {
-     * "cart" : [
-     * "cartProduct1": {
-     * "product": {
-     * "productId": Long,
-     * "productName": String,
-     * "price": int,
-     * "productCount": int,
-     * "createdAt": LocalDateTime,
-     * "modifiedAt": LocalDateTime
-     * },
-     * "cartProductQuantity": int,
-     * "createdAt": LocalDateTime,
-     * "modifiedAt": LocalDateTime* 		},
-     * "cartProduct2": {
-     * "product": {
-     * "productId": Long,
-     * "productName": String,
-     * "price": int,
-     * "productCount": int,
-     * "createdAt": LocalDateTime,
-     * "modifiedAt": LocalDateTime
-     * },
-     * "cartProductQuantity": int,
-     * "createdAt": LocalDateTime,
-     * "modifiedAt": LocalDateTime
-     * }
-     * ],
-     * "createdAt": LocalDateTime,
-     * "modifiedAt": LocalDateTime
-     * }
-     */
     @GetMapping(value = "/carts")
     public ResponseEntity<List<CartProductDto>> cartListAll(
             @RequestParam Long userId
@@ -100,15 +48,6 @@ public class CartController {
         return ResponseEntity.ok().body(cartProductList);
     }
 
-    /**
-     * req
-     * {
-     * "cartProductId" Long,
-     * "cartProductQuantity" : int
-     * }
-     * <p>
-     * res : 204
-     */
     @PutMapping(value = "/carts/cart-products/{cartProductId}")
     public ResponseEntity<Object> updateCartProductList(
             @RequestParam Long userId,
@@ -119,10 +58,6 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * req : cartProductId
-     * res : 204
-     */
     @DeleteMapping(value = "/carts/cart-products/{cartProductId}")
     public ResponseEntity<Object> deleteCartProduct(
             @RequestParam Long userId,
@@ -132,10 +67,6 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * req : cartProductId >> List
-     * res : 204
-     */
     @DeleteMapping(value = "/carts/selects")
     public ResponseEntity<Object> deleteSelectCartProductList(
             @RequestParam Long userId,
@@ -146,11 +77,7 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * req : cartId
-     * res : 204
-     */
-    @DeleteMapping(value = "/carts/selects")
+    @DeleteMapping(value = "/carts")
     public ResponseEntity<Object> deleteCart(
             @RequestParam Long userId
     ) {
