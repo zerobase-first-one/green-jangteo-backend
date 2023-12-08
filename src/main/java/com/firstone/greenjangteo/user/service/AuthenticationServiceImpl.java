@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.service;
 
 
+import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -40,6 +41,7 @@ import static org.springframework.transaction.annotation.Isolation.*;
 @Transactional(isolation = READ_COMMITTED, timeout = 10)
 public class AuthenticationServiceImpl implements AuthenticationService, UserDetailsService {
     private final UserService userService;
+    private final StoreService storeService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -56,7 +58,13 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         validatePassword(user.getPassword(), signUpForm.getPasswordConfirm());
         validateNotDuplicateUser(signUpForm.getUsername(), signUpForm.getEmail(), signUpForm.getPhone());
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (user.getRoles().checkIsSeller()) {
+            storeService.createStore(savedUser.getId(), signUpForm.getStoreName());
+        }
+
+        return savedUser;
     }
 
     @Override
@@ -104,6 +112,10 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         User user = userService.getUser(id);
 
         validatePassword(user.getPassword(), deleteRequestDto.getPassword());
+
+        if (user.getRoles().checkIsSeller()) {
+            storeService.deleteStore(id);
+        }
         userRepository.delete(user);
     }
 
