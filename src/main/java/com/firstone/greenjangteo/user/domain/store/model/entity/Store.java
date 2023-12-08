@@ -1,14 +1,18 @@
 package com.firstone.greenjangteo.user.domain.store.model.entity;
 
 import com.firstone.greenjangteo.audit.BaseEntity;
-import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
+import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
+
+import static javax.persistence.CascadeType.*;
 
 @Entity(name = "store")
 @Table(name = "store")
@@ -27,6 +31,9 @@ public class Store extends BaseEntity {
 
     @Column
     private String imageUrl;
+
+    @OneToMany(mappedBy = "store", cascade = {PERSIST, MERGE, REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Product> products;
 
     private Store(Long userId, String storeName) {
         sellerId = userId;
@@ -51,9 +58,9 @@ public class Store extends BaseEntity {
         return Objects.hash(sellerId, storeName, description, imageUrl);
     }
 
-    public void update(StoreDto storeDto) {
-        storeName = StoreName.of(storeDto.getStoreName());
-        description = storeDto.getDescription();
-        imageUrl = storeDto.getImageUrl();
+    public void update(StoreRequestDto storeRequestDto) {
+        storeName = StoreName.of(storeRequestDto.getStoreName());
+        description = storeRequestDto.getDescription();
+        imageUrl = storeRequestDto.getImageUrl();
     }
 }
