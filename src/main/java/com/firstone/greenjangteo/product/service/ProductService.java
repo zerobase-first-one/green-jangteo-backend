@@ -76,22 +76,20 @@ public class ProductService {
         ProductListDto productListDto = new ProductListDto();
         List<ProductListDto> productList = new ArrayList<>();
 
-        for (int i = 0; i < products.size(); i++) {
-            Long curProductId = products.get(i).getId();
+        for (Product product : products) {
+            Long curProductId = product.getId();
 
             List<ProductImage> productImage = productImageRepository.findByProductId(curProductId);
             List<String> urlList = new ArrayList<>();
-            for (int j = 0; j < productImage.size(); j++) {
-                urlList.add(productImage.get(j).getUrl());
-            }
+            urlList.add(productImage.get(0).getUrl()); // 대표 이미지
 
             List<Category> category = categoryRepository.findByProductId(curProductId);
             List<String> categoryList = new ArrayList<>();
-            for (int j = 0; j < category.size(); j++) {
-                categoryList.add(category.get(j).getCategoryName());
+            for (Category value : category) {
+                categoryList.add(value.getCategoryName());
             }
 
-            productList.add(productListDto.of(products.get(i), urlList, categoryList));
+            productList.add(productListDto.of(product, urlList, categoryList));
         }
         return productList;
     }
@@ -103,20 +101,20 @@ public class ProductService {
 
         List<ProductImage> productImage = productImageRepository.findByProductId(productId);
         List<String> urlList = new ArrayList<>();
-        for (int j = 0; j < productImage.size(); j++) {
-            urlList.add(productImage.get(j).getUrl());
+        for (ProductImage image : productImage) {
+            urlList.add(image.getUrl());
         }
 
         List<Category> category = categoryRepository.findByProductId(productId);
         List<String> categoryList = new ArrayList<>();
-        for (int j = 0; j < category.size(); j++) {
-            categoryList.add(category.get(j).getCategoryName());
+        for (Category value : category) {
+            categoryList.add(value.getCategoryName());
         }
 
         return productListDto.of(products, urlList, categoryList);
     }
 
-    public ResponseEntity.BodyBuilder updateProduct(Long productId, ProductDto productDto, List<String> productImageUrlList, List<String> categoryList, String productImageLocation) throws Exception {
+    public ResponseEntity updateProduct(Long productId, ProductDto productDto, List<String> productImageUrlList, List<String> categoryList, String productImageLocation) throws Exception {
         //product
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
         product.setModifiedAt(LocalDateTime.now());
@@ -127,16 +125,18 @@ public class ProductService {
 
         //category
         categoryService.updateCategory(productId, product, categoryList);
-        return ResponseEntity.status(204);
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity.BodyBuilder removeProduct(Long productId) {
+    public ResponseEntity removeProduct(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
 
         categoryRepository.deleteByProductId(product.getId());
+
         productImageRepository.deleteByProductId(product.getId());
+
         productRepository.deleteById(product.getId());
 
-        return ResponseEntity.status(204);
+        return ResponseEntity.noContent().build();
     }
 }

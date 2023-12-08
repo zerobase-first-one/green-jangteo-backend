@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import com.firstone.greenjangteo.product.domain.dto.ProductListDto;
 import com.firstone.greenjangteo.product.service.CategoryService;
 import com.firstone.greenjangteo.product.service.ProductService;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,14 +25,13 @@ public class ProductController {
     public ResponseEntity<Map<String, Object>> addProduct(
             ProductDto productDto,
             @RequestParam String productImageLocation,
-            @RequestParam List<String> productImageList,
-            @RequestParam List<String> categoryList,
+            @RequestParam @ApiParam(example = "1") List<String> productImageList,
+            @RequestParam @ApiParam(example = "가전제품") List<String> categoryList,
             BindingResult bindingResult
     ) throws Exception {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.notFound().build();
         }
-
         Map<String, Object> productInfo = productService.saveProduct(productDto, productImageList, productImageLocation);
         categoryService.saveCategory(Long.parseLong(productInfo.get("productId").toString()), categoryList);
         return ResponseEntity.ok().body(productInfo);
@@ -46,32 +46,32 @@ public class ProductController {
     @GetMapping(value = "/products/{productId}")
     public ResponseEntity<ProductListDto> productDetail(
             @PathVariable("productId") Long productId
-    ) throws Exception {
+    ) {
         ProductListDto productDetail = productService.getProductDetail(productId);
         return ResponseEntity.ok().body(productDetail);
     }
 
     @PutMapping(value = "/products/{productId}")
     public ResponseEntity<Object> productUpdate(
-            @PathVariable("productId") Long productId,
-            ProductDto productDto,
-            @RequestParam String productImageLocation,
-            @RequestParam List<String> productImageList,
-            @RequestParam List<String> categoryList,
+            @PathVariable("productId") @ApiParam(example = "1") Long productId,
+            @ApiParam(example = "") ProductDto productDto,
+            @RequestParam @ApiParam(example = "C:/greenjangteo/product") String productImageLocation,
+            @RequestParam @ApiParam(example = "1.jpg") List<String> productImageList,
+            @RequestParam @ApiParam(example = "가전제품 2") List<String> categoryList,
             BindingResult bindingResult) throws Exception {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.notFound().build();
         }
         productService.updateProduct(productId, productDto, productImageList, categoryList, productImageLocation);
-        return ResponseEntity.ok(204);
+        return ResponseEntity.noContent().build();
     }
 
 
     @DeleteMapping(value = "/products/{productId}")
     public ResponseEntity<Object> productRemove(
-            @PathVariable("productId") Long productId
-    ) throws Exception {
+            @PathVariable("productId") @ApiParam(example = "1") Long productId
+    ) {
         productService.removeProduct(productId);
-        return ResponseEntity.ok(204);
+        return ResponseEntity.noContent().build();
     }
 }

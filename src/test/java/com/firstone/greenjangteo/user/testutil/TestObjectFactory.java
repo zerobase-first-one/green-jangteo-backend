@@ -17,12 +17,13 @@ import java.util.List;
 import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
 
 public class TestObjectFactory {
-    public static SignUpForm enterUserForm(String email, String username, String password, String fullName,
-                                           String phone, List<String> roles) {
+    public static SignUpForm enterUserForm(String email, String username, String password, String passwordConfirm,
+                                           String fullName, String phone, List<String> roles) {
         return SignUpForm.builder()
                 .email(email)
                 .username(username)
                 .password(password)
+                .passwordConfirm(passwordConfirm)
                 .fullName(fullName)
                 .phone(phone)
                 .addressDto(AddressDto.builder()

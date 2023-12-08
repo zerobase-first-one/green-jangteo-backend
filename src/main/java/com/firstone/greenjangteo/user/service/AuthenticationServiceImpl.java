@@ -53,6 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     public User signUpUser(SignUpForm signUpForm) {
         User user = User.from(signUpForm, passwordEncoder);
 
+        validatePassword(user.getPassword(), signUpForm.getPasswordConfirm());
         validateNotDuplicateUser(signUpForm.getUsername(), signUpForm.getEmail(), signUpForm.getPhone());
 
         return userRepository.save(user);

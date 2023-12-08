@@ -1,7 +1,8 @@
 package com.firstone.greenjangteo.cart.controller;
 
-import com.firstone.greenjangteo.cart.domain.dto.CartDto;
+import com.firstone.greenjangteo.cart.domain.dto.CartProductDto;
 import com.firstone.greenjangteo.cart.service.CartService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,25 +18,38 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 public class CartController {
-
     private final CartService cartService;
 
-    @PostMapping(value = "user/{userId}/cart")
+    /**
+     * req
+     * {
+     * "cartProduct1": {
+     * "productId": Long,
+     * "quantity": int
+     * }
+     * }
+     * <p>
+     * res :
+     * statusCode : 201
+     * {
+     * "cartId": Long,
+     * "createdAt": LocalDateTime
+     * }
+     */
+    @PostMapping(value = "/carts") // 장바구니 화면에서 장바구니에 추가하는 요청(개수 변경)과 상품 화면에서 추가하는 요청(1씩 증가)
     public @ResponseBody ResponseEntity<Object> addCart(
-            @RequestBody CartDto cartDto,
-            @PathVariable("userId") Long userId,
+            @RequestParam Long userId,
+            @RequestParam Boolean hasMany,
+            @RequestBody CartProductDto cartProductDto,
             BindingResult bindingResult
-            //,Principal principal
     ) throws Exception {
         if (bindingResult.hasErrors()) {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
 
-        //String email = principal.getName();
-
         Map<String, Object> result = new HashMap<>();
         try {
-            result = cartService.addCart(userId, cartDto);
+            result = cartService.addCart(userId, hasMany, cartProductDto);
         } catch (Exception e) {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
@@ -43,32 +57,104 @@ public class CartController {
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping(value = "user/{userId}/cart")
-    public ResponseEntity<List<CartDto>> cartListAll(
-            @PathVariable("userId") Long userId
-            //,Principal principal
-    ) throws Exception {
-        List<CartDto> cartProductList = cartService.getCartList(userId);//principal.getName()); <<회원 인증관련
-        return ResponseEntity.ok(cartProductList);
+    /**
+     * req : {}
+     * res
+     * {
+     * "cart" : [
+     * "cartProduct1": {
+     * "product": {
+     * "productId": Long,
+     * "productName": String,
+     * "price": int,
+     * "productCount": int,
+     * "createdAt": LocalDateTime,
+     * "modifiedAt": LocalDateTime
+     * },
+     * "cartProductQuantity": int,
+     * "createdAt": LocalDateTime,
+     * "modifiedAt": LocalDateTime* 		},
+     * "cartProduct2": {
+     * "product": {
+     * "productId": Long,
+     * "productName": String,
+     * "price": int,
+     * "productCount": int,
+     * "createdAt": LocalDateTime,
+     * "modifiedAt": LocalDateTime
+     * },
+     * "cartProductQuantity": int,
+     * "createdAt": LocalDateTime,
+     * "modifiedAt": LocalDateTime
+     * }
+     * ],
+     * "createdAt": LocalDateTime,
+     * "modifiedAt": LocalDateTime
+     * }
+     */
+    @GetMapping(value = "/carts")
+    public ResponseEntity<List<CartProductDto>> cartListAll(
+            @RequestParam Long userId
+    ) {
+        List<CartProductDto> cartProductList = cartService.getCartList(userId);
+        return ResponseEntity.ok().body(cartProductList);
     }
 
-    @PutMapping(value = "user/{userId}/cart/{cartId}")
-    public ResponseEntity<Object> updateCartList(
-            @PathVariable("userId") Long userId,
-            @PathVariable("cartId") Long cartId,
-            @RequestBody List<CartDto> cartDtoList
-    ) throws Exception {
-        cartService.updateCartList(userId, cartId, cartDtoList);
-        return ResponseEntity.ok(204);
+    /**
+     * req
+     * {
+     * "cartProductId" Long,
+     * "cartProductQuantity" : int
+     * }
+     * <p>
+     * res : 204
+     */
+    @PutMapping(value = "/carts/cart-products/{cartProductId}")
+    public ResponseEntity<Object> updateCartProductList(
+            @RequestParam Long userId,
+            @PathVariable("cartProductId") Long cartProductId,
+            @RequestParam int quantity
+    ) {
+        cartService.updateCartProduct(userId, cartProductId, quantity);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping(value = "user/{userId}/cart/{cartId}")
-    public ResponseEntity<Object> deleteCartList(
-            @PathVariable("userId") Long userId,
-            @PathVariable("cartId") Long cartId,
-            @RequestParam List<Long> productIdList
-    ) throws Exception {
-        cartService.deleteCartList(userId, cartId, productIdList);
-        return ResponseEntity.ok(204);
+    /**
+     * req : cartProductId
+     * res : 204
+     */
+    @DeleteMapping(value = "/carts/cart-products/{cartProductId}")
+    public ResponseEntity<Object> deleteCartProduct(
+            @RequestParam Long userId,
+            @PathVariable("cartProductId") Long cartProductId
+    ) {
+        cartService.deleteCartList(userId, cartProductId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * req : cartProductId >> List
+     * res : 204
+     */
+    @DeleteMapping(value = "/carts/selects")
+    public ResponseEntity<Object> deleteSelectCartProductList(
+            @RequestParam Long userId,
+            @Parameter List<CartProductDto> cartProductDtoList
+    ) {
+        // delete service
+        cartService.deleteCartProductList(userId, cartProductDtoList);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * req : cartId
+     * res : 204
+     */
+    @DeleteMapping(value = "/carts/selects")
+    public ResponseEntity<Object> deleteCart(
+            @RequestParam Long userId
+    ) {
+        cartService.deleteCart(userId);
+        return ResponseEntity.noContent().build();
     }
 }

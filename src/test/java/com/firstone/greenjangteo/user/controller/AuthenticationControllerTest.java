@@ -63,7 +63,7 @@ class AuthenticationControllerTest {
     void signUpUser() throws Exception {
         // given
         SignUpForm signUpForm = enterUserForm(
-                EMAIL1, USERNAME1, PASSWORD1, FULL_NAME1,
+                EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1,
                 PHONE1, java.util.List.of(ROLE_BUYER.toString()));
 
         User user = TestObjectFactory.createUser(
@@ -86,8 +86,8 @@ class AuthenticationControllerTest {
     @WithMockUser
     void signInUser() throws Exception {
         // given
-        SignUpForm signUpForm = enterUserForm
-                (EMAIL1, USERNAME1, PASSWORD1, FULL_NAME1,
+        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+                (EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1,
                         PHONE1, List.of(ROLE_SELLER.toString()));
 
         User user = TestObjectFactory.createUser(
