@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.user.domain.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.domain.store.testutil.TestObjectFactory;
@@ -44,8 +44,8 @@ class StoreControllerTest {
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @DisplayName("판매자의 ID를 통해 자신의 가게 정보를 조회할 수 있다.")
-    @WithMockUser
     @Test
+    @WithMockUser
     void getStore() throws Exception {
         // given
         Store store = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
@@ -65,12 +65,12 @@ class StoreControllerTest {
         // given
         Store store = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
 
-        StoreRequestDto storeRequestDto = new StoreRequestDto(STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        StoreDto storeDto = StoreDto.of(STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
 
         // when, then
         mockMvc.perform(put("/stores/{userId}", store.getSellerId())
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(storeRequestDto))
+                        .content(objectMapper.writeValueAsString(storeDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNoContent());
