@@ -10,6 +10,8 @@ import com.firstone.greenjangteo.product.exception.ProductException;
 import com.firstone.greenjangteo.product.repository.CategoryRepository;
 import com.firstone.greenjangteo.product.repository.ProductImageRepository;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
+import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,19 +30,22 @@ public class ProductService {
 
     private final ProductImageService productImageService;
     private final CategoryService categoryService;
+    private final StoreService storeService;
 
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
 
     public Map<String, Object> saveProduct(ProductDto productDto, List<String> productImageUrlList, String productImageLocation) throws Exception {
-        Product product = Product.addProduct(productDto);
-        productRepository.save(product);
+        Store store = storeService.getStore(productDto.getSellerId());
+        Product product = Product.addProduct(productDto, store);
 
         for (int i = 0; i < productImageUrlList.size(); i++) {
             ProductImage productImage = ProductImage.saveProductImage(product, productImageUrlList.get(i), i);
             productImageService.saveProductImage(product, productImage, productImageUrlList.get(i), i, productImageLocation);
         }
+
+        productRepository.save(product);
 
         Map<String, Object> result = new HashMap<>();
         result.put("productId", product.getId());
