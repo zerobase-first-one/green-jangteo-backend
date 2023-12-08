@@ -33,10 +33,6 @@ public class Cart {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="order_id")
-    private Order order;
-
     @CreatedBy
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
