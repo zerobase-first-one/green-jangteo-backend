@@ -38,7 +38,7 @@ class UserDetailsServiceTest {
         List<String> roles1 = List.of(ROLE_SELLER.toString());
         List<String> roles2 = List.of(ROLE_BUYER.toString());
         List<String> roles3 = List.of(ROLE_ADMIN.toString());
-        List<String> roles4 = List.of(ROLE_SELLER.toString(), ROLE_BUYER.toString());
+        List<String> roles4 = List.of(ROLE_BUYER.toString(), ROLE_ADMIN.toString());
 
         SignUpForm signUpForm1 = enterUserForm
                 (EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, roles1);

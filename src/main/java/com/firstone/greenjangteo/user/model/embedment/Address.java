@@ -19,6 +19,7 @@ public class Address {
     private String street;
     private String zipcode;
     private String detailedAddress;
+
     private static final String CITY_PATTERN = "^[가-힣]{1,5}$";
     private static final String STREET_PATTERN = "^[가-힣0-9 ]+$";
     private static final String ZIPCODE_PATTERN = "^\\d{5}$";
@@ -74,25 +75,25 @@ public class Address {
 
 
     private static void checkCityIsNotBlank(String city) {
-        if (city == null || city.isEmpty()) {
+        if (city == null || city.isBlank()) {
             throw new IllegalArgumentException(CITY_NO_VALUE_EXCEPTION);
         }
     }
 
     private static void checkStreetIsNotBlank(String street) {
-        if (street == null || street.isEmpty()) {
+        if (street == null || street.isBlank()) {
             throw new IllegalArgumentException(STREET_NO_VALUE_EXCEPTION);
         }
     }
 
     private static void checkZipcodeIsNotBlank(String zipcode) {
-        if (zipcode == null || zipcode.isEmpty()) {
+        if (zipcode == null || zipcode.isBlank()) {
             throw new IllegalArgumentException(ZIPCODE_NO_VALUE_EXCEPTION);
         }
     }
 
     private static void checkDetailedAddressIsNotBlank(String detailedAddress) {
-        if (detailedAddress == null || detailedAddress.isEmpty()) {
+        if (detailedAddress == null || detailedAddress.isBlank()) {
             throw new IllegalArgumentException(DETAILED_ADDRESS_NO_VALUE_EXCEPTION);
         }
     }

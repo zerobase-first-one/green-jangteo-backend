@@ -41,8 +41,9 @@ class FullNameTest {
     @Test
     void ofBlankValue() {
         // given
-        String fullName1 = "";
-        String fullName2 = null;
+        String fullName1 = null;
+        String fullName2 = "";
+        String fullName3 = " ";
 
         // when, then
         assertThatThrownBy(() -> FullName.of(fullName1))
@@ -50,6 +51,10 @@ class FullNameTest {
                 .hasMessage(FULL_NAME_NO_VALUE_EXCEPTION);
 
         assertThatThrownBy(() -> FullName.of(fullName2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(FULL_NAME_NO_VALUE_EXCEPTION);
+
+        assertThatThrownBy(() -> FullName.of(fullName3))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(FULL_NAME_NO_VALUE_EXCEPTION);
     }

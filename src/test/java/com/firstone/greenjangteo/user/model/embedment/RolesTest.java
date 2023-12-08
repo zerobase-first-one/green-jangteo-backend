@@ -80,7 +80,7 @@ class RolesTest {
     @ParameterizedTest
     @CsvSource({"ROLE_ADMI", "ROLEBUYER", "SELLER", "관리자", "판매자", "구매자"})
     void fromInvalidValue(String role) {
-        // then
+        // given, when, then
         assertThatThrownBy(() -> Roles.from(List.of(role)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(INVALID_ROLE_EXCEPTION + role);

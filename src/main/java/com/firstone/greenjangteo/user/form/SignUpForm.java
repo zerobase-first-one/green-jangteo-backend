@@ -6,10 +6,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Getter
 public class SignUpForm {
     @ApiModelProperty(value = "이메일 주소", example = "abcd@abc.com")
     private String email;
