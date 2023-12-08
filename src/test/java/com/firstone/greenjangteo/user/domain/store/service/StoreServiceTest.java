@@ -1,6 +1,8 @@
 package com.firstone.greenjangteo.user.domain.store.service;
 
-import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
+import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.product.repository.ProductRepository;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
 import com.firstone.greenjangteo.user.domain.store.exception.general.DuplicateStoreNameException;
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
@@ -15,10 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import java.util.List;
+
 import static com.firstone.greenjangteo.user.domain.store.exception.ExceptionMessage.DUPLICATE_STORE_NAME_EXCEPTION;
 import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -29,6 +33,21 @@ class StoreServiceTest {
 
     @Autowired
     private StoreRepository storeRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    private static final String PRODUCT_NAME1 = "컴퓨터";
+    private static final String PRODUCT_NAME2 = "청소기";
+
+    private static final int PRICE1 = 10000;
+    private static final int PRICE2 = 20000;
+
+    private static final int INVENTORY1 = 10;
+    private static final int INVENTORY2 = 20;
 
     @DisplayName("올바른 가게 이름을 전송하면 가게를 생성할 수 있다.")
     @ParameterizedTest
@@ -60,7 +79,15 @@ class StoreServiceTest {
     void getStore() {
         // given
         Store createdStore = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
-        storeRepository.save(createdStore);
+        Store savedStore = storeRepository.save(createdStore);
+
+        Product product1 = TestObjectFactory.createProduct(savedStore, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = TestObjectFactory.createProduct(savedStore, PRODUCT_NAME2, PRICE2, INVENTORY2);
+
+        productRepository.saveAll(List.of(product1, product2));
+
+        entityManager.flush();
+        entityManager.refresh(savedStore);
 
         // when
         Store foundStore = storeRepository.findById(createdStore.getSellerId()).get();
@@ -70,6 +97,14 @@ class StoreServiceTest {
         assertThat(foundStore.getStoreName()).isEqualTo(createdStore.getStoreName());
         assertThat(foundStore.getDescription()).isEqualTo(createdStore.getDescription());
         assertThat(foundStore.getImageUrl()).isEqualTo(createdStore.getImageUrl());
+        assertThat(foundStore.getProducts()).hasSize(2)
+                .extracting("name", "price", "inventory", "salesRate")
+                .containsExactlyInAnyOrder(
+                        tuple(product1.getName(), product1.getPrice(),
+                                product1.getInventory(), product1.getSalesRate()),
+                        tuple(product2.getName(), product2.getPrice(),
+                                product2.getInventory(), product2.getSalesRate())
+                );
     }
 
     @DisplayName("자신의 가게를 수정할 수 있다.")
@@ -80,7 +115,7 @@ class StoreServiceTest {
         storeRepository.save(createdStore);
 
         // when
-        storeService.updateStore(1L, StoreDto.of(STORE_NAME2, DESCRIPTION2, IMAGE_URL2));
+        storeService.updateStore(1L, new StoreRequestDto(STORE_NAME2, DESCRIPTION2, IMAGE_URL2));
         Store foundStore = storeRepository.findById(createdStore.getSellerId()).get();
 
         // then
