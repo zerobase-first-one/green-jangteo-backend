@@ -34,4 +34,7 @@ public class SignUpForm {
 
     @ApiModelProperty(value = "분류", example = "[ROLE_BUYER, ROLE_SELLER]")
     private List<String> roles;
+
+    @ApiModelProperty(value = "가게 이름", example = "친환경 스토어")
+    private String storeName;
 }

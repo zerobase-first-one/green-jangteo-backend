@@ -1,8 +1,13 @@
 package com.firstone.greenjangteo.product.domain.model;
 
+import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,7 +16,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "review")
-public class Review extends BaseEntity {
+public class Review {
 
     /**
      * `id`	BIGINT	NOT NULL,
@@ -24,20 +29,25 @@ public class Review extends BaseEntity {
      */
 
     @Id
+    @Column(name = "review_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id; //review_id
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Long user_id;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<User> users;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Long product_id;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products;
 
     @Column(name = "content", nullable = false)
     private String content;
 
     @Column(name = "score", nullable = false)
     private int score;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedAt;
 }

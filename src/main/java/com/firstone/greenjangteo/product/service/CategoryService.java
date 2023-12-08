@@ -24,12 +24,7 @@ public class CategoryService {
                 .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
 
         for (int idx = 0; idx < category.size(); idx++) {
-            Category curCategory = Category.builder()
-                    .product(product)
-                    .categoryName(category.get(idx))
-                    .level(idx)
-                    .build();
-            categoryRepository.save(curCategory);
+            categoryRepository.save(Category.of(product, category.get(idx), idx));
         }
         return product.getId();
     }
@@ -38,12 +33,7 @@ public class CategoryService {
         int categoryDepth = categoryRepository.findByProductId(productId).size();
         categoryRepository.deleteByProductId(productId);
         for (int idx = 0; idx < categoryDepth; idx++) {
-            Category category = Category.builder()
-                    .product(product)
-                    .categoryName(categoryList.get(idx))
-                    .level(idx)
-                    .build();
-            categoryRepository.save(category);
+            categoryRepository.save(Category.of(product, categoryList.get(idx), idx));
         }
     }
 }

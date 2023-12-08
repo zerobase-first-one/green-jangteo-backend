@@ -82,7 +82,6 @@ public class AuthenticationController {
         Long userId = user.getId();
         LocalDateTime loggedInTime = user.getLastLoggedInAt();
         String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRoles().toStrings());
-        ;
 
         return ResponseEntity.status(HttpStatus.OK).body(new SignInResponseDto(userId, loggedInTime, token));
     }
@@ -94,8 +93,7 @@ public class AuthenticationController {
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_UPDATE_EMAIL_FORM) EmailRequestDto emailRequestDto) {
         authenticationService.updateEmail(Long.parseLong(userId), emailRequestDto);
-//    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private List<Product> products;
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

@@ -34,9 +34,11 @@ public class ProductImage {
     @Column(nullable = false)
     private int position;
 
-    public void saveProductImage(Product product, String imageUrl, int position) {
-        this.product = product;
-        this.url = imageUrl;
-        this.position = position;
+    public static ProductImage saveProductImage(Product product, String imageUrl, int position) {
+        return ProductImage.builder()
+                .product(product)
+                .url(imageUrl)
+                .position(position)
+                .build();
     }
 }
