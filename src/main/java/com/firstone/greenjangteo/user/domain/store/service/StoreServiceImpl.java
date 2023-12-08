@@ -1,6 +1,6 @@
 package com.firstone.greenjangteo.user.domain.store.service;
 
-import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
 import com.firstone.greenjangteo.user.domain.store.exception.general.DuplicateStoreNameException;
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
@@ -37,9 +37,9 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void updateStore(Long userId, StoreRequestDto storeRequestDto) {
+    public void updateStore(Long userId, StoreDto storeDto) {
         Store store = getStore(userId);
-        store.update(storeRequestDto);
+        store.update(storeDto);
     }
 
     @Override

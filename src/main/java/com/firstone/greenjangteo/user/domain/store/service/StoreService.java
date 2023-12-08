@@ -1,6 +1,6 @@
 package com.firstone.greenjangteo.user.domain.store.service;
 
-import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 
 public interface StoreService {
@@ -8,7 +8,7 @@ public interface StoreService {
 
     Store getStore(Long userId);
 
-    void updateStore(Long userId, StoreRequestDto storeRequestDto);
+    void updateStore(Long userId, StoreDto storeDto);
 
     void deleteStore(long id);
 }

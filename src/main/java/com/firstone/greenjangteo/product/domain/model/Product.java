@@ -1,14 +1,13 @@
 package com.firstone.greenjangteo.product.domain.model;
 
-import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
+import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -24,12 +23,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id; //상품코드
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Store store;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ProductImage> productImages;
 
     @Column(nullable = false, length = 20)
     private String name; //상품명
@@ -52,9 +47,9 @@ public class Product {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
-    public static Product addProduct(ProductDto productDto, Store store) {
+    public static Product addProduct(ProductDto productDto) {
         return Product.builder()
-                .store(store)
+                .store(productDto.getSellerId())
                 .name(productDto.getName())
                 .averageScore(productDto.getAverageScore())
                 .description(productDto.getDescription())
