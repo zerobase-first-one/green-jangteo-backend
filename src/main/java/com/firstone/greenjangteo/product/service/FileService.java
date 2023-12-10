@@ -25,7 +25,7 @@ public class FileService {
     }
 
     public void deleteFile(String path, String filePath) {
-        File deleteFile = new File(path + "\\/" + filePath);
+        File deleteFile = new File(path +"/"+ filePath);
         if (deleteFile.exists()) {
             deleteFile.delete();
             log.info("파일을 삭제하였습니다.");

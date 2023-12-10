@@ -5,12 +5,6 @@ import lombok.*;
 import javax.persistence.*;
 
 
-/**
- * `id`	BIGINT	NOT NULL,
- * `product_id`	BIGINT	NOT NULL,
- * `url`	VARCHAR(255)	NOT NULL,
- * `position`	INT	NOT NULL
- */
 @Getter
 @Setter
 @Builder

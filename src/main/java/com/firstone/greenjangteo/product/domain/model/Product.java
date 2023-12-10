@@ -1,5 +1,7 @@
 package com.firstone.greenjangteo.product.domain.model;
 
+import com.firstone.greenjangteo.product.form.AddProductForm;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import lombok.*;
@@ -18,50 +20,63 @@ import java.util.List;
 @Entity
 @Table(name = "product")
 public class Product {
-
     @Id
-    @Column(name = "product_id") //product_id
+    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id; //상품코드
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
     private Store store;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImage> productImages;
 
     @Column(nullable = false, length = 20)
-    private String name; //상품명
+    private String name;
 
-    @Column(name = "price", nullable = false)
-    private int price; //가격
+    @Column(nullable = false)
+    private int price;
 
+    @Column(nullable = false)
     private String description;
+
     private int averageScore;
 
     @Column(nullable = false)
-    private int inventory; //재고
+    private int inventory;
 
-    @Column(nullable = false)
-    private int salesRate; //할인율
+    private int salesRate;
 
     @CreatedDate
+    @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
-    public static Product addProduct(ProductDto productDto, Store store) {
+    public static Product of(ProductDto productDto) {
         return Product.builder()
                 .store(store)
                 .name(productDto.getName())
-                .averageScore(productDto.getAverageScore())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
                 .inventory(productDto.getInventory())
-                .salesRate(productDto.getSalesRate())
                 .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Product addProductRequestDtoToProduct(AddProductForm addProductForm, Store store) {
+        return Product.builder()
+                .store(store)
+                .name(addProductForm.getProductName())
+                .description(addProductForm.getDescription())
+                .price(addProductForm.getPrice())
+                .inventory(addProductForm.getInventory())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
     }
 
@@ -69,9 +84,8 @@ public class Product {
         this.name = productDto.getName();
         this.price = productDto.getPrice();
         this.inventory = productDto.getInventory();
-        this.salesRate = productDto.getSalesRate();
-        this.averageScore = productDto.getAverageScore();
         this.description = productDto.getDescription();
+        this.modifiedAt = productDto.getModifiedAt();
     }
 
     public void subCount(int demand) throws Exception {
