@@ -22,14 +22,13 @@ repositories {
 }
 
 dependencies {
-    // module
-    implementation project(':user-api')
-    implementation project(':product')
-    implementation project(':cart')
-
     // spring boot
     implementation 'org.springframework.boot:spring-boot-starter-web:2.7.12'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.7.12'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
     // json
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
@@ -40,8 +39,9 @@ dependencies {
 
     // data
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
-    testImplementation 'com.h2database:h2:1.4.200'
+    testImplementation 'com.h2database:h2:2.1.214'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.12'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.7.12'
 
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security:2.7.8'
@@ -55,53 +55,6 @@ dependencies {
 
     // health check
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-}
-
-subprojects {
-    apply plugin: 'java'
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
-
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        // spring boot
-        implementation 'org.springframework.boot:spring-boot-starter-web:2.7.12'
-        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.7.12'
-
-        // lombok
-        compileOnly 'org.projectlombok:lombok:1.18.26'
-        annotationProcessor 'org.projectlombok:lombok:1.18.26'
-
-        // json
-        implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-
-        // springfox
-        implementation 'io.springfox:springfox-boot-starter:3.0.0'
-        implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-
-        // data
-        runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
-        testImplementation 'com.h2database:h2:1.4.200'
-        implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.12'
-        implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.7.12'
-
-        // security
-        implementation 'org.springframework.boot:spring-boot-starter-security:2.7.8'
-        implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-        implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-        implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-        // test
-        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.8'
-        testImplementation 'org.springframework.security:spring-security-test'
-    }
-}
-
-bootJar {
-    mainClass.set('com.firstone.greenjangteo.GreenJangteoApplication')
 }
 
 tasks.named('test') {
