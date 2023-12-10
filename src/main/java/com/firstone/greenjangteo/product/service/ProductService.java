@@ -35,6 +35,7 @@ public class ProductService {
 
     private final ProductImageService productImageService;
     private final CategoryService categoryService;
+    private final StoreService storeService;
 
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;

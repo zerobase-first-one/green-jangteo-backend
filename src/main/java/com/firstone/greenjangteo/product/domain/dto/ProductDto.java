@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ProductDto {
     private Long productId;
-    private Store sellerId;
+    private Long sellerId;
     private String name;
     private Integer price;
     private String description;
@@ -27,7 +27,7 @@ public class ProductDto {
     public static ProductDto of(Product product) {
         return ProductDto.builder()
                 .productId(product.getId())
-                .sellerId(product.getStore())
+                .sellerId(product.getStore().getSellerId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .inventory(product.getInventory())

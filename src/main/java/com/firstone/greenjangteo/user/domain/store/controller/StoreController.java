@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.domain.store.controller;
 
-import com.firstone.greenjangteo.user.domain.store.dto.StoreDto;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
+import com.firstone.greenjangteo.user.domain.store.dto.StoreResponseDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import io.swagger.annotations.ApiOperation;
@@ -30,11 +31,11 @@ public class StoreController {
     @ApiOperation(value = GET_STORE, notes = GET_STORE_DESCRIPTION)
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @GetMapping("/{userId}")
-    public ResponseEntity<StoreDto> getStore
+    public ResponseEntity<StoreResponseDto> getStore
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
         Store store = storeService.getStore(Long.parseLong(userId));
 
-        return ResponseEntity.status(HttpStatus.OK).body(StoreDto.from(store));
+        return ResponseEntity.status(HttpStatus.OK).body(StoreResponseDto.from(store));
     }
 
     @ApiOperation(value = UPDATE_STORE, notes = UPDATE_STORE_DESCRIPTION)
@@ -42,8 +43,8 @@ public class StoreController {
     @PutMapping("/{userId}")
     public ResponseEntity<Void> updateStore
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
-             @RequestBody @ApiParam(value = UPDATE_STORE_FORM) StoreDto storeDto) {
-        storeService.updateStore(Long.parseLong(userId), storeDto);
+             @RequestBody @ApiParam(value = UPDATE_STORE_FORM) StoreRequestDto storeRequestDto) {
+        storeService.updateStore(Long.parseLong(userId), storeRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

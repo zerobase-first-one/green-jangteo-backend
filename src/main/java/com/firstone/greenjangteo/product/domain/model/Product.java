@@ -3,12 +3,14 @@ package com.firstone.greenjangteo.product.domain.model;
 import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.product.domain.dto.ProductDto;
+import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +28,9 @@ public class Product {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id")
     private Store store;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProductImage> productImages;
 
     @Column(nullable = false, length = 20)
     private String name;
@@ -53,7 +58,7 @@ public class Product {
 
     public static Product of(ProductDto productDto) {
         return Product.builder()
-                .store(productDto.getSellerId())
+                .store(store)
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
