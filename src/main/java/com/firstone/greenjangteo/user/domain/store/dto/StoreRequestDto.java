@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class StoreDto {
+public class StoreRequestDto {
     private static final String STORE_NAME_VALUE = "가게 이름";
     private static final String STORE_NAME_EXAMPLE = "친환경 스토어";
 
@@ -21,7 +21,6 @@ public class StoreDto {
     private static final String IMAGE_URL_EXAMPLE
             = "https://test-images-bucket.s3.us-west-1.amazonaws.com/images/sample1.jpg";
 
-
     @ApiModelProperty(value = STORE_NAME_VALUE, example = STORE_NAME_EXAMPLE)
     private String storeName;
 
@@ -31,11 +30,7 @@ public class StoreDto {
     @ApiModelProperty(value = IMAGE_URL_VALUE, example = IMAGE_URL_EXAMPLE)
     private String imageUrl;
 
-    public static StoreDto of(String storeName, String description, String imageUrl) {
-        return new StoreDto(storeName, description, imageUrl);
-    }
-
-    public static StoreDto from(Store store) {
-        return new StoreDto(store.getStoreName().getValue(), store.getDescription(), store.getImageUrl());
+    public static StoreRequestDto from(Store store) {
+        return new StoreRequestDto(store.getStoreName().getValue(), store.getDescription(), store.getImageUrl());
     }
 }
