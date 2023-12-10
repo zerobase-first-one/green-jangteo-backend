@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.product.service;
 
+import com.firstone.greenjangteo.product.domain.dto.CategoryDetailDto;
 import com.firstone.greenjangteo.product.domain.model.Category;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.exception.ErrorCode;
@@ -19,21 +20,19 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public Long saveCategory(Long productId, List<String> category) {
+    public void saveCategory(Long productId, List<CategoryDetailDto> categories) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
 
-        for (int idx = 0; idx < category.size(); idx++) {
-            categoryRepository.save(Category.of(product, category.get(idx), idx));
+        for (CategoryDetailDto category : categories) {
+            categoryRepository.save(Category.of(product, category.getCategory(), category.getLevel()));
         }
-        return product.getId();
     }
 
-    public void updateCategory(Long productId, Product product, List<String> categoryList) {
-        int categoryDepth = categoryRepository.findByProductId(productId).size();
-        categoryRepository.deleteByProductId(productId);
-        for (int idx = 0; idx < categoryDepth; idx++) {
-            categoryRepository.save(Category.of(product, categoryList.get(idx), idx));
+    public void updateCategory(Long productId, Product product, List<CategoryDetailDto> categories) {
+        categoryRepository.deleteAllByProductId(productId);
+        for (CategoryDetailDto category : categories) {
+            categoryRepository.save(Category.of(product, category.getCategory(), category.getLevel()));
         }
     }
 }
