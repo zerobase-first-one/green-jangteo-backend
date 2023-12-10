@@ -7,7 +7,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -18,26 +17,18 @@ import java.util.List;
 @Table(name = "review")
 public class Review {
 
-    /**
-     * `id`	BIGINT	NOT NULL,
-     * `user_id`	BIGINT	NOT NULL,
-     * `product_id`	BIGINT	NOT NULL,
-     * `content`	VARCHAR(255)	NOT NULL,
-     * `score`	INT	NOT NULL,
-     * `created_at`	DATETIME	NOT NULL,
-     * `modified_at`	DATETIME	NOT NULL
-     */
-
     @Id
     @Column(name = "review_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id; //review_id
+    private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<User> users;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User users;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Product> products;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product products;
 
     @Column(name = "content", nullable = false)
     private String content;
@@ -46,8 +37,10 @@ public class Review {
     private int score;
 
     @CreatedDate
+    @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column(nullable = false)
     private LocalDateTime modifiedAt;
 }
