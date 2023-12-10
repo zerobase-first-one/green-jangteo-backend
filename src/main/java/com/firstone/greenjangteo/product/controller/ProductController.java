@@ -1,10 +1,11 @@
 package com.firstone.greenjangteo.product.controller;
 
-import com.firstone.greenjangteo.product.domain.dto.ProductDto;
-import com.firstone.greenjangteo.product.domain.dto.ProductListDto;
-import com.firstone.greenjangteo.product.service.CategoryService;
+import com.firstone.greenjangteo.product.domain.dto.response.AddProductResponseDto;
+import com.firstone.greenjangteo.product.domain.dto.response.ProductDetailResponseDto;
+import com.firstone.greenjangteo.product.domain.dto.response.ProductsResponseDto;
+import com.firstone.greenjangteo.product.form.AddProductForm;
+import com.firstone.greenjangteo.product.form.UpdateProductForm;
 import com.firstone.greenjangteo.product.service.ProductService;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,64 +13,58 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
-    private final CategoryService categoryService;
 
     @PostMapping(value = "/products")
-    public ResponseEntity<Map<String, Object>> addProduct(
-            ProductDto productDto,
-            @RequestParam String productImageLocation,
-            @RequestParam @ApiParam(example = "1") List<String> productImageList,
-            @RequestParam @ApiParam(example = "가전제품") List<String> categoryList,
+    public ResponseEntity<AddProductResponseDto> addProduct(
+            @RequestBody AddProductForm addProductForm,
             BindingResult bindingResult
     ) throws Exception {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.notFound().build();
         }
-        Map<String, Object> productInfo = productService.saveProduct(productDto, productImageList, productImageLocation);
-        categoryService.saveCategory(Long.parseLong(productInfo.get("productId").toString()), categoryList);
-        return ResponseEntity.ok().body(productInfo);
+        return ResponseEntity.ok().body(productService.saveProduct(addProductForm));
     }
 
     @GetMapping(value = "/products")
-    public ResponseEntity<List<ProductListDto>> productListAll() {
-        List<ProductListDto> productList = productService.getProductList();
-        return ResponseEntity.ok().body(productList);
+    public ResponseEntity<List<ProductsResponseDto>> productListAll() {
+        return ResponseEntity.ok().body(productService.getProductList());
     }
 
-    @GetMapping(value = "/products/{productId}")
-    public ResponseEntity<ProductListDto> productDetail(
+    @GetMapping(value = "/products/{productId}/description")
+    public ResponseEntity<ProductDetailResponseDto> productDescription(
             @PathVariable("productId") Long productId
     ) {
-        ProductListDto productDetail = productService.getProductDetail(productId);
-        return ResponseEntity.ok().body(productDetail);
+        return ResponseEntity.ok().body(productService.getProductDescription(productId));
+    }
+
+    @GetMapping(value = "/products/{productId}/review")
+    public ResponseEntity<ProductDetailResponseDto> productReview(
+            @PathVariable("productId") Long productId
+    ) {
+        return ResponseEntity.ok().body(productService.getProductReviews(productId));
     }
 
     @PutMapping(value = "/products/{productId}")
-    public ResponseEntity<Object> productUpdate(
-            @PathVariable("productId") @ApiParam(example = "1") Long productId,
-            @ApiParam(example = "") ProductDto productDto,
-            @RequestParam @ApiParam(example = "C:/greenjangteo/product") String productImageLocation,
-            @RequestParam @ApiParam(example = "1.jpg") List<String> productImageList,
-            @RequestParam @ApiParam(example = "가전제품 2") List<String> categoryList,
+    public ResponseEntity productUpdate(
+            @RequestBody UpdateProductForm updateProductForm,
             BindingResult bindingResult) throws Exception {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.notFound().build();
         }
-        productService.updateProduct(productId, productDto, productImageList, categoryList, productImageLocation);
+        productService.updateProduct(updateProductForm);
         return ResponseEntity.noContent().build();
     }
 
 
     @DeleteMapping(value = "/products/{productId}")
-    public ResponseEntity<Object> productRemove(
-            @PathVariable("productId") @ApiParam(example = "1") Long productId
+    public ResponseEntity productRemove(
+            @PathVariable("productId") Long productId
     ) {
         productService.removeProduct(productId);
         return ResponseEntity.noContent().build();
