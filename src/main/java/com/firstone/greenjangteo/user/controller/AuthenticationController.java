@@ -24,8 +24,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 
-import static com.firstone.greenjangteo.user.controller.ApiConstant.PRINCIPAL_POINTCUT;
-import static com.firstone.greenjangteo.user.controller.ApiConstant.USER_ID_FORM;
+import static com.firstone.greenjangteo.web.ApiConstant.PRINCIPAL_POINTCUT;
+import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_FORM;
 
 /**
  * 인증이 필요한 API
