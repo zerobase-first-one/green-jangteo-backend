@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.model;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.util.Objects;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.USERNAME_NO_VALUE_EXCEPTION;
@@ -54,6 +55,7 @@ public class Username {
         }
     }
 
+    @Converter
     public static class UsernameConverter implements AttributeConverter<Username, String> {
         @Override
         public String convertToDatabaseColumn(Username username) {

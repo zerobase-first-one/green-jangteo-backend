@@ -5,6 +5,7 @@ import com.firstone.greenjangteo.user.dto.response.UserResponseDto;
 import com.firstone.greenjangteo.user.model.EntityToDtoMapper;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
+import com.firstone.greenjangteo.utility.InputFormatValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.firstone.greenjangteo.web.ApiConstant.PRINCIPAL_POINTCUT;
-import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_FORM;
+import static com.firstone.greenjangteo.web.ApiConstant.*;
 
 /**
  * 회원 API
@@ -39,7 +39,8 @@ public class UserController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @GetMapping("/{userId}/profile")
     public ResponseEntity<UserResponseDto> getUserDetails
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId) {
+        InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toPrincipal(user));
@@ -48,7 +49,8 @@ public class UserController {
     @ApiOperation(value = GET_USER, notes = GET_USER_DESCRIPTION)
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> getUser
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId) {
+        InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toOthers(user));
@@ -58,8 +60,9 @@ public class UserController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/address")
     public ResponseEntity<Void> updateAddress
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_ADDRESS_FORM) AddressDto addressDto) {
+        InputFormatValidator.validateId(userId);
         userService.updateAddress(Long.parseLong(userId), addressDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

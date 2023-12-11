@@ -3,10 +3,10 @@ package com.firstone.greenjangteo.user.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Getter
 public class AddressDto {
     private static final String CITY_VALUE = "지역 이름";
     private static final String CITY_EXAMPLE = "서울";

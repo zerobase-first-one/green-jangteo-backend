@@ -5,10 +5,10 @@ import lombok.*;
 
 import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_EXAMPLE;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Getter
 public class PasswordUpdateRequestDto {
     private static final String CURRENT_PASSWORD_VALUE = "현재 비밀번호";
     private static final String PASSWORD_TO_CHANGE_VALUE = "변경할 비밀번호";
