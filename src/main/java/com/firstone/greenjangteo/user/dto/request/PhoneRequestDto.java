@@ -6,10 +6,10 @@ import lombok.*;
 import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_EXAMPLE;
 import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_VALUE;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Getter
 public class PhoneRequestDto {
     private static final String PHONE_TO_CHANGE_VALUE = "변경할 전화번호";
     private static final String PHONE_TO_CHANGE_EXAMPLE = "01012345678";

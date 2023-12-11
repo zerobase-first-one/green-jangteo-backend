@@ -21,9 +21,9 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity(name = "users")
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
+@Getter
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
