@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.domain.store.model;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.util.Objects;
 
 import static com.firstone.greenjangteo.user.domain.store.exception.ExceptionMessage.INVALID_STORE_NAME_EXCEPTION;
@@ -53,6 +54,7 @@ public class StoreName {
         }
     }
 
+    @Converter
     public static class StoreNameConverter implements AttributeConverter<StoreName, String> {
         @Override
         public String convertToDatabaseColumn(StoreName storeName) {
