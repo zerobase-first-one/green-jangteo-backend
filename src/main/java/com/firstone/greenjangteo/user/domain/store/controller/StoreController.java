@@ -13,8 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.firstone.greenjangteo.web.ApiConstant.PRINCIPAL_POINTCUT;
-import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_FORM;
+import static com.firstone.greenjangteo.web.ApiConstant.*;
 
 @RestController
 @RequestMapping("/stores")
@@ -33,7 +32,7 @@ public class StoreController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @GetMapping("/{userId}")
     public ResponseEntity<StoreResponseDto> getStore
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId) {
         InputFormatValidator.validateId(userId);
         Store store = storeService.getStore(Long.parseLong(userId));
 
@@ -44,7 +43,7 @@ public class StoreController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PutMapping("/{userId}")
     public ResponseEntity<Void> updateStore
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_STORE_FORM) StoreRequestDto storeRequestDto) {
         InputFormatValidator.validateId(userId);
         storeService.updateStore(Long.parseLong(userId), storeRequestDto);
