@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.user.domain.store.exception.ExceptionMessage.INVALID_STORE_NAME_EXCEPTION;
 import static com.firstone.greenjangteo.user.domain.store.exception.ExceptionMessage.STORE_NAME_NO_VALUE_EXCEPTION;
@@ -39,23 +41,12 @@ class StoreNameTest {
     }
 
     @DisplayName("가게 이름을 전송하지 않으면 IllegalArgumentException이 발생한다.")
-    @Test
-    void ofBlankValue() {
-        // given
-        String storeName1 = null;
-        String storeName2 = "";
-        String storeName3 = " ";
-
-        // when, then
-        assertThatThrownBy(() -> StoreName.of(storeName1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(STORE_NAME_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> StoreName.of(storeName2))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(STORE_NAME_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> StoreName.of(storeName3))
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void ofBlankValue(String storeName) {
+        // given, when, then
+        assertThatThrownBy(() -> StoreName.of(storeName))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(STORE_NAME_NO_VALUE_EXCEPTION);
     }
