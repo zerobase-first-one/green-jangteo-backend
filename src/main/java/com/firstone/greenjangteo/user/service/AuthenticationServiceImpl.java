@@ -105,8 +105,6 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         validatePassword(user.getPassword(), passwordUpdateRequestDto.getCurrentPassword());
         user.updatePassword(passwordUpdateRequestDto.getPasswordToChange(), passwordEncoder);
-
-        validatePassword(user.getPassword(), passwordUpdateRequestDto.getPasswordToChangeConfirm());
     }
 
     @Override
