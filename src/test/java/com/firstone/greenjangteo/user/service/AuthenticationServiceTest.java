@@ -421,7 +421,7 @@ class AuthenticationServiceTest {
                 .hasMessage(INVALID_PHONE_EXCEPTION);
     }
 
-    @DisplayName("현재 비밀번호와 변경할 비밀번호를 입력해 비밀번호를 변경할 수 있다.")
+    @DisplayName("현재 비밀번호와 변경할 비밀번호, 변경할 비밀번호 확인을 입력해 비밀번호를 변경할 수 있다.")
     @Test
     void updatePassword() {
         // given
@@ -433,6 +433,7 @@ class AuthenticationServiceTest {
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD1)
                 .passwordToChange(PASSWORD2)
+                .passwordToChangeConfirm(PASSWORD2)
                 .build();
 
         // when
@@ -455,6 +456,7 @@ class AuthenticationServiceTest {
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD2)
                 .passwordToChange(PASSWORD2)
+                .passwordToChangeConfirm(PASSWORD2)
                 .build();
 
         // when, then
@@ -463,7 +465,7 @@ class AuthenticationServiceTest {
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
 
-    @DisplayName("유효하지 비밃번호를 통해 비밀번호를 변경하려 하면 IllegalArgumentException이 발생한다.")
+    @DisplayName("유효하지 않은 비밃번호를 통해 비밀번호를 변경하려 하면 IllegalArgumentException이 발생한다.")
     @ParameterizedTest
     @CsvSource({
             "abcD1!", "1234!abcde", "AbCdE12345", "!@1234ABCDE"
@@ -478,12 +480,34 @@ class AuthenticationServiceTest {
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD1)
                 .passwordToChange(password)
+                .passwordToChangeConfirm(password)
                 .build();
 
         // when, then
         assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordUpdateRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(INVALID_PASSWORD_EXCEPTION);
+    }
+
+    @DisplayName("일치하지 않는 비밀번호 확인을 통해 비밀번호를 변경하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void updatePasswordWithWrongPasswordConfirm() {
+        // given
+        User user = TestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword(PASSWORD1)
+                .passwordToChange(PASSWORD2)
+                .passwordToChangeConfirm(PASSWORD3)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordUpdateRequestDto))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
 
     @DisplayName("비밀번호 인증을 통해 회원을 탈퇴할 수 있다.")
