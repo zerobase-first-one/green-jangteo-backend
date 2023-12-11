@@ -6,35 +6,57 @@ import lombok.*;
 
 import java.util.List;
 
+import static com.firstone.greenjangteo.web.ApiConstant.*;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Getter
 public class SignUpForm {
-    @ApiModelProperty(value = "이메일 주소", example = "abcd@abc.com")
+    private static final String EMAIL_VALUE = "이메일 주소";
+
+    public static final String USERNAME_VALUE = "사용자 이름(아이디)";
+    private static final String USERNAME_EXAMPLE = "tester1";
+
+    private static final String FULL_NAME_VALUE = "성명";
+    private static final String FULL_NAME_EXAMPLE = "홍길동";
+
+    private static final String PHONE_VALUE = "전화번호";
+    private static final String PHONE_EXAMPLE = "01012345678";
+
+    private static final String ADDRESS_VALUE = "주소";
+
+    private static final String ROLES_VALUE = "분류";
+    private static final String ROLES_EXAMPLE = "[ROLE_BUYER, ROLE_SELLER]";
+
+    private static final String STORE_NAME_VALUE = "가게 이름";
+    private static final String STORE_NAME_EXAMPLE = "친환경 스토어";
+
+
+    @ApiModelProperty(value = EMAIL_VALUE, example = EMAIL_EXAMPLE)
     private String email;
 
-    @ApiModelProperty(value = "사용자 이름(아이디)", example = "tester1")
+    @ApiModelProperty(value = USERNAME_VALUE, example = USERNAME_EXAMPLE)
     private String username;
 
-    @ApiModelProperty(value = "비밀번호", example = "Abc1!2@34")
+    @ApiModelProperty(value = PASSWORD_VALUE, example = PASSWORD_EXAMPLE)
     private String password;
 
-    @ApiModelProperty(value = "비밀번호 확인", example = "Abc1!2@34")
+    @ApiModelProperty(value = PASSWORD_CONFIRM_VALUE, example = PASSWORD_EXAMPLE)
     private String passwordConfirm;
 
-    @ApiModelProperty(value = "성명", example = "홍길동")
+    @ApiModelProperty(value = FULL_NAME_VALUE, example = FULL_NAME_EXAMPLE)
     private String fullName;
 
-    @ApiModelProperty(value = "전화번호", example = "01012345678")
+    @ApiModelProperty(value = PHONE_VALUE, example = PHONE_EXAMPLE)
     private String phone;
 
-    @ApiModelProperty("주소")
+    @ApiModelProperty(ADDRESS_VALUE)
     private AddressDto addressDto;
 
-    @ApiModelProperty(value = "분류", example = "[ROLE_BUYER, ROLE_SELLER]")
+    @ApiModelProperty(value = ROLES_VALUE, example = ROLES_EXAMPLE)
     private List<String> roles;
 
-    @ApiModelProperty(value = "가게 이름", example = "친환경 스토어")
+    @ApiModelProperty(value = STORE_NAME_VALUE, example = STORE_NAME_EXAMPLE)
     private String storeName;
 }
