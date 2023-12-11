@@ -5,6 +5,7 @@ import com.firstone.greenjangteo.user.dto.response.UserResponseDto;
 import com.firstone.greenjangteo.user.model.EntityToDtoMapper;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
+import com.firstone.greenjangteo.utility.InputFormatValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class UserController {
     @GetMapping("/{userId}/profile")
     public ResponseEntity<UserResponseDto> getUserDetails
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
+        InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toPrincipal(user));
@@ -49,6 +51,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> getUser
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
+        InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toOthers(user));
@@ -60,6 +63,7 @@ public class UserController {
     public ResponseEntity<Void> updateAddress
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_ADDRESS_FORM) AddressDto addressDto) {
+        InputFormatValidator.validateId(userId);
         userService.updateAddress(Long.parseLong(userId), addressDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

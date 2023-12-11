@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
 import com.firstone.greenjangteo.user.domain.store.dto.StoreResponseDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
+import com.firstone.greenjangteo.utility.InputFormatValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class StoreController {
     @GetMapping("/{userId}")
     public ResponseEntity<StoreResponseDto> getStore
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId) {
+        InputFormatValidator.validateId(userId);
         Store store = storeService.getStore(Long.parseLong(userId));
 
         return ResponseEntity.status(HttpStatus.OK).body(StoreResponseDto.from(store));
@@ -44,6 +46,7 @@ public class StoreController {
     public ResponseEntity<Void> updateStore
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_STORE_FORM) StoreRequestDto storeRequestDto) {
+        InputFormatValidator.validateId(userId);
         storeService.updateStore(Long.parseLong(userId), storeRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

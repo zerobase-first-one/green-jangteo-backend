@@ -11,6 +11,7 @@ import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
+import com.firstone.greenjangteo.utility.InputFormatValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -92,6 +93,7 @@ public class AuthenticationController {
     public ResponseEntity<Void> updateEmail
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_UPDATE_EMAIL_FORM) EmailRequestDto emailRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.updateEmail(Long.parseLong(userId), emailRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -103,6 +105,7 @@ public class AuthenticationController {
     public ResponseEntity<Void> updatePhone
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_PHONE_FORM) PhoneRequestDto phoneRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.updatePhone(Long.parseLong(userId), phoneRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -115,6 +118,7 @@ public class AuthenticationController {
             (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
              @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM)
              PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.updatePassword(Long.parseLong(userId), passwordUpdateRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -126,6 +130,7 @@ public class AuthenticationController {
     public ResponseEntity<Void> deleteUser(
             @PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
             @RequestBody @ApiParam(value = DELETE_USER_FORM) DeleteRequestDto deleteRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.deleteUser(Long.parseLong(userId), deleteRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
