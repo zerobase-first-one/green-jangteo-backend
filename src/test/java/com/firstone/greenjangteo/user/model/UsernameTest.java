@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.USERNAME_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_USERNAME_EXCEPTION;
@@ -38,23 +40,12 @@ class UsernameTest {
     }
 
     @DisplayName("사용자 이름을 전송하지 않으면 IllegalArgumentException이 발생한다.")
-    @Test
-    void ofBlankValue() {
-        // given
-        String username1 = null;
-        String username2 = "";
-        String username3 = " ";
-
-        // when, then
-        assertThatThrownBy(() -> Username.of(username1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(USERNAME_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> Username.of(username2))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(USERNAME_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> Username.of(username3))
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void ofBlankValue(String username) {
+        // given, when, then
+        assertThatThrownBy(() -> Username.of(username))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(USERNAME_NO_VALUE_EXCEPTION);
     }
