@@ -1,6 +1,5 @@
-package com.firstone.greenjangteo.user.domain.store.service.model;
+package com.firstone.greenjangteo.user.domain.store.model;
 
-import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
