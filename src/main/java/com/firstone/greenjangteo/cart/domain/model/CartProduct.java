@@ -8,21 +8,13 @@ import org.springframework.data.annotation.LastModifiedBy;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * `id`	BIGINT	NOT NULL,
- * `cart_id`	BIGINT	NOT NULL,
- * `product_id`	BIGINT	NOT NULL,
- * `quantity`	INT	NOT NULL,
- * `created_at`	DATETIME	NOT NULL,
- * `modified_at`	DATETIME	NOT NULL
- */
-
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity(name = "cart_product")
+@Entity
+@Table(name = "cart_product")
 public class CartProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,7 +36,29 @@ public class CartProduct {
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
     @LastModifiedBy
+    @Column(nullable = false)
     private LocalDateTime modifiedAt;
+
+
+    public static CartProduct cartProductModifiedOf(CartProduct cartProduct, int quantity) {
+        return CartProduct.builder()
+                .id(cartProduct.getId())
+                .cart(cartProduct.getCart())
+                .product(cartProduct.getProduct())
+                .quantity(quantity)
+                .createdAt(cartProduct.getCreatedAt())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static CartProduct cartProductCreatedOf(Cart cart, Product product, int quantity){
+        return CartProduct.builder()
+                .cart(cart)
+                .product(product)
+                .quantity(quantity)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
 }
