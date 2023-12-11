@@ -6,10 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_EXAMPLE;
+import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_VALUE;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class DeleteRequestDto {
-    @ApiModelProperty(value = "비밀번호", example = "Abc1!2@34")
+    @ApiModelProperty(value = PASSWORD_VALUE, example = PASSWORD_EXAMPLE)
     private String password;
 }

@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.firstone.greenjangteo.user.controller.ApiConstant.PRINCIPAL_POINTCUT;
-import static com.firstone.greenjangteo.user.controller.ApiConstant.USER_ID_FORM;
+import static com.firstone.greenjangteo.web.ApiConstant.PRINCIPAL_POINTCUT;
+import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_FORM;
 
 @RestController
 @RequestMapping("/stores")
