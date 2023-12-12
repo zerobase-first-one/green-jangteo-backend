@@ -62,7 +62,7 @@ public class AuthenticationController {
     private static final String DELETE_USER = "회원 탈퇴";
     private static final String DELETE_USER_DESCRIPTION
             = "비밀번호를 입력해 회원을 탈퇴할 수 있습니다.";
-    private static final String DELETE_USER_FORM = "비밀번호 변경 양식";
+    private static final String DELETE_USER_FORM = "회원 탈퇴 양식";
 
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
