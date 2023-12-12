@@ -63,6 +63,15 @@ public class Address {
         return Objects.hash(city, street, zipcode, detailedAddress);
     }
 
+    public AddressDto toDto() {
+        return AddressDto.builder()
+                .city(city)
+                .street(street)
+                .zipcode(zipcode)
+                .detailedAddress(detailedAddress)
+                .build();
+    }
+
     private static void validate(String city, String street, String zipcode, String detailedAddress) {
         checkAddressIsNotBlank(city, street, zipcode, detailedAddress);
         checkAddressPattern(city, street, zipcode, detailedAddress);
@@ -129,14 +138,5 @@ public class Address {
         if (!detailedAddress.matches(DETAILED_ADDRESS_PATTERN)) {
             throw new IllegalArgumentException(INVALID_DETAILED_ADDRESS_EXCEPTION);
         }
-    }
-
-    public AddressDto toDto() {
-        return AddressDto.builder()
-                .city(city)
-                .street(street)
-                .zipcode(zipcode)
-                .detailedAddress(detailedAddress)
-                .build();
     }
 }
