@@ -4,7 +4,9 @@ import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 
-public class TestObjectFactory {
+import java.time.LocalDateTime;
+
+public class StoreTestObjectFactory {
     public static Store createStore(Long sellerId, String storeName, String description, String imageUrl) {
         Store store = Store.of(sellerId, storeName);
 
@@ -19,8 +21,11 @@ public class TestObjectFactory {
                 .store(store)
                 .name(productName)
                 .price(price)
+                .description(productName)
                 .inventory(inventory)
                 .salesRate(0)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
     }
 }

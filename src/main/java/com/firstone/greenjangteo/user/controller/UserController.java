@@ -2,7 +2,7 @@ package com.firstone.greenjangteo.user.controller;
 
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.dto.response.UserResponseDto;
-import com.firstone.greenjangteo.user.model.EntityToDtoMapper;
+import com.firstone.greenjangteo.user.model.UserEntityToDtoMapper;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
@@ -43,7 +43,7 @@ public class UserController {
         InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
-        return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toPrincipal(user));
+        return ResponseEntity.status(HttpStatus.OK).body(UserEntityToDtoMapper.toPrincipal(user));
     }
 
     @ApiOperation(value = GET_USER, notes = GET_USER_DESCRIPTION)
@@ -53,7 +53,7 @@ public class UserController {
         InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
-        return ResponseEntity.status(HttpStatus.OK).body(EntityToDtoMapper.toOthers(user));
+        return ResponseEntity.status(HttpStatus.OK).body(UserEntityToDtoMapper.toOthers(user));
     }
 
     @ApiOperation(value = UPDATE_ADDRESS, notes = UPDATE_ADDRESS_DESCRIPTION)

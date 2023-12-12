@@ -1,6 +1,6 @@
 package com.firstone.greenjangteo.user.testutil;
 
-public class TestConstant {
+public class UserTestConstant {
     public static final String EMAIL1 = "abcd@abc.com";
     public static final String EMAIL2 = "abcd@abcd.com";
     public static final String EMAIL3 = "abcd@abcde.com";

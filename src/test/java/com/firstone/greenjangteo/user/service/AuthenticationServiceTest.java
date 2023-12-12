@@ -18,7 +18,7 @@ import com.firstone.greenjangteo.user.model.Role;
 import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.repository.UserRepository;
-import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,14 +33,14 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME1;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.STORE_NAME1;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -70,7 +70,7 @@ class AuthenticationServiceTest {
     void signUpUser(String email, String username, String password, String fullName,
                     String phone, String role) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, password, fullName, phone, List.of(role));
 
         // when
@@ -95,7 +95,7 @@ class AuthenticationServiceTest {
     void signUpUserWithMultipleRoles(String email, String username, String password, String fullName,
                                      String phone, String role1, String role2) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, password, fullName, phone, List.of(role1, role2));
 
         // when
@@ -121,7 +121,7 @@ class AuthenticationServiceTest {
     void signUpUserWithEncodingPassword(String email, String username, String password, String fullName,
                                         String phone, Role role1, Role role2) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, password, fullName, phone, List.of(role1.toString(), role2.toString()));
 
         // when
@@ -143,7 +143,7 @@ class AuthenticationServiceTest {
     void signUpUserWithWrongPasswordConfirm(String email, String username, String password, String passwordConfirm,
                                             String fullName, String phone, Role role1, Role role2) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, passwordConfirm,
                         fullName, phone, List.of(role1.toString(), role2.toString()));
 
@@ -157,12 +157,12 @@ class AuthenticationServiceTest {
     @Test
     void signUpUserByDuplicateEmail() {
         // given
-        SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm1 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME2,
+        SignUpForm signUpForm2 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME2,
                 PASSWORD2, PASSWORD2, FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -175,12 +175,12 @@ class AuthenticationServiceTest {
     @Test
     void signUpUserByDuplicatePhone() {
         // given
-        SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm1 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME2,
+        SignUpForm signUpForm2 = UserTestObjectFactory.enterUserForm(EMAIL2, USERNAME2,
                 PASSWORD2, PASSWORD2, FULL_NAME2, PHONE1, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -193,12 +193,12 @@ class AuthenticationServiceTest {
     @Test
     void signUpUserByDuplicateUsername() {
         // given
-        SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm1 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, PASSWORD2,
+        SignUpForm signUpForm2 = UserTestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, PASSWORD2,
                 FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -211,7 +211,7 @@ class AuthenticationServiceTest {
     @Test
     void createStore() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
 
@@ -230,7 +230,7 @@ class AuthenticationServiceTest {
     @Test
     void signInUser() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
@@ -251,7 +251,7 @@ class AuthenticationServiceTest {
     @Test
     void signInUserWithNonExistentEmailOrUsername() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
@@ -273,7 +273,7 @@ class AuthenticationServiceTest {
     @Test
     void signInUserWithWrongPassword() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
@@ -295,7 +295,7 @@ class AuthenticationServiceTest {
     @Test
     void updateEmail() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -317,7 +317,7 @@ class AuthenticationServiceTest {
     @Test
     void updateEmailWithWrongPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -340,7 +340,7 @@ class AuthenticationServiceTest {
     })
     void updateEmailWithInvalidEmail(String email) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -360,7 +360,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePhone() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -382,7 +382,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePhoneWithWrongPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -405,7 +405,7 @@ class AuthenticationServiceTest {
     })
     void updatePhoneWithInvalidPhone(String phone) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -425,7 +425,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -448,7 +448,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePasswordWithWrongCurrentPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -472,7 +472,7 @@ class AuthenticationServiceTest {
     })
     void updatePasswordWithInvalidPassword(String password) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -493,7 +493,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePasswordWithWrongPasswordConfirm() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -522,7 +522,7 @@ class AuthenticationServiceTest {
             String fullName, String phone, String role
     ) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 email, username, password, passwordEncoder, fullName, phone, List.of(role)
         );
         userRepository.save(user);
@@ -543,7 +543,7 @@ class AuthenticationServiceTest {
     @Test
     void deleteUserByNonExistentId() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -563,7 +563,7 @@ class AuthenticationServiceTest {
     @Test
     void deleteUserWithWrongPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -583,7 +583,7 @@ class AuthenticationServiceTest {
     @Test
     void deleteStore() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
         User user = authenticationService.signUpUser(signUpForm);

@@ -3,7 +3,7 @@ package com.firstone.greenjangteo.user.service;
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.repository.UserRepository;
-import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +19,7 @@ import java.util.List;
 
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -47,7 +47,7 @@ class UserServiceTest {
                         String fullName, String phone, String role) {
 
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 email, username, password, passwordEncoder, fullName, phone, List.of(role)
         );
 
@@ -67,7 +67,7 @@ class UserServiceTest {
     @Test
     void getUserDetailsByWrongUserId() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -83,7 +83,7 @@ class UserServiceTest {
     @Test
     void updateAddress() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -116,7 +116,7 @@ class UserServiceTest {
     })
     void updateAddressWithInvalidAddress(String city, String street, String zipcode, String detailedAddress) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);

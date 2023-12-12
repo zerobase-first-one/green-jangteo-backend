@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
-import com.firstone.greenjangteo.user.domain.store.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,7 +48,7 @@ class StoreControllerTest {
     @Test
     void getStore() throws Exception {
         // given
-        Store store = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        Store store = StoreTestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
 
         when(storeService.getStore(store.getSellerId())).thenReturn(store);
 
@@ -63,7 +63,7 @@ class StoreControllerTest {
     @Test
     void updateStore() throws Exception {
         // given
-        Store store = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        Store store = StoreTestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
 
         StoreRequestDto storeRequestDto = new StoreRequestDto(STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
 
