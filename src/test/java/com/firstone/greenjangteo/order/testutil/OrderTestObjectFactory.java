@@ -9,7 +9,6 @@ import com.firstone.greenjangteo.order.model.OrderProducts;
 import com.firstone.greenjangteo.order.model.TotalOrderPrice;
 import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.product.domain.model.Product;
-import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.model.embedment.Address;
@@ -48,8 +47,7 @@ public class OrderTestObjectFactory {
                 .build();
     }
 
-    public static Order createOrder
-            (Store store, User buyer, int totalOrderPrice) {
+    public static Order createOrder(Store store, User buyer, int totalOrderPrice) {
         return Order.builder()
                 .store(store)
                 .buyer(buyer)
@@ -59,11 +57,16 @@ public class OrderTestObjectFactory {
                 .build();
     }
 
-
-    public static OrderProducts createOrderProducts
-            (List<OrderProductRequestDto> orderProductRequestDtos, ProductService productService, long sellerId) {
-        OrderProducts orderProducts = OrderProducts.from(orderProductRequestDtos, productService, sellerId);
-        return orderProducts;
+    public static Order createOrder(Long id, Store store, User buyer, int totalOrderPrice) {
+        return Order.builder()
+                .id(id)
+                .store(store)
+                .buyer(buyer)
+                .orderProducts(mock(OrderProducts.class))
+                .orderStatus(BEFORE_PAYMENT)
+                .totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
+                .shippingAddress(mock(Address.class))
+                .build();
     }
 
     public static Cart createCart(User user) {
