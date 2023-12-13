@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.PASSWORD_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_PASSWORD_EXCEPTION;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.PASSWORD1;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.PASSWORD2;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.PASSWORD1;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.PASSWORD2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

@@ -9,8 +9,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.FULL_NAME_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_FULL_NAME_EXCEPTION;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.FULL_NAME1;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.FULL_NAME2;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.FULL_NAME1;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.FULL_NAME2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

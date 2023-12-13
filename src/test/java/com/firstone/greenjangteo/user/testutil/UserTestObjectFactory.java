@@ -14,10 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME1;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.STORE_NAME1;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 
-public class TestObjectFactory {
+public class UserTestObjectFactory {
     public static SignUpForm enterUserForm(String email, String username, String password, String passwordConfirm,
                                            String fullName, String phone, List<String> roles) {
         return SignUpForm.builder()

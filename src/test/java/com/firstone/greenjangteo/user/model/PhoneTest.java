@@ -9,8 +9,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.PHONE_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_PHONE_EXCEPTION;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.PHONE1;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.PHONE2;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.PHONE1;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.PHONE2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

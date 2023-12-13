@@ -15,8 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static com.firstone.greenjangteo.user.model.Role.*;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
-import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUserForm;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestObjectFactory.enterUserForm;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ActiveProfiles("test")

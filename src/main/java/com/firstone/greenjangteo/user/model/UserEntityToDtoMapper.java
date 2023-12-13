@@ -4,7 +4,7 @@ import com.firstone.greenjangteo.order.dto.response.BuyerResponseDto;
 import com.firstone.greenjangteo.user.dto.response.UserResponseDto;
 import com.firstone.greenjangteo.user.model.entity.User;
 
-public class EntityToDtoMapper {
+public class UserEntityToDtoMapper {
     public static UserResponseDto toPrincipal(User user) {
         return UserResponseDto.builder()
                 .email(user.getEmail().getValue())
@@ -27,12 +27,11 @@ public class EntityToDtoMapper {
                 .build();
     }
 
-    public static BuyerResponseDto toOrder(User user) {
+    public static BuyerResponseDto toOrder(User buyer) {
         return BuyerResponseDto.builder()
-                .buyerName(user.getFullName().getValue())
-                .buyerPhone(user.getPhone().getValue())
-                .createdAt(user.getCreatedAt())
-                .modifiedAt(user.getModifiedAt())
+                .buyerName(buyer.getFullName().getValue())
+                .buyerPhone(buyer.getPhone().getValue())
+                .shippingAddressDto(buyer.getAddress().toDto())
                 .build();
     }
 }
