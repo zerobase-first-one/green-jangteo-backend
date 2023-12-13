@@ -16,8 +16,11 @@ import com.firstone.greenjangteo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +62,12 @@ public class OrderServiceImpl implements OrderService {
         order.getOrderProducts().addOrder(order);
 
         return orderRepository.save(order);
+    }
+
+    @Override
+    public Order getOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException(ORDER_ID_NOT_FOUND_EXCEPTION + orderId));
     }
 
     private List<OrderProductRequestDto> transferCartToOrderDto
