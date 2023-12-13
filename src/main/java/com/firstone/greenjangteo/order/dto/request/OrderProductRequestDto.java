@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.order.dto.request;
 
+import com.firstone.greenjangteo.cart.domain.dto.response.CartProductListResponseDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,4 +22,11 @@ public class OrderProductRequestDto {
 
     @ApiModelProperty(value = QUANTITY_VALUE, example = QUANTITY_EXAMPLE)
     private String quantity;
+
+    public static OrderProductRequestDto from(CartProductListResponseDto cartProductListResponseDto) {
+        String productId = String.valueOf(cartProductListResponseDto.getProductId());
+        String quantity = String.valueOf(cartProductListResponseDto.getQuantity());
+
+        return new OrderProductRequestDto(productId, quantity);
+    }
 }
