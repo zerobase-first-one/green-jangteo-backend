@@ -1,21 +1,16 @@
 package com.firstone.greenjangteo.order.testutil;
 
-import com.firstone.greenjangteo.cart.domain.model.Cart;
-import com.firstone.greenjangteo.cart.domain.model.CartProduct;
-import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.model.OrderProducts;
 import com.firstone.greenjangteo.order.model.TotalOrderPrice;
 import com.firstone.greenjangteo.order.model.entity.Order;
-import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.model.embedment.Address;
 import com.firstone.greenjangteo.user.model.entity.User;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +43,10 @@ public class OrderTestObjectFactory {
                 .build();
     }
 
+    private static OrderProductRequestDto createOrderProductDto(String productId, String quantity) {
+        return new OrderProductRequestDto(productId, quantity);
+    }
+
     public static Order createOrder
             (Store store, User buyer, int totalOrderPrice) {
         return Order.builder()
@@ -64,38 +63,5 @@ public class OrderTestObjectFactory {
             (List<OrderProductRequestDto> orderProductRequestDtos, ProductService productService, long sellerId) {
         OrderProducts orderProducts = OrderProducts.from(orderProductRequestDtos, productService, sellerId);
         return orderProducts;
-    }
-
-    public static Cart createCart(User user) {
-        return Cart.builder()
-                .user(user)
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
-                .build();
-    }
-
-    public static CartProduct createCartProduct(Cart cart, Product product1, String quantity1) {
-        return CartProduct.builder()
-                .cart(cart)
-                .product(product1)
-                .quantity(Integer.parseInt(quantity1))
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
-                .build();
-    }
-
-    public static CartOrderRequestDto createCartOrderRequestDto(String buyerId, String cartId) {
-        AddressDto shippingAddressDto = AddressDto.builder()
-                .city(CITY1)
-                .street(STREET1)
-                .zipcode(ZIPCODE1)
-                .detailedAddress(DETAILED_ADDRESS1)
-                .build();
-
-        return new CartOrderRequestDto(buyerId, cartId, shippingAddressDto);
-    }
-
-    private static OrderProductRequestDto createOrderProductDto(String productId, String quantity) {
-        return new OrderProductRequestDto(productId, quantity);
     }
 }
