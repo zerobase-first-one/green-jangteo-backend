@@ -8,4 +8,6 @@ public interface OrderService {
     Order createOrder(OrderRequestDto orderRequestDto);
 
     Order createOrderFromCart(CartOrderRequestDto cartOrderRequestDto);
+
+    Order getOrder(Long orderId);
 }

@@ -9,11 +9,13 @@ import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 public class OrderResponseDto {
@@ -25,6 +27,7 @@ public class OrderResponseDto {
     private int amountToPay;
     private String orderStatus;
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     public static OrderResponseDto from(Order order) {
         User buyer = order.getBuyer();
@@ -41,6 +44,7 @@ public class OrderResponseDto {
                 .amountToPay(totalOrderPrice.getValue())
                 .orderStatus(order.getOrderStatus().getDescription())
                 .createdAt(order.getCreatedAt())
+                .modifiedAt(order.getModifiedAt())
                 .build();
     }
 }
