@@ -16,6 +16,7 @@ import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -23,9 +24,12 @@ import java.util.List;
 
 import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDERED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
+import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
+import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = READ_COMMITTED, timeout = 10)
 public class OrderServiceImpl implements OrderService {
     private final StoreService storeService;
     private final UserService userService;
@@ -34,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
 
     @Override
+    @Transactional(isolation = SERIALIZABLE, timeout = 20)
     public Order createOrder(OrderRequestDto orderRequestDto) {
         Store store = storeService.getStore(Long.parseLong(orderRequestDto.getSellerId()));
         User buyer = userService.getUser(Long.parseLong(orderRequestDto.getBuyerId()));
@@ -43,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(isolation = SERIALIZABLE, timeout = 20)
     public Order createOrderFromCart(CartOrderRequestDto cartOrderRequestDto) {
         Long buyerId = Long.parseLong(cartOrderRequestDto.getBuyerId());
         User buyer = userService.getUser(buyerId);
@@ -65,6 +71,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(isolation = SERIALIZABLE, readOnly = true, timeout = 20)
     public List<Order> getOrders(UserIdRequestDto userIdRequestDto) {
         User user = userService.getUser(Long.parseLong(userIdRequestDto.getUserId()));
 
@@ -76,6 +83,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
     public Order getOrder(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException(ORDER_ID_NOT_FOUND_EXCEPTION + orderId));
