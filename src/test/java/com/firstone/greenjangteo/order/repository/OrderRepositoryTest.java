@@ -116,4 +116,46 @@ class OrderRepositoryTest {
                         tuple(store2.getSellerId(), buyer.getId())
                 );
     }
+
+    @DisplayName("주문 ID와 구매자 ID를 통해 주문의 존재 여부를 확인할 수 있다.")
+    @Test
+    void existsByIdAndBuyerId() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer1 = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        User buyer2 = UserTestObjectFactory.createUser(
+                EMAIL3, USERNAME3, PASSWORD3, passwordEncoder, FULL_NAME3, PHONE3, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer1, buyer2));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        productRepository.saveAll(List.of(product1, product2));
+
+        Order order1 = OrderTestObjectFactory.createOrder(store, buyer1, PRICE1);
+        Order order2 = OrderTestObjectFactory.createOrder(store, buyer2, PRICE2);
+        orderRepository.saveAll(List.of(order1, order2));
+
+        // when
+        boolean result1 = orderRepository.existsByIdAndBuyerId(order1.getId(), buyer1.getId());
+        boolean result2 = orderRepository.existsByIdAndBuyerId(order2.getId(), buyer2.getId());
+
+        boolean result3 = orderRepository.existsByIdAndBuyerId(order2.getId() + 1, buyer2.getId());
+        boolean result4 = orderRepository.existsByIdAndBuyerId(order2.getId(), buyer2.getId() + 1);
+        boolean result5 = orderRepository.existsByIdAndBuyerId(order2.getId() + 1, buyer2.getId() + 1);
+
+        // then
+        assertThat(result1).isTrue();
+        assertThat(result2).isTrue();
+
+        assertThat(result3).isFalse();
+        assertThat(result4).isFalse();
+        assertThat(result5).isFalse();
+    }
 }
