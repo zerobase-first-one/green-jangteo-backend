@@ -38,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
         Store store = storeService.getStore(Long.parseLong(orderRequestDto.getSellerId()));
         User buyer = userService.getUser(Long.parseLong(orderRequestDto.getBuyerId()));
         Order order = Order.from(store, buyer, orderRequestDto, productService);
-        order.getOrderProducts().addOrder(order);
 
         return orderRepository.save(order);
     }
@@ -61,7 +60,6 @@ public class OrderServiceImpl implements OrderService {
         );
 
         Order order = Order.from(store, buyer, orderRequestDto, productService);
-        order.getOrderProducts().addOrder(order);
 
         return orderRepository.save(order);
     }

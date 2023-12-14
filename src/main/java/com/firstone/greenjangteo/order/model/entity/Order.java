@@ -67,7 +67,7 @@ public class Order extends BaseEntity {
         OrderProducts orderProducts
                 = OrderProducts.from(orderRequestDto.getOrderProductRequestDtos(), productService, store.getSellerId());
 
-        return Order.builder()
+        Order order = Order.builder()
                 .store(store)
                 .buyer(buyer)
                 .orderProducts(orderProducts)
@@ -75,6 +75,10 @@ public class Order extends BaseEntity {
                 .totalOrderPrice(TotalOrderPrice.from(orderProducts))
                 .shippingAddress(Address.from(orderRequestDto.getShippingAddressDto()))
                 .build();
+
+        orderProducts.addOrder(order);
+
+        return order;
     }
 
     @Override
@@ -83,13 +87,13 @@ public class Order extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
         return Objects.equals(id, order.id) && Objects.equals(store, order.store)
-                && Objects.equals(buyer, order.buyer) && Objects.equals(orderProducts, order.orderProducts)
-                && orderStatus == order.orderStatus && Objects.equals(totalOrderPrice, order.totalOrderPrice)
+                && Objects.equals(buyer, order.buyer) && orderStatus == order.orderStatus
+                && Objects.equals(totalOrderPrice, order.totalOrderPrice)
                 && Objects.equals(shippingAddress, order.shippingAddress);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, store, buyer, orderProducts, orderStatus, totalOrderPrice, shippingAddress);
+        return Objects.hash(id, store, buyer, orderStatus, totalOrderPrice, shippingAddress);
     }
 }
