@@ -29,6 +29,7 @@ import static com.firstone.greenjangteo.exception.message.AccessDeniedMessage.AC
 import static com.firstone.greenjangteo.exception.message.AccessDeniedMessage.ACCESS_DENIED_REQUEST_ID;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_ADMIN;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
+import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_VALUE;
 
 @RestController
 @RequestMapping("/orders")
@@ -110,6 +111,21 @@ public class OrderController {
         Order order = orderService.getOrder(Long.parseLong(orderId));
 
         return ResponseEntity.status(HttpStatus.OK).body(OrderResponseDto.from(order));
+    }
+
+    @ApiOperation(value = DELETE_ORDER, notes = DELETE_ORDER_DESCRIPTION)
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDto> deleteOrder
+            (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
+             @RequestBody @ApiParam(value = USER_ID_VALUE) UserIdRequestDto userIdRequestDto) {
+        InputFormatValidator.validateId(orderId);
+        InputFormatValidator.validateId(userIdRequestDto.getUserId());
+
+        checkAuthentication(userIdRequestDto.getUserId());
+
+        orderService.deleteOrder(Long.parseLong(orderId), userIdRequestDto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private void checkAuthentication(String requestedId) {
