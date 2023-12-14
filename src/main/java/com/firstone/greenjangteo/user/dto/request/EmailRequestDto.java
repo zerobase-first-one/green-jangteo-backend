@@ -6,10 +6,10 @@ import lombok.*;
 import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_EXAMPLE;
 import static com.firstone.greenjangteo.web.ApiConstant.PASSWORD_VALUE;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Getter
 public class EmailRequestDto {
     private static final String EMAIL_TO_CHANGE_VALUE = "변경할 이메일 주소";
     private static final String EMAIL_TO_CHANGE_EXAMPLE = "abcde@abc.com";

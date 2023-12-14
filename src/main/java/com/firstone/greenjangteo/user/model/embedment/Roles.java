@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.model.embedment;
 
 import com.firstone.greenjangteo.user.model.Role;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMe
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_ROLE_EXCEPTION;
 
 @Embeddable
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Roles {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)

@@ -7,7 +7,7 @@ import com.firstone.greenjangteo.user.domain.store.exception.general.DuplicateSt
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
-import com.firstone.greenjangteo.user.domain.store.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,7 +21,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.firstone.greenjangteo.user.domain.store.exception.ExceptionMessage.DUPLICATE_STORE_NAME_EXCEPTION;
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -40,15 +40,6 @@ class StoreServiceTest {
     @Autowired
     private EntityManager entityManager;
 
-    private static final String PRODUCT_NAME1 = "컴퓨터";
-    private static final String PRODUCT_NAME2 = "청소기";
-
-    private static final int PRICE1 = 10000;
-    private static final int PRICE2 = 20000;
-
-    private static final int INVENTORY1 = 10;
-    private static final int INVENTORY2 = 20;
-
     @DisplayName("올바른 가게 이름을 전송하면 가게를 생성할 수 있다.")
     @ParameterizedTest
     @CsvSource({"친환경 스토어", "green jangteo", "착한 가게"})
@@ -65,7 +56,7 @@ class StoreServiceTest {
     @Test
     void createStoreWithInvalidValue() {
         // given
-        Store createdStore = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        Store createdStore = StoreTestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
         storeRepository.save(createdStore);
 
         // when, then
@@ -78,11 +69,11 @@ class StoreServiceTest {
     @Test
     void getStore() {
         // given
-        Store createdStore = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        Store createdStore = StoreTestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
         Store savedStore = storeRepository.save(createdStore);
 
-        Product product1 = TestObjectFactory.createProduct(savedStore, PRODUCT_NAME1, PRICE1, INVENTORY1);
-        Product product2 = TestObjectFactory.createProduct(savedStore, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        Product product1 = StoreTestObjectFactory.createProduct(savedStore, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(savedStore, PRODUCT_NAME2, PRICE2, INVENTORY2);
 
         productRepository.saveAll(List.of(product1, product2));
 
@@ -111,7 +102,7 @@ class StoreServiceTest {
     @Test
     void updateStore() {
         // given
-        Store createdStore = TestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        Store createdStore = StoreTestObjectFactory.createStore(1L, STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
         storeRepository.save(createdStore);
 
         // when

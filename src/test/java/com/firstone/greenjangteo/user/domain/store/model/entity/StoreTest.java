@@ -1,14 +1,13 @@
-package com.firstone.greenjangteo.user.domain.store.service.model.entity;
+package com.firstone.greenjangteo.user.domain.store.model.entity;
 
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
-import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME1;
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME2;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.STORE_NAME1;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.STORE_NAME2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class StoreTest {

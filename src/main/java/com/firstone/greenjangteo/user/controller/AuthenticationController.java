@@ -11,6 +11,7 @@ import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
+import com.firstone.greenjangteo.utility.InputFormatValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 
-import static com.firstone.greenjangteo.web.ApiConstant.PRINCIPAL_POINTCUT;
-import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_FORM;
+import static com.firstone.greenjangteo.web.ApiConstant.*;
 
 /**
  * 인증이 필요한 API
@@ -62,7 +62,7 @@ public class AuthenticationController {
     private static final String DELETE_USER = "회원 탈퇴";
     private static final String DELETE_USER_DESCRIPTION
             = "비밀번호를 입력해 회원을 탈퇴할 수 있습니다.";
-    private static final String DELETE_USER_FORM = "비밀번호 변경 양식";
+    private static final String DELETE_USER_FORM = "회원 탈퇴 양식";
 
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
@@ -90,8 +90,9 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/email")
     public ResponseEntity<Void> updateEmail
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_UPDATE_EMAIL_FORM) EmailRequestDto emailRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.updateEmail(Long.parseLong(userId), emailRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -101,8 +102,9 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/phone")
     public ResponseEntity<Void> updatePhone
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_PHONE_FORM) PhoneRequestDto phoneRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.updatePhone(Long.parseLong(userId), phoneRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -112,9 +114,10 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/password")
     public ResponseEntity<Void> updatePassword
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM)
              PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.updatePassword(Long.parseLong(userId), passwordUpdateRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -124,8 +127,9 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(
-            @PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = "1") String userId,
+            @PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
             @RequestBody @ApiParam(value = DELETE_USER_FORM) DeleteRequestDto deleteRequestDto) {
+        InputFormatValidator.validateId(userId);
         authenticationService.deleteUser(Long.parseLong(userId), deleteRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

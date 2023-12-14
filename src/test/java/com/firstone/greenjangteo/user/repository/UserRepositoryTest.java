@@ -4,7 +4,7 @@ import com.firstone.greenjangteo.user.model.Email;
 import com.firstone.greenjangteo.user.model.Phone;
 import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.entity.User;
-import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ActiveProfiles("test")
@@ -36,7 +36,7 @@ class UserRepositoryTest {
         // given
         Email email1 = Email.of(EMAIL1);
         Email email2 = Email.of(EMAIL2);
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -57,7 +57,7 @@ class UserRepositoryTest {
         // given
         Username username1 = Username.of(USERNAME1);
         Username username2 = Username.of(USERNAME2);
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -78,7 +78,7 @@ class UserRepositoryTest {
         // given
         Phone phone1 = Phone.of(PHONE1);
         Phone phone2 = Phone.of(PHONE2);
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -97,7 +97,7 @@ class UserRepositoryTest {
     @Test
     void findByEmailByExistent() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -116,7 +116,7 @@ class UserRepositoryTest {
     @Test
     void findByEmailByNotExistent() {
         // given
-        TestObjectFactory.createUser(
+        UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -131,7 +131,7 @@ class UserRepositoryTest {
     @Test
     void findByUsernameByExistent() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -150,7 +150,7 @@ class UserRepositoryTest {
     @Test
     void findByUsernameByNotExistent() {
         // given
-        TestObjectFactory.createUser(
+        UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
