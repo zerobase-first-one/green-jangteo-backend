@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.web;
 
 public class ApiConstant {
-    public static final String USER_ID_FORM = "회원 ID";
+    public static final String USER_ID_VALUE = "회원 ID";
 
     public static final String EMAIL_EXAMPLE = "abcd@abc.com";
     public static final String PASSWORD_VALUE = "비밀번호";

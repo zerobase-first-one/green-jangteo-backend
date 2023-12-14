@@ -39,7 +39,7 @@ public class UserController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @GetMapping("/{userId}/profile")
     public ResponseEntity<UserResponseDto> getUserDetails
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId) {
+            (@PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
         InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
@@ -49,7 +49,7 @@ public class UserController {
     @ApiOperation(value = GET_USER, notes = GET_USER_DESCRIPTION)
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> getUser
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId) {
+            (@PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
         InputFormatValidator.validateId(userId);
         User user = userService.getUser(Long.parseLong(userId));
 
@@ -60,7 +60,7 @@ public class UserController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/address")
     public ResponseEntity<Void> updateAddress
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_ADDRESS_FORM) AddressDto addressDto) {
         InputFormatValidator.validateId(userId);
         userService.updateAddress(Long.parseLong(userId), addressDto);
