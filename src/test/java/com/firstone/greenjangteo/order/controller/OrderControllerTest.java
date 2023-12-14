@@ -247,4 +247,30 @@ class OrderControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @DisplayName("주문 ID와 구매자 ID를 입력해 주문을 삭제할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void deleteOrder() throws Exception {
+        // given
+        Store store = StoreTestObjectFactory.createStore(
+                Long.parseLong(SELLER_ID1), STORE_NAME1, DESCRIPTION1, IMAGE_URL1
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                Long.parseLong(BUYER_ID), EMAIL2, USERNAME2, PASSWORD2,
+                passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+
+        Order order = OrderTestObjectFactory.createOrder(1L, store, buyer, PRICE2);
+
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(buyer.getId().toString());
+
+        // when, then
+        mockMvc.perform(delete("/orders/{orderId}", order.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(userIdRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
 }
