@@ -57,8 +57,8 @@ public class OrderLoggingAspect {
     }
 
     @Around(CART_ORDER_POINTCUT)
-    public Object logAroundForSignUpForm(ProceedingJoinPoint joinPoint,
-                                         CartOrderRequestDto cartOrderRequestDto) throws Throwable {
+    public Object logAroundForCartOrderRequestDto(ProceedingJoinPoint joinPoint,
+                                                  CartOrderRequestDto cartOrderRequestDto) throws Throwable {
         log.info(CART_ORDER_START,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), cartOrderRequestDto.getBuyerId(), cartOrderRequestDto.getCartId());

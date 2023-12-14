@@ -37,8 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -131,6 +130,68 @@ class OrderControllerTest {
                 .andExpect(status().isCreated());
     }
 
+    @DisplayName("판매자 ID를 입력해 판매자의 주문 목록을 조회할 수 있다.")
+    @Test
+    @WithMockUser(username = SELLER_ID1, roles = {"SELLER"})
+    void getOrdersToSeller() throws Exception {
+        // given
+        Store store = StoreTestObjectFactory.createStore(
+                Long.parseLong(SELLER_ID1), STORE_NAME1, DESCRIPTION1, IMAGE_URL1
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                Long.parseLong(BUYER_ID), EMAIL2, USERNAME2, PASSWORD2,
+                passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+
+        Order order1 = OrderTestObjectFactory.createOrder(1L, store, buyer, PRICE2);
+        Order order2 = OrderTestObjectFactory.createOrder(2L, store, buyer, PRICE2);
+
+        List<Order> orders = List.of(order1, order2);
+
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(store.getSellerId().toString());
+
+        when(orderService.getOrders(any(UserIdRequestDto.class))).thenReturn(orders);
+
+        // when, then
+        mockMvc.perform(get("/orders")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(userIdRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("구매자 ID를 입력해 구매자의 주문 목록을 조회할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void getOrdersToBuyer() throws Exception {
+        // given
+        Store store = StoreTestObjectFactory.createStore(
+                Long.parseLong(SELLER_ID1), STORE_NAME1, DESCRIPTION1, IMAGE_URL1
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                Long.parseLong(BUYER_ID), EMAIL2, USERNAME2, PASSWORD2,
+                passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+
+        Order order1 = OrderTestObjectFactory.createOrder(1L, store, buyer, PRICE2);
+        Order order2 = OrderTestObjectFactory.createOrder(2L, store, buyer, PRICE2);
+
+        List<Order> orders = List.of(order1, order2);
+
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(buyer.getId().toString());
+
+        when(orderService.getOrders(any(UserIdRequestDto.class))).thenReturn(orders);
+
+        // when, then
+        mockMvc.perform(get("/orders")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(userIdRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("주문 ID와 판매자 ID를 입력해 주문을 조회할 수 있다.")
     @Test
     @WithMockUser(username = SELLER_ID1, roles = {"SELLER"})
@@ -179,7 +240,7 @@ class OrderControllerTest {
         when(orderService.getOrder(anyLong())).thenReturn(order);
 
         // when, then
-        mockMvc.perform(get("/orders/{userId}", buyer.getId())
+        mockMvc.perform(get("/orders/{orderId}", order.getId())
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(userIdRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
