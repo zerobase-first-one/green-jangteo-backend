@@ -7,6 +7,7 @@ import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.product.form.UpdateProductForm;
 import com.firstone.greenjangteo.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -24,41 +25,41 @@ public class ProductController {
     public ResponseEntity<AddProductResponseDto> addProduct(
             @RequestBody AddProductForm addProductForm,
             BindingResult bindingResult
-    ) throws Exception {
+    ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.ok().body(productService.saveProduct(addProductForm));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(addProductForm));
     }
 
     @GetMapping(value = "/products")
     public ResponseEntity<List<ProductsResponseDto>> productListAll() {
-        return ResponseEntity.ok().body(productService.getProductList());
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductList());
     }
 
     @GetMapping(value = "/products/{productId}/description")
     public ResponseEntity<ProductDetailResponseDto> productDescription(
             @PathVariable("productId") Long productId
     ) {
-        return ResponseEntity.ok().body(productService.getProductDescription(productId));
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductDescription(productId));
     }
 
     @GetMapping(value = "/products/{productId}/review")
     public ResponseEntity<ProductDetailResponseDto> productReview(
             @PathVariable("productId") Long productId
     ) {
-        return ResponseEntity.ok().body(productService.getProductReviews(productId));
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReviews(productId));
     }
 
     @PutMapping(value = "/products/{productId}")
     public ResponseEntity productUpdate(
             @RequestBody UpdateProductForm updateProductForm,
-            BindingResult bindingResult) throws Exception {
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         productService.updateProduct(updateProductForm);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
@@ -67,6 +68,6 @@ public class ProductController {
             @PathVariable("productId") Long productId
     ) {
         productService.removeProduct(productId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
