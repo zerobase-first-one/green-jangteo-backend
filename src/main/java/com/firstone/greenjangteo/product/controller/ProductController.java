@@ -44,6 +44,13 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductDescription(productId));
     }
 
+    @GetMapping(value = "/products/{productId}/review")
+    public ResponseEntity<ProductDetailResponseDto> productReview(
+            @PathVariable("productId") Long productId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReviews(productId));
+    }
+
     @PutMapping(value = "/products/{productId}")
     public ResponseEntity productUpdate(
             @RequestBody UpdateProductForm updateProductForm,
