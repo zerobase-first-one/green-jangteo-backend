@@ -6,10 +6,10 @@ import java.util.Objects;
 
 import static com.firstone.greenjangteo.order.excpeption.message.BlankExceptionMessage.ORDER_QUANTITY_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.order.excpeption.message.InvalidExceptionMessage.INVALID_ORDER_QUANTITY_EXCEPTION;
+import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_PATTERN;
 
 public class Quantity {
     private final int quantity;
-    private static final String QUANTITY_PATTERN = "^[1-9]\\d*$";
 
     private Quantity(int quantity) {
         this.quantity = quantity;
@@ -49,7 +49,7 @@ public class Quantity {
     }
 
     private static void checkQuantityPattern(String quantity) {
-        if (!quantity.matches(QUANTITY_PATTERN)) {
+        if (!quantity.matches(POSITIVE_INTEGER_PATTERN)) {
             throw new IllegalArgumentException(INVALID_ORDER_QUANTITY_EXCEPTION + quantity);
         }
     }
