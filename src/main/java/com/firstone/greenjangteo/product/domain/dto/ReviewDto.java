@@ -1,8 +1,11 @@
 package com.firstone.greenjangteo.product.domain.dto;
 
+import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.Review;
-import com.firstone.greenjangteo.user.model.Username;
+import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -11,15 +14,23 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ReviewDto {
-    private Username username;
+    private Product product;
+    private User user;
     private String content;
     private int score;
+    private String imageUrl;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
-    private static ReviewDto of(Review review){
+    public static ReviewDto of(Review review) {
         return ReviewDto.builder()
-                .username(review.getUsers().getUsername())
+                .product(review.getProduct())
+                .user(review.getUser())
                 .content(review.getContent())
                 .score(review.getScore())
+                .imageUrl(review.getImageUrl())
+                .createdAt(review.getCreatedAt())
+                .modifiedAt(review.getModifiedAt())
                 .build();
     }
 }
