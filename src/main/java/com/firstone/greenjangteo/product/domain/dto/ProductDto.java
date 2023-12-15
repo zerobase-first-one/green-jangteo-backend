@@ -2,7 +2,6 @@ package com.firstone.greenjangteo.product.domain.dto;
 
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.form.UpdateProductForm;
-import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import lombok.*;
 
 import java.time.LocalDateTime;
