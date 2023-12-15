@@ -5,7 +5,7 @@ import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PhoneRequestDto;
 import com.firstone.greenjangteo.user.dto.response.SignInResponseDto;
-import com.firstone.greenjangteo.user.dto.response.UserResponseDto;
+import com.firstone.greenjangteo.user.dto.response.SignUpResponseDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -66,11 +66,11 @@ public class AuthenticationController {
 
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signUpUser
+    public ResponseEntity<SignUpResponseDto> signUpUser
             (@RequestBody @ApiParam(value = SIGN_UP_FORM) SignUpForm signUpForm) {
         User user = authenticationService.signUpUser(signUpForm);
 
-        return buildResponse(UserResponseDto.of(user.getId(), user.getCreatedAt()));
+        return buildResponse(new SignUpResponseDto(user.getId(), user.getCreatedAt()));
     }
 
     @ApiOperation(value = SIGN_IN, notes = SIGN_IN_DESCRIPTION)
@@ -135,16 +135,16 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    private ResponseEntity<UserResponseDto> buildResponse(UserResponseDto userResponseDto) {
+    private ResponseEntity<SignUpResponseDto> buildResponse(SignUpResponseDto signUpResponseDto) {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{userId}")
-                .buildAndExpand(userResponseDto.getUserId())
+                .buildAndExpand(signUpResponseDto.getUserId())
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
 
-        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(userResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(signUpResponseDto);
     }
 }
