@@ -1,5 +1,9 @@
 package com.firstone.greenjangteo.order.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.firstone.greenjangteo.order.model.OrderProducts;
 import com.firstone.greenjangteo.order.model.TotalOrderPrice;
 import com.firstone.greenjangteo.order.model.entity.Order;
@@ -26,7 +30,13 @@ public class OrderResponseDto {
     private int totalOrderPrice;
     private int amountToPay;
     private String orderStatus;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedAt;
 
     public static OrderResponseDto from(Order order) {
