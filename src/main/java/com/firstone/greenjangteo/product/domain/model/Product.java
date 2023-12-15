@@ -86,16 +86,4 @@ public class Product {
         this.description = productDto.getDescription();
         this.modifiedAt = productDto.getModifiedAt();
     }
-
-    public void subCount(int demand) throws Exception {
-        int curCount = this.inventory - demand;
-        if (curCount < 0) {
-            throw new Exception("상품 재고가 부족합니다. (현 재고량 : " + this.inventory + ")");
-        }
-        this.inventory = curCount;
-    }
-
-    public void addCount(int supply) {
-        this.inventory += supply;
-    }
 }
