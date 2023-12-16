@@ -10,7 +10,6 @@ import com.firstone.greenjangteo.product.domain.dto.response.ProductsResponseDto
 import com.firstone.greenjangteo.product.domain.model.Category;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.ProductImage;
-import com.firstone.greenjangteo.product.domain.model.Review;
 import com.firstone.greenjangteo.product.exception.ErrorCode;
 import com.firstone.greenjangteo.product.exception.ProductException;
 import com.firstone.greenjangteo.product.form.AddProductForm;
@@ -20,7 +19,7 @@ import com.firstone.greenjangteo.product.repository.ProductImageRepository;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
 import com.firstone.greenjangteo.product.repository.ReviewRepository;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
-import com.firstone.greenjangteo.user.domain.store.service.StoreServiceImpl;
+import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,9 +39,6 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
-    private final ReviewRepository reviewRepository;
-
-    private final StoreServiceImpl storeService;
 
     public AddProductResponseDto saveProduct(AddProductForm addProductForm) throws Exception {
         Store store = storeService.getStore(addProductForm.getUserId());
@@ -113,13 +109,6 @@ public class ProductService {
         }
 
         return productDetailResponseDto.descriptionOf(products, categoryList, urlList);
-    }
-
-    @Transactional(readOnly = true)
-    public ProductDetailResponseDto getProductReviews(Long productId) {
-        ProductDetailResponseDto productDetailResponseDto = new ProductDetailResponseDto();
-        List<ReviewDto> reviews = reviewRepository.findAllByProducts(productId);
-        return productDetailResponseDto.reviewsOf(reviews);
     }
 
     public void updateProduct(UpdateProductForm updateProductForm) throws Exception {
