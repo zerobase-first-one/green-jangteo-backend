@@ -29,7 +29,7 @@ public class Order extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
+    @JoinColumn(name = "seller_id", nullable = false)
     private Store store;
 
     @ManyToOne

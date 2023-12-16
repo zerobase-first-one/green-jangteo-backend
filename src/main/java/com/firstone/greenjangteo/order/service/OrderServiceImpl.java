@@ -6,6 +6,7 @@ import com.firstone.greenjangteo.order.repository.OrderRepository;
 import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDERED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
 
 @Service
@@ -56,6 +58,17 @@ public class OrderServiceImpl implements OrderService {
         order.getOrderProducts().addOrder(order);
 
         return orderRepository.save(order);
+    }
+
+    @Override
+    public List<Order> getOrders(UserIdRequestDto userIdRequestDto) {
+        User user = userService.getUser(Long.parseLong(userIdRequestDto.getUserId()));
+
+        if (user.getRoles().checkIsSeller()) {
+            return orderRepository.findBySellerId(Long.parseLong(userIdRequestDto.getUserId()));
+        }
+
+        return orderRepository.findByBuyerId(Long.parseLong(userIdRequestDto.getUserId()));
     }
 
     @Override
