@@ -43,6 +43,7 @@ public class OrderTestObjectFactory {
                 .build();
     }
 
+
     private static OrderProductRequestDto createOrderProductDto(String productId, String quantity) {
         return new OrderProductRequestDto(productId, quantity);
     }
@@ -58,10 +59,15 @@ public class OrderTestObjectFactory {
                 .build();
     }
 
-
-    public static OrderProducts createOrderProducts
-            (List<OrderProductRequestDto> orderProductRequestDtos, ProductService productService, long sellerId) {
-        OrderProducts orderProducts = OrderProducts.from(orderProductRequestDtos, productService, sellerId);
-        return orderProducts;
+    public static Order createOrder(Long id, Store store, User buyer, int totalOrderPrice) {
+        return Order.builder()
+                .id(id)
+                .store(store)
+                .buyer(buyer)
+                .orderProducts(mock(OrderProducts.class))
+                .orderStatus(BEFORE_PAYMENT)
+                .totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
+                .shippingAddress(mock(Address.class))
+                .build();
     }
 }

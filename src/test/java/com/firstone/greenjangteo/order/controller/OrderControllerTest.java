@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.order.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.model.entity.Order;
@@ -67,12 +68,13 @@ class OrderControllerTest {
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
         User buyer = UserTestObjectFactory.createUser(
-                2L, EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+                Long.parseLong(BUYER_ID), EMAIL2, USERNAME2, PASSWORD2, passwordEncoder,
+                FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
         );
 
         Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
 
-        Order order = OrderTestObjectFactory.createOrder(1L, store, buyer, PRICE2);
+        Order order = OrderTestObjectFactory.createOrder(Long.parseLong(ORDER_ID), store, buyer, PRICE2);
 
         List<OrderProductRequestDto> orderProductRequestDtos
                 = OrderTestObjectFactory.createOrderProductDtos(
@@ -91,6 +93,36 @@ class OrderControllerTest {
         mockMvc.perform(post("/orders")
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(orderRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @DisplayName("장바구니 ID를 전송해 주문을 생성할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void requestOrderFromCart() throws Exception {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                Long.parseLong(BUYER_ID), EMAIL2, USERNAME2, PASSWORD2, passwordEncoder,
+                FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Order order = OrderTestObjectFactory.createOrder(Long.parseLong(ORDER_ID), store, buyer, PRICE2);
+
+        CartOrderRequestDto cartOrderRequestDto
+                = OrderTestObjectFactory.createCartOrderRequestDto(BUYER_ID, CART_ID);
+
+        when(orderService.createOrderFromCart(any(CartOrderRequestDto.class))).thenReturn(order);
+
+        // when, then
+        mockMvc.perform(post("/orders/cart-order")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(cartOrderRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
