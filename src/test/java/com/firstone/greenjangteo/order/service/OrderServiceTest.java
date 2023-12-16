@@ -25,9 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
+import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.model.OrderStatus.BEFORE_PAYMENT;
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY1;
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY2;
@@ -36,6 +37,7 @@ import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @ActiveProfiles("test")
@@ -81,6 +83,9 @@ class OrderServiceTest {
         Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
         productRepository.saveAll(List.of(product1, product2));
 
+        int totalOrderPrice = product1.getPrice() * Integer.parseInt(QUANTITY1)
+                + product2.getPrice() * Integer.parseInt(QUANTITY2);
+
         List<OrderProductRequestDto> orderProductRequestDtos
                 = OrderTestObjectFactory.createOrderProductDtos(
                 List.of(product1.getId().toString(), product2.getId().toString()),
@@ -96,9 +101,6 @@ class OrderServiceTest {
         Order createdOrder = orderService.createOrder(orderRequestDto);
         Order foundOrder = orderRepository.findById(createdOrder.getId()).get();
 
-        int totalOrderPrice = product1.getPrice() * Integer.parseInt(QUANTITY1)
-                + product2.getPrice() * Integer.parseInt(QUANTITY2);
-
         // then
         assertThat(foundOrder.getId()).isEqualTo(createdOrder.getId());
         assertThat(foundOrder.getStore()).isEqualTo(store);
@@ -109,7 +111,66 @@ class OrderServiceTest {
         assertThat(foundOrder.getCreatedAt()).isEqualTo(createdOrder.getCreatedAt());
         assertThat(foundOrder.getModifiedAt()).isEqualTo(createdOrder.getModifiedAt());
         assertThat(foundOrder.getOrderProducts().getOrderItems()).hasSize(2)
-                .extracting("id", "order", "product", "quantity", "orderPrice")
+                .extracting("order", "product", "quantity", "orderPrice")
+                .containsExactlyInAnyOrder(
+                        tuple(
+                                createdOrder, product1, Quantity.of(QUANTITY1),
+                                OrderPrice.from(PRICE1, Quantity.of(QUANTITY1))
+                        ),
+                        tuple(
+                                createdOrder, product2, Quantity.of(QUANTITY2),
+                                OrderPrice.from(PRICE2, Quantity.of(QUANTITY2))
+                        )
+                );
+    }
+
+    @DisplayName("장바구니 ID를 통해 주문을 생성한다.")
+    @Test
+    void createOrderFromCart() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        productRepository.saveAll(List.of(product1, product2));
+
+        int totalOrderPrice = product1.getPrice() * Integer.parseInt(QUANTITY1)
+                + product2.getPrice() * Integer.parseInt(QUANTITY2);
+
+        Cart cart = OrderTestObjectFactory.createCart(buyer);
+        cartRepository.save(cart);
+
+        CartProduct cartProduct1 = OrderTestObjectFactory.createCartProduct(cart, product1, QUANTITY1);
+        CartProduct cartProduct2 = OrderTestObjectFactory.createCartProduct(cart, product2, QUANTITY2);
+        cartProductRepository.saveAll(List.of(cartProduct1, cartProduct2));
+
+
+        CartOrderRequestDto cartOrderRequestDto = OrderTestObjectFactory
+                .createCartOrderRequestDto(buyer.getId().toString(), cart.getId().toString());
+
+        // when
+        Order createdOrder = orderService.createOrderFromCart(cartOrderRequestDto);
+        Order foundOrder = orderRepository.findById(createdOrder.getId()).get();
+
+        // then
+        assertThat(foundOrder.getId()).isEqualTo(createdOrder.getId());
+        assertThat(foundOrder.getStore()).isEqualTo(store);
+        assertThat(foundOrder.getBuyer()).isEqualTo(buyer);
+        assertThat(foundOrder.getOrderStatus()).isEqualTo(BEFORE_PAYMENT);
+        assertThat(foundOrder.getTotalOrderPrice()).isEqualTo(new TotalOrderPrice(totalOrderPrice));
+        assertThat(foundOrder.getShippingAddress()).isEqualTo(Address.from(cartOrderRequestDto.getShippingAddressDto()));
+        assertThat(foundOrder.getCreatedAt()).isEqualTo(createdOrder.getCreatedAt());
+        assertThat(foundOrder.getModifiedAt()).isEqualTo(createdOrder.getModifiedAt());
+        assertThat(foundOrder.getOrderProducts().getOrderItems()).hasSize(2)
+                .extracting("order", "product", "quantity", "orderPrice")
                 .containsExactlyInAnyOrder(
                         tuple(
                                 product1.getId(), foundOrder, product1, Quantity.of(QUANTITY1),
@@ -120,5 +181,99 @@ class OrderServiceTest {
                                 OrderPrice.from(PRICE2, Quantity.of(QUANTITY2))
                         )
                 );
+    }
+
+    @DisplayName("주문 ID와 판매자 또는 구매자 ID를 전송해 주문을 조회한다.")
+    @Test
+    void getOrder() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        productRepository.saveAll(List.of(product1, product2));
+
+        List<OrderProductRequestDto> orderProductRequestDtos
+                = OrderTestObjectFactory.createOrderProductDtos(
+                List.of(product1.getId().toString(), product2.getId().toString()),
+                List.of(QUANTITY1, QUANTITY2)
+        );
+
+        OrderRequestDto orderRequestDto
+                = OrderTestObjectFactory.createOrderRequestDto(
+                seller.getId().toString(), buyer.getId().toString(), orderProductRequestDtos
+        );
+
+        Order createdOrder = orderService.createOrder(orderRequestDto);
+
+        // when
+        Order foundOrder = orderService.getOrder(createdOrder.getId());
+
+        // then
+        assertThat(foundOrder.getId()).isEqualTo(createdOrder.getId());
+        assertThat(foundOrder.getStore()).isEqualTo(store);
+        assertThat(foundOrder.getBuyer()).isEqualTo(buyer);
+        assertThat(foundOrder.getOrderStatus()).isEqualTo(createdOrder.getOrderStatus());
+        assertThat(foundOrder.getTotalOrderPrice()).isEqualTo(createdOrder.getTotalOrderPrice());
+        assertThat(foundOrder.getShippingAddress()).isEqualTo(createdOrder.getShippingAddress());
+        assertThat(foundOrder.getCreatedAt()).isEqualTo(createdOrder.getCreatedAt());
+        assertThat(foundOrder.getModifiedAt()).isEqualTo(createdOrder.getModifiedAt());
+        assertThat(foundOrder.getOrderProducts().getOrderItems()).hasSize(2)
+                .extracting("order", "product", "quantity", "orderPrice")
+                .containsExactlyInAnyOrder(
+                        tuple(
+                                createdOrder, product1, Quantity.of(QUANTITY1),
+                                OrderPrice.from(PRICE1, Quantity.of(QUANTITY1))
+                        ),
+                        tuple(
+                                createdOrder, product2, Quantity.of(QUANTITY2),
+                                OrderPrice.from(PRICE2, Quantity.of(QUANTITY2))
+                        )
+                );
+    }
+
+    @DisplayName("잘못된 주문 ID를 입력하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void getOrderFromWrongOrderId() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        productRepository.saveAll(List.of(product1, product2));
+
+        List<OrderProductRequestDto> orderProductRequestDtos
+                = OrderTestObjectFactory.createOrderProductDtos(
+                List.of(product1.getId().toString(), product2.getId().toString()),
+                List.of(QUANTITY1, QUANTITY2)
+        );
+
+        OrderRequestDto orderRequestDto
+                = OrderTestObjectFactory.createOrderRequestDto(
+                seller.getId().toString(), buyer.getId().toString(), orderProductRequestDtos
+        );
+
+        Order createdOrder = orderService.createOrder(orderRequestDto);
+
+        // when, then
+        assertThatThrownBy(() -> orderService.getOrder(createdOrder.getId() + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(ORDER_ID_NOT_FOUND_EXCEPTION + (createdOrder.getId() + 1));
     }
 }

@@ -11,6 +11,12 @@ import com.firstone.greenjangteo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
+
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -27,5 +33,44 @@ public class OrderServiceImpl implements OrderService {
         order.getOrderProducts().addOrder(order);
 
         return orderRepository.save(order);
+    }
+
+    @Override
+    public Order createOrderFromCart(CartOrderRequestDto cartOrderRequestDto) {
+        Long buyerId = Long.parseLong(cartOrderRequestDto.getBuyerId());
+        User buyer = userService.getUser(buyerId);
+
+        List<CartProductListResponseDto> cartProductListResponseDtos = cartService.getCartList(buyerId);
+        List<OrderProductRequestDto> orderProductRequestDtos = transferCartToOrderDto(cartProductListResponseDtos);
+
+        Product product = productService.getProduct(Long.parseLong(orderProductRequestDtos.get(0).getProductId()));
+        Store store = product.getStore();
+
+        OrderRequestDto orderRequestDto
+                = OrderRequestDto.of(
+                String.valueOf(store.getSellerId()), cartOrderRequestDto.getBuyerId(),
+                orderProductRequestDtos, cartOrderRequestDto.getShippingAddressDto()
+        );
+
+        Order order = Order.from(store, buyer, orderRequestDto, productService);
+        order.getOrderProducts().addOrder(order);
+
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public Order getOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException(ORDER_ID_NOT_FOUND_EXCEPTION + orderId));
+    }
+
+    private List<OrderProductRequestDto> transferCartToOrderDto
+            (List<CartProductListResponseDto> cartProductListResponseDtos) {
+        List<OrderProductRequestDto> orderProductRequestDtos = new ArrayList<>();
+        for (CartProductListResponseDto cartProductListResponseDto : cartProductListResponseDtos) {
+            orderProductRequestDtos.add(OrderProductRequestDto.from(cartProductListResponseDto));
+        }
+
+        return orderProductRequestDtos;
     }
 }
