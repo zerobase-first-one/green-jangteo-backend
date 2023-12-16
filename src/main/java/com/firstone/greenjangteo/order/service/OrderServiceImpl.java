@@ -1,13 +1,8 @@
 package com.firstone.greenjangteo.order.service;
 
-import com.firstone.greenjangteo.cart.domain.dto.response.CartProductListResponseDto;
-import com.firstone.greenjangteo.cart.service.CartService;
-import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
-import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.repository.OrderRepository;
-import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
@@ -30,7 +25,6 @@ public class OrderServiceImpl implements OrderService {
     private final StoreService storeService;
     private final UserService userService;
     private final ProductService productService;
-    private final CartService cartService;
     private final OrderRepository orderRepository;
 
     @Override

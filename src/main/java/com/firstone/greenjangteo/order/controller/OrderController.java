@@ -1,6 +1,5 @@
 package com.firstone.greenjangteo.order.controller;
 
-import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.dto.response.OrderResponseDto;
 import com.firstone.greenjangteo.order.dto.response.OrdersResponseDto;
@@ -40,6 +39,7 @@ public class OrderController {
     private static final String ORDER_REQUEST = "주문 요청";
     private static final String ORDER_REQUEST_DESCRIPTION = "주문 요청 양식을 입력해 상품을 주문할 수 있습니다.";
     private static final String ORDER_REQUEST_FORM = "주문 요청 양식";
+
 
     private static final String CART_ORDER_REQUEST = "장바구니 상품 주문 요청";
     private static final String CART_ORDER_REQUEST_DESCRIPTION = "장바구니 ID를 입력해 상품을 주문할 수 있습니다.";
@@ -133,7 +133,7 @@ public class OrderController {
         String currentUsername = authentication.getName();
 
         if (requestedId.equals(currentUsername)
-                || authentication.getAuthorities().contains(new SimpleGrantedAuthority(ROLE_ADMIN.name()))) {
+                || authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             return;
         }
 
