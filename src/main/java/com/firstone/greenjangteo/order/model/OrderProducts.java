@@ -24,7 +24,7 @@ public class OrderProducts {
     @OneToMany(mappedBy = "order", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
     private List<OrderProduct> orderProducts;
 
-    private OrderProducts(List<OrderProduct> orderProducts) {
+    OrderProducts(List<OrderProduct> orderProducts) {
         this.orderProducts = orderProducts;
     }
 
