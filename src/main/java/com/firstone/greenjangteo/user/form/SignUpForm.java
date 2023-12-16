@@ -27,7 +27,7 @@ public class SignUpForm {
     private static final String ADDRESS_VALUE = "주소";
 
     private static final String ROLES_VALUE = "분류";
-    private static final String ROLES_EXAMPLE = "[ROLE_BUYER, ROLE_SELLER]";
+    private static final String ROLES_EXAMPLE = "[ROLE_ADMIN, ROLE_BUYER, ROLE_SELLER]";
 
     private static final String STORE_NAME_VALUE = "가게 이름";
     private static final String STORE_NAME_EXAMPLE = "친환경 스토어";
