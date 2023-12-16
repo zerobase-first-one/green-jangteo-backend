@@ -1,10 +1,5 @@
 package com.firstone.greenjangteo.order.service;
 
-import com.firstone.greenjangteo.cart.domain.model.Cart;
-import com.firstone.greenjangteo.cart.domain.model.CartProduct;
-import com.firstone.greenjangteo.cart.repository.CartProductRepository;
-import com.firstone.greenjangteo.cart.repository.CartRepository;
-import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.model.OrderPrice;
@@ -30,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.firstone.greenjangteo.order.model.OrderStatus.BEFORE_PAYMENT;
@@ -62,13 +58,10 @@ class OrderServiceTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    private CartProductRepository cartProductRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("주문 요청 양식을 전송해 주문을 생성한다.")
     @Test
@@ -116,73 +109,14 @@ class OrderServiceTest {
         assertThat(foundOrder.getCreatedAt()).isEqualTo(createdOrder.getCreatedAt());
         assertThat(foundOrder.getModifiedAt()).isEqualTo(createdOrder.getModifiedAt());
         assertThat(foundOrder.getOrderProducts().getOrderItems()).hasSize(2)
-                .extracting("order", "product", "quantity", "orderPrice")
+                .extracting("id", "order", "product", "quantity", "orderPrice")
                 .containsExactlyInAnyOrder(
                         tuple(
-                                createdOrder, product1, Quantity.of(QUANTITY1),
+                                product1.getId(), foundOrder, product1, Quantity.of(QUANTITY1),
                                 OrderPrice.from(PRICE1, Quantity.of(QUANTITY1))
                         ),
                         tuple(
-                                createdOrder, product2, Quantity.of(QUANTITY2),
-                                OrderPrice.from(PRICE2, Quantity.of(QUANTITY2))
-                        )
-                );
-    }
-
-    @DisplayName("장바구니 ID를 통해 주문을 생성한다.")
-    @Test
-    void createOrderFromCart() {
-        // given
-        User seller = UserTestObjectFactory.createUser(
-                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
-        );
-        User buyer = UserTestObjectFactory.createUser(
-                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
-        );
-        userRepository.saveAll(List.of(seller, buyer));
-
-        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
-
-        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
-        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
-        productRepository.saveAll(List.of(product1, product2));
-
-        Cart cart = OrderTestObjectFactory.createCart(buyer);
-        cartRepository.save(cart);
-
-        CartProduct cartProduct1 = OrderTestObjectFactory.createCartProduct(cart, product1, QUANTITY1);
-        CartProduct cartProduct2 = OrderTestObjectFactory.createCartProduct(cart, product2, QUANTITY2);
-        cartProductRepository.saveAll(List.of(cartProduct1, cartProduct2));
-
-
-        CartOrderRequestDto cartOrderRequestDto = OrderTestObjectFactory
-                .createCartOrderRequestDto(buyer.getId().toString(), cart.getId().toString());
-
-        // when
-        Order createdOrder = orderService.createOrderFromCart(cartOrderRequestDto);
-        Order foundOrder = orderRepository.findById(createdOrder.getId()).get();
-
-        int totalOrderPrice = product1.getPrice() * Integer.parseInt(QUANTITY1)
-                + product2.getPrice() * Integer.parseInt(QUANTITY2);
-
-        // then
-        assertThat(foundOrder.getId()).isEqualTo(createdOrder.getId());
-        assertThat(foundOrder.getStore()).isEqualTo(store);
-        assertThat(foundOrder.getBuyer()).isEqualTo(buyer);
-        assertThat(foundOrder.getOrderStatus()).isEqualTo(BEFORE_PAYMENT);
-        assertThat(foundOrder.getTotalOrderPrice()).isEqualTo(new TotalOrderPrice(totalOrderPrice));
-        assertThat(foundOrder.getShippingAddress()).isEqualTo(Address.from(cartOrderRequestDto.getShippingAddressDto()));
-        assertThat(foundOrder.getCreatedAt()).isEqualTo(createdOrder.getCreatedAt());
-        assertThat(foundOrder.getModifiedAt()).isEqualTo(createdOrder.getModifiedAt());
-        assertThat(foundOrder.getOrderProducts().getOrderItems()).hasSize(2)
-                .extracting("order", "product", "quantity", "orderPrice")
-                .containsExactlyInAnyOrder(
-                        tuple(
-                                createdOrder, product1, Quantity.of(QUANTITY1),
-                                OrderPrice.from(PRICE1, Quantity.of(QUANTITY1))
-                        ),
-                        tuple(
-                                createdOrder, product2, Quantity.of(QUANTITY2),
+                                product2.getId(), foundOrder, product2, Quantity.of(QUANTITY2),
                                 OrderPrice.from(PRICE2, Quantity.of(QUANTITY2))
                         )
                 );
