@@ -27,7 +27,7 @@ import static javax.persistence.CascadeType.*;
 @Getter
 public class CouponGroup extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 20)

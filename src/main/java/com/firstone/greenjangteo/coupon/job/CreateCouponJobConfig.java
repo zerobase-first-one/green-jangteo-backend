@@ -53,42 +53,6 @@ public class CreateCouponJobConfig {
                 .build();
     }
 
-    //    @Bean
-//    public FlatFileItemReader<IssueCouponsRequestDto> createCouponReader() {
-//        return new FlatFileItemReaderBuilder<IssueCouponsRequestDto>()
-//                .name("createCouponReader")
-//                .resource(new ClassPathResource("Coupons.csv"))
-//                .delimited()
-//                .names("couponName", "amount", "description", "publishedNumber", "expirationPeriod", "expirationPeriod")
-//                .targetType(IssueCouponsRequestDto.class)
-//                .build();
-//    }
-
-//    @Bean
-//    public ItemReader<IssueCouponsRequestDto> createCouponReader
-//            (@Value("#{jobParameters['couponName']}") String couponName) {
-//        return new ItemReader<IssueCouponsRequestDto>() {
-//            private boolean batchJobState = false;
-//
-//            @Override
-//            public IssueCouponsRequestDto read() {
-//                if (!batchJobState) {
-//                    batchJobState = true;
-//
-//                    return IssueCouponsRequestDto.builder()
-//                            .couponName(couponName)
-//                            .amount(100)
-//                            .description("쿠폰 설명")
-//                            .issueQuantity(100)
-//                            .expirationPeriod(100)
-//                            .build();
-//                }
-//
-//                return null;
-//            }
-//        };
-//    }
-
     @Bean
     public ItemReader<CouponGroupModel> createCouponReader() {
         return new CouponItemReader();
