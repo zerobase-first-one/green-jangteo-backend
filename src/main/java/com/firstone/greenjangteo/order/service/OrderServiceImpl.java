@@ -77,6 +77,20 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new EntityNotFoundException(ORDER_ID_NOT_FOUND_EXCEPTION + orderId));
     }
 
+    @Override
+    public void deleteOrder(Long orderId, UserIdRequestDto userIdRequestDto) {
+        Long buyerId = Long.parseLong(userIdRequestDto.getUserId());
+
+        if (orderRepository.existsByIdAndBuyerId(orderId, buyerId)) {
+            orderRepository.deleteById(orderId);
+            return;
+        }
+
+        throw new EntityNotFoundException(
+                ORDER_ID_NOT_FOUND_EXCEPTION + orderId + ORDERED_USER_ID_NOT_FOUND_EXCEPTION + buyerId
+        );
+    }
+
     private List<OrderProductRequestDto> transferCartToOrderDto
             (List<CartProductListResponseDto> cartProductListResponseDtos) {
         List<OrderProductRequestDto> orderProductRequestDtos = new ArrayList<>();

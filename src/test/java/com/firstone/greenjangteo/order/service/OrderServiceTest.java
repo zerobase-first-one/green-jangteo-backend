@@ -30,6 +30,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
+import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDERED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.model.OrderStatus.BEFORE_PAYMENT;
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY1;
@@ -426,5 +427,83 @@ class OrderServiceTest {
 
         // then
         assertThat(foundOrder).isEmpty();
+    }
+
+    @DisplayName("잘못된 주문 ID를 통해 주문을 삭제하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void deleteOrderByWrongOrderId() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        productRepository.saveAll(List.of(product1, product2));
+
+        List<OrderProductRequestDto> orderProductRequestDtos
+                = OrderTestObjectFactory.createOrderProductDtos(
+                List.of(product1.getId().toString(), product2.getId().toString()),
+                List.of(QUANTITY1, QUANTITY2)
+        );
+
+        OrderRequestDto orderRequestDto
+                = OrderTestObjectFactory.createOrderRequestDto(
+                seller.getId().toString(), buyer.getId().toString(), orderProductRequestDtos
+        );
+
+        Order order = orderService.createOrder(orderRequestDto);
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(buyer.getId().toString());
+
+        // when, then
+        assertThatThrownBy(() -> orderService.deleteOrder(order.getId() + 1, userIdRequestDto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(ORDER_ID_NOT_FOUND_EXCEPTION + (order.getId() + 1)
+                        + ORDERED_USER_ID_NOT_FOUND_EXCEPTION + buyer.getId());
+    }
+
+    @DisplayName("잘못된 구매자 ID를 통해 주문을 삭제하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void deleteOrderByWrongBuyerId() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        productRepository.saveAll(List.of(product1, product2));
+
+        List<OrderProductRequestDto> orderProductRequestDtos
+                = OrderTestObjectFactory.createOrderProductDtos(
+                List.of(product1.getId().toString(), product2.getId().toString()),
+                List.of(QUANTITY1, QUANTITY2)
+        );
+
+        OrderRequestDto orderRequestDto
+                = OrderTestObjectFactory.createOrderRequestDto(
+                seller.getId().toString(), buyer.getId().toString(), orderProductRequestDtos
+        );
+
+        Order order = orderService.createOrder(orderRequestDto);
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(String.valueOf(buyer.getId() + 1));
+
+        // when, then
+        assertThatThrownBy(() -> orderService.deleteOrder(order.getId(), userIdRequestDto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(ORDER_ID_NOT_FOUND_EXCEPTION + (order.getId())
+                        + ORDERED_USER_ID_NOT_FOUND_EXCEPTION + (buyer.getId() + 1));
     }
 }
