@@ -1,10 +1,5 @@
 package com.firstone.greenjangteo.order.service;
 
-import com.firstone.greenjangteo.cart.domain.model.Cart;
-import com.firstone.greenjangteo.cart.domain.model.CartProduct;
-import com.firstone.greenjangteo.cart.repository.CartProductRepository;
-import com.firstone.greenjangteo.cart.repository.CartRepository;
-import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.model.OrderPrice;
@@ -65,13 +60,10 @@ class OrderServiceTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    private CartProductRepository cartProductRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("주문 요청 양식을 전송해 주문을 생성한다.")
     @Test
@@ -181,11 +173,11 @@ class OrderServiceTest {
                 .extracting("order", "product", "quantity", "orderPrice")
                 .containsExactlyInAnyOrder(
                         tuple(
-                                createdOrder, product1, Quantity.of(QUANTITY1),
+                                product1.getId(), foundOrder, product1, Quantity.of(QUANTITY1),
                                 OrderPrice.from(PRICE1, Quantity.of(QUANTITY1))
                         ),
                         tuple(
-                                createdOrder, product2, Quantity.of(QUANTITY2),
+                                product2.getId(), foundOrder, product2, Quantity.of(QUANTITY2),
                                 OrderPrice.from(PRICE2, Quantity.of(QUANTITY2))
                         )
                 );

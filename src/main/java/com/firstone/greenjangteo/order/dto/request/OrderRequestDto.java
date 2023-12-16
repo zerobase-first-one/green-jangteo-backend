@@ -6,8 +6,6 @@ import lombok.*;
 
 import java.util.List;
 
-import static com.firstone.greenjangteo.order.dto.DtoConstant.BUYER_ID_VALUE;
-import static com.firstone.greenjangteo.order.dto.DtoConstant.SHIPPING_ADDRESS_VALUE;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,7 +14,9 @@ import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 @Getter
 public class OrderRequestDto {
     private static final String SELLER_ID_VALUE = "판매자 ID";
+    private static final String BUYER_ID_VALUE = "구매자 ID";
     private static final String ORDER_PRODUCTS_VALUE = "주문 상품 목록";
+    private static final String SHIPPING_ADDRESS_VALUE = "배송 주소";
 
     @ApiModelProperty(value = SELLER_ID_VALUE, example = ID_EXAMPLE)
     private String sellerId;
@@ -29,15 +29,4 @@ public class OrderRequestDto {
 
     @ApiModelProperty(SHIPPING_ADDRESS_VALUE)
     private AddressDto shippingAddressDto;
-
-    public static OrderRequestDto of(String sellerId, String buyerId,
-                                     List<OrderProductRequestDto> orderProductRequestDtos,
-                                     AddressDto shippingAddressDto) {
-        return OrderRequestDto.builder()
-                .sellerId(sellerId)
-                .buyerId(buyerId)
-                .orderProductRequestDtos(orderProductRequestDtos)
-                .shippingAddressDto(shippingAddressDto)
-                .build();
-    }
 }
