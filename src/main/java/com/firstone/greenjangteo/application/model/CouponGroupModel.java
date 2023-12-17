@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.coupon.model;
+package com.firstone.greenjangteo.application.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

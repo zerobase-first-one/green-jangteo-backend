@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.coupon.model.entity;
 
+import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.coupon.model.Amount;
-import com.firstone.greenjangteo.coupon.model.CouponGroupModel;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;

@@ -1,6 +1,6 @@
-package com.firstone.greenjangteo.coupon.job;
+package com.firstone.greenjangteo.application.job;
 
-import com.firstone.greenjangteo.coupon.model.CouponGroupModel;
+import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
@@ -35,9 +35,13 @@ public class CreateCouponJobConfig {
     private final CouponGroupRepository couponGroupRepository;
     private final JdbcTemplate jdbcTemplate;
 
+    private static final String JOB_NAME = "createCouponJob";
+    private static final String STEP_NAME = "createCouponStep";
+    private static final String COUPON_INSERT_QUERY = "INSERT INTO coupon (coupon_group_id, created_at) VALUES (?, ?)";
+
     @Bean
     public Job createCouponJob() {
-        return jobBuilderFactory.get("createCouponJob")
+        return jobBuilderFactory.get(JOB_NAME)
                 .incrementer(new RunIdIncrementer())
                 .start(createCouponStep())
                 .build();
@@ -45,7 +49,7 @@ public class CreateCouponJobConfig {
 
     @Bean
     public Step createCouponStep() {
-        return stepBuilderFactory.get("createCouponStep")
+        return stepBuilderFactory.get(STEP_NAME)
                 .<CouponGroupModel, List<Coupon>>chunk(100)
                 .reader(createCouponReader())
                 .processor(createCouponProcessor())
@@ -126,7 +130,7 @@ public class CreateCouponJobConfig {
         return listOfCouponsLists -> {
             for (List<Coupon> coupons : listOfCouponsLists) {
                 jdbcTemplate.batchUpdate(
-                        "INSERT INTO coupon (coupon_group_id, created_at) VALUES (?, ?)",
+                        COUPON_INSERT_QUERY,
                         new BatchPreparedStatementSetter() {
                             @Override
                             public void setValues(PreparedStatement ps, int i) throws SQLException {
