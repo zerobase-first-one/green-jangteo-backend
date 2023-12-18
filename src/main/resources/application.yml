@@ -37,6 +37,10 @@ spring:
     host: redis-container
     port: 6379
     password: ${REDIS_PASSWORD}
+  batch:
+    initialize-schema: always
+    job:
+      names: ${job.name:createCouponJob}
   jwt:
     secret: ${JWT_SECRET_KEY}
   frontend:
