@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOrigins(
+                .allowedOriginPatterns(
                         frontendUrl,
                         "http://127.0.0.1:5173"
                 )
