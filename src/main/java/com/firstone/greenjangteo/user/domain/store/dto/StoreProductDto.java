@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class StoreProductDto {
+    private Long productId;
     private String productName;
     private int price;
     private String imageUrl;
@@ -20,6 +21,7 @@ public class StoreProductDto {
 
     public static StoreProductDto from(Product product) {
         return StoreProductDto.builder()
+                .productId(product.getId())
                 .productName(product.getName())
                 .price(product.getPrice())
                 .imageUrl(product.getProductImages().get(0).getUrl())
