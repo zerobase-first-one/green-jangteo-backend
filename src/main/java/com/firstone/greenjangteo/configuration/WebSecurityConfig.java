@@ -79,7 +79,6 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
                 HttpMethod.OPTIONS.name()
         ));
 
-        config.addExposedHeader("Authorization");
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("*"));
 
