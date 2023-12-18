@@ -15,7 +15,8 @@ public class WebConfig implements WebMvcConfigurer {
         corsRegistry.addMapping("/**")
                 .allowedOriginPatterns(
                         frontendUrl,
-                        "http://127.0.0.1:5173"
+                        "http://127.0.0.1:5173",
+                        "http://127.0.0.1:8443"
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")
                 .allowedHeaders("*")
