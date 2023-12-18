@@ -10,9 +10,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${spring.frontend.url}")
     private String frontendUrl;
 
-    @Value("${spring.frontend.port}")
-    private String frontendPort;
-
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
