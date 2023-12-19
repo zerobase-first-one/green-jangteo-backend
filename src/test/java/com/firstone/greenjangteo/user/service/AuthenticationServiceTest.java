@@ -1,8 +1,13 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.product.domain.model.Category;
+import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.product.repository.CategoryRepository;
+import com.firstone.greenjangteo.product.repository.ProductRepository;
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
+import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -29,11 +34,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.STORE_NAME1;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.*;
@@ -58,7 +64,16 @@ class AuthenticationServiceTest {
     private StoreRepository storeRepository;
 
     @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("올바른 회원 가입 양식을 전송하면 회원 가입을 할 수 있다.")
     @ParameterizedTest
@@ -514,8 +529,8 @@ class AuthenticationServiceTest {
     @ParameterizedTest
     @CsvSource({
             "abcd@abc.com, person1, Abcd1234!, 홍길동, 01012345678, ROLE_BUYER",
-            "abcd@abcd.com, person2, Abcd12345!, 고길동, 01012345679, ROLE_SELLER",
-            "abcd@abcde.com, person3, Abcd123456!, 김길동, 01012345680, ROLE_ADMIN"
+            "abcd@abcd.com, person2, Abcd12345!, 고길동, 01012345679, ROLE_ADMIN",
+            "abcd@abcde.com, person3, Abcd123456!, 김길동, 01012345680, ROLE_BUYER"
     })
     void deleteUser(
             String email, String username, String password,
@@ -587,11 +602,25 @@ class AuthenticationServiceTest {
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
         User user = authenticationService.signUpUser(signUpForm);
+        Store store = storeRepository.findById(user.getId()).get();
+
+        createProductsAndCategory(store);
 
         // when
         authenticationService.deleteUser(user.getId(), new DeleteRequestDto(PASSWORD1));
 
         // then
         assertThat(storeRepository.findById(user.getId()).isPresent()).isFalse();
+    }
+
+    private void createProductsAndCategory(Store store) {
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        Category category = StoreTestObjectFactory.createCategory(product1);
+        productRepository.saveAll(List.of(product1, product2));
+        categoryRepository.save(category);
+
+        entityManager.flush();
+        entityManager.refresh(store);
     }
 }
