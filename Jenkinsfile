@@ -70,8 +70,8 @@ pipeline {
                         string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_KEY'),
                         string(credentialsId: 'SSL_KEY_STORE_PASSWORD', variable: 'SSL_KEY_STORE_PASSWORD'),
                         string(credentialsId: 'FRONTEND_IP_FOR_GREEN_JANGTEO', variable: 'FRONTEND_IP_FOR_GREEN_JANGTEO'),
-                        string(credentialsId: 'FRONTEND_PORT_FOR_GREEN_JANGTEO', variable: 'FRONTEND_PORT_FOR_GREEN_JANGTEO')
-                        string(credentialsId: 'FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO', variable: 'FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO')
+                        string(credentialsId: 'FRONTEND_PORT_FOR_GREEN_JANGTEO', variable: 'FRONTEND_PORT_FOR_GREEN_JANGTEO'),
+                        string(credentialsId: 'FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO', variable: 'FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO'),
                         string(credentialsId: 'FRONTEND_LOCAL_PORT_FOR_GREEN_JANGTEO', variable: 'FRONTEND_LOCAL_PORT_FOR_GREEN_JANGTEO')
                     ]) {
                         sh '''
