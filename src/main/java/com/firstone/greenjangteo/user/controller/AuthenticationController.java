@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 
 import static com.firstone.greenjangteo.web.ApiConstant.*;
 
@@ -78,12 +77,9 @@ public class AuthenticationController {
     public ResponseEntity<SignInResponseDto> signInUser
             (@RequestBody @ApiParam(value = SIGN_IN_FORM) SignInForm signInForm) {
         User user = authenticationService.signInUser(signInForm);
-
-        Long userId = user.getId();
-        LocalDateTime loggedInTime = user.getLastLoggedInAt();
         String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRoles().toStrings());
 
-        return ResponseEntity.status(HttpStatus.OK).body(new SignInResponseDto(userId, loggedInTime, token));
+        return ResponseEntity.status(HttpStatus.OK).body(SignInResponseDto.from(user, token));
     }
 
     @ApiOperation(value = UPDATE_EMAIL, notes = UPDATE_UPDATE_EMAIL_DESCRIPTION)
