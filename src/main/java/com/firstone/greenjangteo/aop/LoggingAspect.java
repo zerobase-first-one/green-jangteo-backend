@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.aop;
 
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.utility.MemoryUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -27,6 +28,13 @@ public class LoggingAspect {
             = "Beginning to '{}.{}' task by {}: '{}'";
     private static final String END
             = "'{}.{}' task was executed successfully by '{}: {}', ";
+
+    private static final String USER_ID_REQUEST_DTO_POINTCUT
+            = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(userIdRequestDto)";
+    private static final String USER_ID_REQUEST_DTO_START
+            = "Beginning to '{}.{}' task by userId: '{}', ";
+    private static final String USER_ID_REQUEST_DTO_END
+            = "'{}.{}' task was executed successfully by 'userId: {}', ";
 
     @Around(STRING_VALUE_POINTCUT)
     public Object logAroundForStringValue(ProceedingJoinPoint joinPoint, String stringValue) throws Throwable {
@@ -73,6 +81,30 @@ public class LoggingAspect {
         log.info(END + PERFORMANCE_MEASUREMENT,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), parameterName, longValue,
+                stopWatch.getTotalTimeMillis(), memoryUsage);
+
+        return process;
+    }
+
+    @Around(USER_ID_REQUEST_DTO_POINTCUT)
+    public Object logAroundForUserIdRequestDto(ProceedingJoinPoint joinPoint,
+                                               UserIdRequestDto userIdRequestDto) throws Throwable {
+        log.info(USER_ID_REQUEST_DTO_START,
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(), userIdRequestDto.getUserId());
+
+        long beforeMemory = MemoryUtil.usedMemory();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        Object process = joinPoint.proceed();
+
+        stopWatch.stop();
+        long memoryUsage = MemoryUtil.usedMemory() - beforeMemory;
+
+        log.info(USER_ID_REQUEST_DTO_END + PERFORMANCE_MEASUREMENT,
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(), userIdRequestDto.getUserId(),
                 stopWatch.getTotalTimeMillis(), memoryUsage);
 
         return process;

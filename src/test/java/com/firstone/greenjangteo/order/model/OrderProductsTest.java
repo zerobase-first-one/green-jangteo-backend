@@ -84,8 +84,10 @@ class OrderProductsTest {
         );
 
         // when
-        OrderProducts orderProducts1 = OrderProducts.from(orderProductRequestDtos1, productService, store.getSellerId());
-        OrderProducts orderProducts2 = OrderProducts.from(orderProductRequestDtos2, productService, store.getSellerId());
+        OrderProducts orderProducts1
+                = OrderProducts.from(orderProductRequestDtos1, productService, store.getSellerId());
+        OrderProducts orderProducts2
+                = OrderProducts.from(orderProductRequestDtos2, productService, store.getSellerId());
 
         // then
         assertThat(orderProducts1).isEqualTo(orderProducts2);

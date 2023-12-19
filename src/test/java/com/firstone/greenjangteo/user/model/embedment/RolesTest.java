@@ -98,7 +98,7 @@ class RolesTest {
         Roles roles2 = Roles.from(List.of(admin, buyer));
 
         // when, then
-        assertThat(roles1.checkIsSeller()).isTrue();
-        assertThat(roles2.checkIsSeller()).isFalse();
+        assertThat(roles1.isSeller()).isTrue();
+        assertThat(roles2.isSeller()).isFalse();
     }
 }

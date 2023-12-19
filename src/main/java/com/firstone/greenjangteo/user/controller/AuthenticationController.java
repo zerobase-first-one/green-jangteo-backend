@@ -5,7 +5,7 @@ import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PhoneRequestDto;
 import com.firstone.greenjangteo.user.dto.response.SignInResponseDto;
-import com.firstone.greenjangteo.user.dto.response.UserResponseDto;
+import com.firstone.greenjangteo.user.dto.response.SignUpResponseDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -66,11 +66,11 @@ public class AuthenticationController {
 
     @ApiOperation(value = SIGN_UP, notes = SIGN_UP_DESCRIPTION)
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signUpUser
+    public ResponseEntity<SignUpResponseDto> signUpUser
             (@RequestBody @ApiParam(value = SIGN_UP_FORM) SignUpForm signUpForm) {
         User user = authenticationService.signUpUser(signUpForm);
 
-        return buildResponse(UserResponseDto.of(user.getId(), user.getCreatedAt()));
+        return buildResponse(new SignUpResponseDto(user.getId(), user.getCreatedAt()));
     }
 
     @ApiOperation(value = SIGN_IN, notes = SIGN_IN_DESCRIPTION)
@@ -90,7 +90,7 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/email")
     public ResponseEntity<Void> updateEmail
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_UPDATE_EMAIL_FORM) EmailRequestDto emailRequestDto) {
         InputFormatValidator.validateId(userId);
         authenticationService.updateEmail(Long.parseLong(userId), emailRequestDto);
@@ -102,7 +102,7 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/phone")
     public ResponseEntity<Void> updatePhone
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_PHONE_FORM) PhoneRequestDto phoneRequestDto) {
         InputFormatValidator.validateId(userId);
         authenticationService.updatePhone(Long.parseLong(userId), phoneRequestDto);
@@ -114,7 +114,7 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @PatchMapping("/{userId}/password")
     public ResponseEntity<Void> updatePassword
-            (@PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
+            (@PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId,
              @RequestBody @ApiParam(value = UPDATE_PASSWORD_FORM)
              PasswordUpdateRequestDto passwordUpdateRequestDto) {
         InputFormatValidator.validateId(userId);
@@ -127,7 +127,7 @@ public class AuthenticationController {
     @PreAuthorize(PRINCIPAL_POINTCUT)
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(
-            @PathVariable("userId") @ApiParam(value = USER_ID_FORM, example = ID_EXAMPLE) String userId,
+            @PathVariable("userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId,
             @RequestBody @ApiParam(value = DELETE_USER_FORM) DeleteRequestDto deleteRequestDto) {
         InputFormatValidator.validateId(userId);
         authenticationService.deleteUser(Long.parseLong(userId), deleteRequestDto);
@@ -135,16 +135,16 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    private ResponseEntity<UserResponseDto> buildResponse(UserResponseDto userResponseDto) {
+    private ResponseEntity<SignUpResponseDto> buildResponse(SignUpResponseDto signUpResponseDto) {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{userId}")
-                .buildAndExpand(userResponseDto.getUserId())
+                .buildAndExpand(signUpResponseDto.getUserId())
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
 
-        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(userResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(signUpResponseDto);
     }
 }
