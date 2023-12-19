@@ -9,8 +9,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -19,26 +18,20 @@ public class CouponServiceImpl implements CouponService {
     private final Job createCouponJob;
 
     public void createCoupons(IssueCouponsRequestDto issueCouponsRequestDto) throws JobExecutionException {
-        long scheduledIssueDateMillis
-                = serializeLocalDateTimeToTimeStamp(issueCouponsRequestDto.getScheduledIssueDate());
+        String scheduledIssueDate = issueCouponsRequestDto.getScheduledIssueDate()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE);
+
 
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("couponName", issueCouponsRequestDto.getCouponName())
                 .addString("amount", issueCouponsRequestDto.getAmount())
                 .addString("description", issueCouponsRequestDto.getDescription())
                 .addString("issueQuantity", issueCouponsRequestDto.getIssueQuantity())
-                .addLong("scheduledIssueDate", scheduledIssueDateMillis)
+                .addString("scheduledIssueDate", scheduledIssueDate)
                 .addString("expirationPeriod", issueCouponsRequestDto.getExpirationPeriod())
                 .addLong("time", System.currentTimeMillis())
                 .toJobParameters();
 
         jobLauncher.run(createCouponJob, jobParameters);
-    }
-
-    private long serializeLocalDateTimeToTimeStamp(LocalDateTime scheduledIssueDate) {
-        return scheduledIssueDate
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli();
     }
 }

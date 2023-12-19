@@ -20,9 +20,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,14 +68,15 @@ public class CreateCouponJobConfig {
 
         @Override
         public void beforeStep(StepExecution stepExecution) {
-            long scheduledIssueDateMillis = stepExecution.getJobParameters().getLong("scheduledIssueDate");
-
             String couponName = stepExecution.getJobParameters().getString("couponName");
             String amount = stepExecution.getJobParameters().getString("amount");
             String description = stepExecution.getJobParameters().getString("description");
             String issueQuantity = stepExecution.getJobParameters().getString("issueQuantity");
-            LocalDateTime scheduledIssueDate
-                    = LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledIssueDateMillis), ZoneId.systemDefault());
+
+            LocalDate scheduledIssueDate = parseScheduledIssueDateToLocalDate(
+                    stepExecution.getJobParameters().getString("scheduledIssueDate")
+            );
+
             String expirationPeriod = stepExecution.getJobParameters().getString("expirationPeriod");
 
             couponGroupModel = CouponGroupModel.builder()
@@ -118,13 +119,6 @@ public class CreateCouponJobConfig {
         };
     }
 
-    private CouponGroup createCouponGroup(CouponGroupModel couponGroupModel) {
-        CouponGroup couponGroup = couponGroupRepository.findByCouponName(couponGroupModel.getCouponName())
-                .orElse(CouponGroup.from(couponGroupModel));
-
-        return couponGroupRepository.save(couponGroup);
-    }
-
     @Bean
     public ItemWriter<List<Coupon>> createCouponWriter() {
         return listOfCouponsLists -> {
@@ -147,5 +141,16 @@ public class CreateCouponJobConfig {
                 );
             }
         };
+    }
+
+    private static LocalDate parseScheduledIssueDateToLocalDate(String stringValue) {
+        return LocalDate.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    private CouponGroup createCouponGroup(CouponGroupModel couponGroupModel) {
+        CouponGroup couponGroup = couponGroupRepository.findByCouponName(couponGroupModel.getCouponName())
+                .orElse(CouponGroup.from(couponGroupModel));
+
+        return couponGroupRepository.save(couponGroup);
     }
 }

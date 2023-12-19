@@ -16,8 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
@@ -39,8 +38,7 @@ class CouponServiceTest {
     @Test
     void createCoupons() throws JobExecutionException {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         IssueCouponsRequestDto issueCouponsRequestDto
                 = CouponTestObjectFactory.createIssueCouponsRequestDto(
