@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOriginPatterns(
+                .allowedOrigins(
                         frontendUrl,
                         frontendLocalUrl + ":" + frontendLocalPort
                 )
