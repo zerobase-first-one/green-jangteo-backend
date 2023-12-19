@@ -2,7 +2,6 @@ package com.firstone.greenjangteo.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -14,10 +13,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${spring.frontend.port}")
     private String frontendPort;
 
-    @Value("${spring.frontend.local.url}")
+    @Value("${spring.frontend.local-url}")
     private String frontendLocalUrl;
 
-    @Value("${spring.frontend.local.port}")
+    @Value("${spring.frontend.local-port}")
     private String frontendLocalPort;
 
     @Override
