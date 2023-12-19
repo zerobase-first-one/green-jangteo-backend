@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.exception.message.ExceptionLogMessage;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -20,6 +21,8 @@ import java.nio.file.AccessDeniedException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    private static final String BATCH_START_FAILED = "배치 작업 시작에 실패했습니다.";
 
     @ExceptionHandler(AbstractSeriousException.class)
     private ResponseEntity<ErrorResponse> handleSeriousExceptions
@@ -80,6 +83,19 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));
+    }
+
+    @ExceptionHandler(JobExecutionException.class)
+    private ResponseEntity<ErrorResponse> handleJobExecutionException
+            (JobExecutionException e) {
+        log.error(ExceptionLogMessage.LOG_ERROR_MESSAGE, e.getMessage(), e);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(BATCH_START_FAILED)
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.resolve(errorResponse.getStatusCode()));

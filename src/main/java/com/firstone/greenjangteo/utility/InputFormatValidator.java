@@ -1,8 +1,9 @@
 package com.firstone.greenjangteo.utility;
 
+import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_PATTERN;
+
 public class InputFormatValidator {
     static final String ID_NO_VALUE_EXCEPTION = "ID는 필수값입니다.";
-    private static final String ID_PATTERN = "^[1-9]\\d*$";
     static final String INVALID_ID_EXCEPTION = "ID는 양의 정수(1 이상의 숫자값)여야 합니다. 입력된 ID: ";
 
 
@@ -18,7 +19,7 @@ public class InputFormatValidator {
     }
 
     private static void checkIdPattern(String id) {
-        if (!id.matches(ID_PATTERN)) {
+        if (!id.matches(POSITIVE_INTEGER_PATTERN)) {
             throw new IllegalArgumentException(INVALID_ID_EXCEPTION + id);
         }
     }
