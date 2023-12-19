@@ -39,9 +39,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
-    private final ReviewRepository reviewRepository;
 
-    public AddProductResponseDto saveProduct(AddProductForm addProductForm) {
+    public AddProductResponseDto saveProduct(AddProductForm addProductForm) throws Exception {
+
         Store store = storeService.getStore(addProductForm.getUserId());
         Product product = Product.addProductRequestDtoToProduct(addProductForm, store);
         productRepository.save(product);
@@ -111,14 +111,7 @@ public class ProductService {
         return productDetailResponseDto.descriptionOf(products, categoryList, urlList);
     }
 
-    @Transactional(readOnly = true)
-    public ProductDetailResponseDto getProductReviews(Long productId) {
-        ProductDetailResponseDto productDetailResponseDto = new ProductDetailResponseDto();
-        List<ReviewDto> reviews = reviewRepository.findAllByProducts(productId);
-        return productDetailResponseDto.reviewsOf(reviews);
-    }
-
-    public void updateProduct(UpdateProductForm updateProductForm) {
+    public void updateProduct(UpdateProductForm updateProductForm) throws Exception {
         Product product = productRepository.findById(updateProductForm.getProductId())
                 .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
         ProductDto productDto = ProductDto.updateProductRequestDtoToProductDto(product, updateProductForm);

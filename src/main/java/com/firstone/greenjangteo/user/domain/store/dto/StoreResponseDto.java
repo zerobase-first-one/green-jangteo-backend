@@ -1,5 +1,9 @@
 package com.firstone.greenjangteo.user.domain.store.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import lombok.AllArgsConstructor;
@@ -20,7 +24,13 @@ public class StoreResponseDto {
     private String description;
     private String imageUrl;
     private List<StoreProductDto> storeProductDtos;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedAt;
 
     public static StoreResponseDto from(Store store) {
