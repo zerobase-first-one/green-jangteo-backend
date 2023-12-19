@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtAuthenticationFilter;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +29,9 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Value("${spring.frontend.url}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

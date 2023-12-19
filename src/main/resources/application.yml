@@ -44,8 +44,9 @@ spring:
   jwt:
     secret: ${JWT_SECRET_KEY}
   frontend:
-    url: http://${FRONTEND_IP_FOR_GREEN_JANGTEO}
-    port: ${FRONTEND_PORT_FOR_GREEN_JANGTEO}
+    url: https://${FRONTEND_IP_FOR_GREEN_JANGTEO}
+    local:
+      url: http://${FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO}
 
 logging:
   config: classpath:logback-spring.xml
