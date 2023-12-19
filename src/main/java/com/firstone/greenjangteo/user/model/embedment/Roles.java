@@ -42,6 +42,10 @@ public class Roles {
         return roles.stream().map(Role::toString).collect(Collectors.toList());
     }
 
+    public List<String> toDescriptions() {
+        return roles.stream().map(Role::getDescription).collect(Collectors.toList());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
