@@ -14,15 +14,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${spring.frontend.local.url}")
     private String frontendLocalUrl;
 
-    @Value("${spring.frontend.local.port}")
-    private String frontendLocalPort;
-
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOrigins(
                         frontendUrl,
-                        frontendLocalUrl + ":" + frontendLocalPort
+                        frontendLocalUrl
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")
                 .allowedHeaders("*")
