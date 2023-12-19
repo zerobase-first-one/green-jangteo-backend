@@ -11,6 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${spring.frontend.url}")
     private String frontendUrl;
 
+    @Value("${spring.frontend.port}")
+    private String frontendPort;
+
     @Value("${spring.frontend.local.url}")
     private String frontendLocalUrl;
 
@@ -21,7 +24,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOrigins(
-                        frontendUrl,
+                        frontendUrl + ":" + frontendPort,
                         frontendLocalUrl + ":" + frontendLocalPort
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")
