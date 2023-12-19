@@ -1,5 +1,7 @@
 package com.firstone.greenjangteo.user.domain.store.service;
 
+import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.product.repository.CategoryRepository;
 import com.firstone.greenjangteo.user.domain.store.dto.StoreRequestDto;
 import com.firstone.greenjangteo.user.domain.store.exception.general.DuplicateStoreNameException;
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
@@ -20,6 +22,7 @@ import static org.springframework.transaction.annotation.Isolation.READ_COMMITTE
 @Transactional(isolation = READ_COMMITTED, timeout = 10)
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public void createStore(Long userId, String storeName) {
@@ -45,6 +48,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public void deleteStore(long id) {
         if (storeRepository.existsById(id)) {
+            deleteCategories(id);
             storeRepository.deleteById(id);
             return;
         }
@@ -56,5 +60,11 @@ public class StoreServiceImpl implements StoreService {
         if (storeRepository.existsByStoreName(StoreName.of(storeName))) {
             throw new DuplicateStoreNameException(DUPLICATE_STORE_NAME_EXCEPTION + storeName);
         }
+    }
+
+    private void deleteCategories(long id) {
+        getStore(id).getProducts().stream()
+                .map(Product::getId)
+                .forEach(categoryRepository::deleteAllByProductId);
     }
 }
