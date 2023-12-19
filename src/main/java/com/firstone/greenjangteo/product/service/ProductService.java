@@ -3,7 +3,6 @@ package com.firstone.greenjangteo.product.service;
 import com.firstone.greenjangteo.product.domain.dto.ImageDto;
 import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import com.firstone.greenjangteo.product.domain.dto.ProductImageDto;
-import com.firstone.greenjangteo.product.domain.dto.ReviewDto;
 import com.firstone.greenjangteo.product.domain.dto.response.AddProductResponseDto;
 import com.firstone.greenjangteo.product.domain.dto.response.ProductDetailResponseDto;
 import com.firstone.greenjangteo.product.domain.dto.response.ProductsResponseDto;
@@ -17,7 +16,6 @@ import com.firstone.greenjangteo.product.form.UpdateProductForm;
 import com.firstone.greenjangteo.product.repository.CategoryRepository;
 import com.firstone.greenjangteo.product.repository.ProductImageRepository;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
-import com.firstone.greenjangteo.product.repository.ReviewRepository;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import lombok.AllArgsConstructor;
@@ -57,9 +55,8 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Product getProduct(Long productId) {
-        Product products = productRepository.findById(productId)
+        return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
-        return products;
     }
 
     @Transactional(readOnly = true)
@@ -71,8 +68,8 @@ public class ProductService {
         List<Product> productList = productRepository.findAll();
         List<ProductsResponseDto> products = new ArrayList<>();
 
-        for (int i = 0; i < productList.size(); i++) {
-            Long curProductId = productList.get(i).getId();
+        for (Product product : productList) {
+            Long curProductId = product.getId();
 
             List<ProductImage> productImage = productImageRepository.findByProductId(curProductId);
             List<String> urlList = new ArrayList<>();
@@ -86,7 +83,7 @@ public class ProductService {
                 categoryList.add(value.getCategoryName());
             }
 
-            products.add(ProductsResponseDto.of(productList.get(i), urlList.get(0), categoryList));
+            products.add(ProductsResponseDto.of(product, urlList.get(0), categoryList));
         }
         return products;
     }
@@ -108,10 +105,10 @@ public class ProductService {
             urlList.add(ImageDto.toImageDto(image));
         }
 
-        return productDetailResponseDto.descriptionOf(products, categoryList, urlList);
+        return ProductDetailResponseDto.descriptionOf(products, categoryList, urlList);
     }
 
-    public void updateProduct(UpdateProductForm updateProductForm) throws Exception {
+    public void updateProduct(UpdateProductForm updateProductForm) {
         Product product = productRepository.findById(updateProductForm.getProductId())
                 .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
         ProductDto productDto = ProductDto.updateProductRequestDtoToProductDto(product, updateProductForm);
