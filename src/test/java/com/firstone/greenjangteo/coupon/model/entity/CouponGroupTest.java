@@ -9,20 +9,18 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class CouponGroupTest {
+    LocalDate tomorrow = LocalDate.now().plusDays(1);
+
     @DisplayName("올바른 값을 전송하면 쿠폰 그룹 인스턴스를 생성할 수 있다.")
     @Test
     void from() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
         CouponGroupModel couponGroupModel
                 = CouponTestObjectFactory.createCouponGroupModel(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
@@ -44,9 +42,6 @@ class CouponGroupTest {
     @Test
     void fromSameValue() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
         CouponGroupModel couponGroupModel
                 = CouponTestObjectFactory.createCouponGroupModel(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
@@ -65,11 +60,7 @@ class CouponGroupTest {
     @Test
     void fromDifferentValue() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
-        LocalDateTime dayAfterTomorrow = LocalDateTime.now().plusDays(2)
-                .truncatedTo(ChronoUnit.MILLIS);
+        LocalDate dayAfterTomorrow = LocalDate.now().plusDays(2);
 
         CouponGroupModel couponGroupModel1
                 = CouponTestObjectFactory.createCouponGroupModel(

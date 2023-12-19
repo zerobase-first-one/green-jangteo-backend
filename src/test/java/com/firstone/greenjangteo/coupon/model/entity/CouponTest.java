@@ -4,22 +4,21 @@ import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class CouponTest {
+    LocalDate tomorrow = LocalDate.now().plusDays(1);
+    LocalDate dayAfterTomorrow = LocalDate.now().plusDays(2);
+    LocalDateTime now = LocalDateTime.now();
+
     @DisplayName("쿠폰을 생성할 수 있다.")
     @Test
     void create() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
-        LocalDateTime now = LocalDateTime.now();
-
         CouponGroup couponGroup
                 = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
@@ -37,11 +36,6 @@ class CouponTest {
     @Test
     void ofSameValue() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
-        LocalDateTime now = LocalDateTime.now();
-
         CouponGroup couponGroup
                 = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
@@ -60,14 +54,6 @@ class CouponTest {
     @Test
     void ofDifferentValue() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
-        LocalDateTime dayAfterTomorrow = LocalDateTime.now().plusDays(2)
-                .truncatedTo(ChronoUnit.MILLIS);
-
-        LocalDateTime now = LocalDateTime.now();
-
         CouponGroup couponGroup1
                 = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
