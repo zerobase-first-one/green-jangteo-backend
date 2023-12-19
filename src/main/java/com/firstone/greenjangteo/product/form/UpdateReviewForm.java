@@ -17,6 +17,6 @@ public class UpdateReviewForm {
     @ApiModelProperty(value = "별점", example = "5")
     private int score;
 
-    @ApiModelProperty(value = "첨부 이미지", example = "")
+    @ApiModelProperty(value = "첨부 이미지", example = "New_Url")
     private String imageUrl;
 }
