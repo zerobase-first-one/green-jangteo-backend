@@ -11,22 +11,23 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${spring.frontend.url}")
     private String frontendUrl;
 
+    @Value("${spring.frontend.port}")
+    private String frontendPort;
+
+    @Value("${spring.frontend.local.url}")
+    private String frontendLocalUrl;
+
+    @Value("${spring.frontend.local.port}")
+    private String frontendLocalPort;
+
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOriginPatterns(
-                        frontendUrl,
-                        "http://127.0.0.1:5173",
-                        "http://127.0.0.1:8443"
+                .allowedOrigins(
+                        frontendUrl + ":" + frontendPort,
+                        frontendLocalUrl + ":" + frontendLocalPort
                 )
-                .allowedMethods(
-                        HttpMethod.GET.name(),
-                        HttpMethod.HEAD.name(),
-                        HttpMethod.POST.name(),
-                        HttpMethod.PUT.name(),
-                        HttpMethod.PATCH.name(),
-                        HttpMethod.DELETE.name()
-                )
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
