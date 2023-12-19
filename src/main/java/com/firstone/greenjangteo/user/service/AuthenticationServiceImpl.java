@@ -60,7 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         User savedUser = userRepository.save(user);
 
-        if (user.getRoles().checkIsSeller()) {
+        if (user.getRoles().isSeller()) {
             storeService.createStore(savedUser.getId(), signUpForm.getStoreName());
         }
 
@@ -115,7 +115,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         validatePassword(user.getPassword(), deleteRequestDto.getPassword());
 
-        if (user.getRoles().checkIsSeller()) {
+        if (user.getRoles().isSeller()) {
             storeService.deleteStore(id);
         }
         userRepository.delete(user);

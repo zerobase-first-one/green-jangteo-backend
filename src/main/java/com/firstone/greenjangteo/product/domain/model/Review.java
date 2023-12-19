@@ -62,7 +62,6 @@ public class Review {
                 .modifiedAt(reviewDto.getModifiedAt())
                 .build();
     }
-
     public static Review createdOf(CreateReviewForm createReviewForm, User user, Product product) {
         return Review.builder()
                 .user(user)

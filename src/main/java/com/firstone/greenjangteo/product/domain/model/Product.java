@@ -57,7 +57,7 @@ public class Product {
 
     public static Product of(ProductDto productDto, Store store) {
         return Product.builder()
-                .store(store)
+                .store(productDto.getSellerId())
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())

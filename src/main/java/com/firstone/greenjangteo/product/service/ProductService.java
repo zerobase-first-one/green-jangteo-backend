@@ -38,7 +38,8 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
 
-    public AddProductResponseDto saveProduct(AddProductForm addProductForm) {
+    public AddProductResponseDto saveProduct(AddProductForm addProductForm) throws Exception {
+
         Store store = storeService.getStore(addProductForm.getUserId());
         Product product = Product.addProductRequestDtoToProduct(addProductForm, store);
         productRepository.save(product);
