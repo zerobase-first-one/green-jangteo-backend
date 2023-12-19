@@ -49,6 +49,8 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
                         "/**/signup", "/**/login", "/users")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/users/{userId}").permitAll()
+                .antMatchers(HttpMethod.GET, "/products/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/reviews/products/{productId}").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter

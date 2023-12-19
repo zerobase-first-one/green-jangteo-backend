@@ -22,7 +22,7 @@ public class ProductDetailResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private int reviewCount;
-    private List<ReviewDto> review;
+    private List<ReviewsResponseDto> review;
     private String description;
 
     public static ProductDetailResponseDto descriptionOf(Product product, List<String> categories, List<ImageDto> images) {
@@ -38,7 +38,7 @@ public class ProductDetailResponseDto {
                 .build();
     }
 
-    public static ProductDetailResponseDto reviewsOf(List<ReviewDto> reviews) {
+    public static ProductDetailResponseDto reviewsOf(List<ReviewsResponseDto> reviews) {
         return ProductDetailResponseDto.builder()
                 .reviewCount(reviews.size())
                 .review(reviews)

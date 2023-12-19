@@ -1,6 +1,8 @@
 package com.firstone.greenjangteo.product.domain.model;
 
 import com.firstone.greenjangteo.product.domain.dto.ReviewDto;
+import com.firstone.greenjangteo.product.form.CreateReviewForm;
+import com.firstone.greenjangteo.product.form.UpdateReviewForm;
 import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -58,5 +61,34 @@ public class Review {
                 .createdAt(reviewDto.getCreatedAt())
                 .modifiedAt(reviewDto.getModifiedAt())
                 .build();
+    }
+    public static Review createdOf(CreateReviewForm createReviewForm, User user, Product product) {
+        return Review.builder()
+                .user(user)
+                .product(product)
+                .content(createReviewForm.getContent())
+                .score(createReviewForm.getScore())
+                .imageUrl(createReviewForm.getImageUrl())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Review modifiedOf(UpdateReviewForm updateReviewForm, Optional<Review> review) {
+        return Review.builder()
+                .id(updateReviewForm.getReviewId())
+                .user(review.get().getUser())
+                .product(review.get().getProduct())
+                .content(updateReviewForm.getContent())
+                .score(updateReviewForm.getScore())
+                .imageUrl(updateReviewForm.getImageUrl())
+                .createdAt(review.get().getCreatedAt())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static void deleteOf(Optional<Review> review){
+        review.get().setUser(null);
+        review.get().setProduct(null);
     }
 }
