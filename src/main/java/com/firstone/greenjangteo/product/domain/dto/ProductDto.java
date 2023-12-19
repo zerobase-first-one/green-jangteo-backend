@@ -39,7 +39,7 @@ public class ProductDto {
     public static ProductDto updateProductRequestDtoToProductDto(Product product, UpdateProductForm updateProductForm){
         return ProductDto.builder()
                 .productId(product.getId())
-                .sellerId(product.getStore())
+                .sellerId(product.getStore().getSellerId())
                 .name(updateProductForm.getProductName())
                 .price(updateProductForm.getPrice())
                 .inventory(updateProductForm.getInventory())

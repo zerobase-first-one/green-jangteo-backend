@@ -3,7 +3,6 @@ package com.firstone.greenjangteo.product.domain.model;
 import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.product.domain.dto.ProductDto;
-import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -56,7 +55,7 @@ public class Product {
     @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
-    public static Product of(ProductDto productDto) {
+    public static Product of(ProductDto productDto, Store store) {
         return Product.builder()
                 .store(productDto.getSellerId())
                 .name(productDto.getName())

@@ -41,15 +41,15 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     public AddProductResponseDto saveProduct(AddProductForm addProductForm) throws Exception {
+
         Store store = storeService.getStore(addProductForm.getUserId());
         Product product = Product.addProductRequestDtoToProduct(addProductForm, store);
         productRepository.save(product);
 
         List<ProductImageDto> imageList = addProductForm.getImages();
-        String imagePath = addProductForm.getImageStoragePath();
 
         for (int i = 0; i < imageList.size(); i++) {
-            productImageService.saveProductImage(product, imageList.get(i).getUrl(), i, imagePath);
+            productImageService.saveProductImage(product, imageList.get(i).getUrl(), i);
         }
         categoryService.saveCategory(product.getId(), addProductForm.getCategories());
         return AddProductResponseDto.of(product);
@@ -65,7 +65,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductsResponseDto> getProductList() {
         if (productRepository.findAll().isEmpty()) {
-            return new ArrayList<>();
+            throw new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND);
         }
 
         List<Product> productList = productRepository.findAll();
@@ -116,13 +116,7 @@ public class ProductService {
                 .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
         ProductDto productDto = ProductDto.updateProductRequestDtoToProductDto(product, updateProductForm);
         product.updateProduct(productDto);
-
-        productImageService.updateProductImage(product.getId(), product, updateProductForm.getImages(), updateProductForm.getImageStoragePath());
-        for (int i = 0; i < updateProductForm.getImages().size(); i++) {
-            productImageService.saveProductImage(product, updateProductForm.getImages().get(i).getUrl(),
-                    updateProductForm.getImages().get(i).getPosition(), updateProductForm.getImageStoragePath());
-        }
-
+        productImageService.updateProductImage(product.getId(), updateProductForm.getImages());
         categoryService.updateCategory(product.getId(), product, updateProductForm.getCategories());
     }
 
