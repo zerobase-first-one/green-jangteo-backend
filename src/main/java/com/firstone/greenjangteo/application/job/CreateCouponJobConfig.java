@@ -64,7 +64,7 @@ public class CreateCouponJobConfig {
 
     public static class CouponItemReader implements ItemReader<CouponGroupModel>, StepExecutionListener {
         private CouponGroupModel couponGroupModel;
-        private boolean batchJobState = false;
+        private boolean batchJobState;
 
         @Override
         public void beforeStep(StepExecution stepExecution) {
@@ -87,6 +87,8 @@ public class CreateCouponJobConfig {
                     .scheduledIssueDate(scheduledIssueDate)
                     .expirationPeriod(expirationPeriod)
                     .build();
+
+            batchJobState = false;
         }
 
         @Override
