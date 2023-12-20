@@ -1,9 +1,5 @@
 package com.firstone.greenjangteo.coupon.model.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.coupon.model.Amount;
@@ -15,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,10 +42,8 @@ public class CouponGroup extends BaseEntity {
 
     private int remainingQuantity;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Column(nullable = false)
-    private LocalDateTime scheduledIssueDate;
+    private LocalDate scheduledIssueDate;
 
     @Convert(converter = ExpirationPeriod.ExpirationPeriodConverter.class)
     private ExpirationPeriod expirationPeriod;
@@ -59,7 +53,7 @@ public class CouponGroup extends BaseEntity {
 
     @Builder
     private CouponGroup(String couponName, Amount amount, String description, IssueQuantity issueQuantity,
-                        LocalDateTime scheduledIssueDate, ExpirationPeriod expirationPeriod) {
+                        LocalDate scheduledIssueDate, ExpirationPeriod expirationPeriod) {
         this.couponName = couponName;
         this.amount = amount;
         this.description = description;

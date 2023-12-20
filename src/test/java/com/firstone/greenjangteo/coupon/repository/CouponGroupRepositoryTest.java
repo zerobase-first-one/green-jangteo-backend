@@ -9,8 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
@@ -23,13 +22,12 @@ class CouponGroupRepositoryTest {
     @Autowired
     private CouponGroupRepository couponGroupRepository;
 
+    LocalDate tomorrow = LocalDate.now().plusDays(1);
+
     @DisplayName("쿠폰 이름을 통해 쿠폰 그룹을 찾을 수 있다.")
     @Test
     void findByCouponName() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
         CouponGroup createdCouponGroup
                 = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
@@ -52,9 +50,6 @@ class CouponGroupRepositoryTest {
     @Test
     void findByNonExistentCouponName() {
         // given
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1)
-                .truncatedTo(ChronoUnit.MILLIS);
-
         CouponGroup createdCouponGroup
                 = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD

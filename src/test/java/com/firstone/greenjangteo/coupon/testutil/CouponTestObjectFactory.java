@@ -7,12 +7,12 @@ import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class CouponTestObjectFactory {
     public static IssueCouponsRequestDto createIssueCouponsRequestDto(
             String couponName, String amount, String description, String issueQuantity,
-            LocalDateTime scheduledIssueDate, String expirationPeriod
+            LocalDate scheduledIssueDate, String expirationPeriod
     ) {
         return IssueCouponsRequestDto.builder()
                 .couponName(couponName)
@@ -26,7 +26,7 @@ public class CouponTestObjectFactory {
 
     public static CouponGroupModel createCouponGroupModel(
             String couponName, String amount, String description, String issueQuantity,
-            LocalDateTime scheduledIssueDate, String expirationPeriod
+            LocalDate scheduledIssueDate, String expirationPeriod
     ) {
         return CouponGroupModel.builder()
                 .couponName(couponName)
@@ -40,7 +40,7 @@ public class CouponTestObjectFactory {
 
     public static CouponGroup createCouponGroup(
             String couponName, String amount, String description, String issueQuantity,
-            LocalDateTime tomorrow, String expirationPeriod
+            LocalDate tomorrow, String expirationPeriod
     ) {
         return CouponGroup.builder()
                 .couponName(couponName)

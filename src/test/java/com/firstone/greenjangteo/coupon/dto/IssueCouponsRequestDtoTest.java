@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.validation.ConstraintViolation;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IssueCouponsRequestDtoTest {
-    @DisplayName("scheduledIssueDate 필드에 현재 이전의 시간을 입력하거나 시간을 입력하지 않으면 유효성 검사를 통과할 수 없다.")
+    @DisplayName("scheduledIssueDate 필드에 오늘 이전의 날짜를 입력하거나 날짜를 입력하지 않으면 유효성 검사를 통과할 수 없다.")
     @Test
     void createByInvalidScheduledIssueDate() {
         // given
@@ -25,7 +25,7 @@ class IssueCouponsRequestDtoTest {
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
                 .issueQuantity(ISSUE_QUANTITY)
-                .scheduledIssueDate(LocalDateTime.now().plusDays(1))
+                .scheduledIssueDate(LocalDate.now().plusDays(1))
                 .expirationPeriod(EXPIRATION_PERIOD)
                 .build();
 
@@ -35,7 +35,7 @@ class IssueCouponsRequestDtoTest {
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
                 .issueQuantity(ISSUE_QUANTITY)
-                .scheduledIssueDate(LocalDateTime.now())
+                .scheduledIssueDate(LocalDate.now())
                 .expirationPeriod(EXPIRATION_PERIOD)
                 .build();
 
@@ -45,7 +45,7 @@ class IssueCouponsRequestDtoTest {
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
                 .issueQuantity(ISSUE_QUANTITY)
-                .scheduledIssueDate(LocalDateTime.now().minusDays(1))
+                .scheduledIssueDate(LocalDate.now().minusDays(1))
                 .expirationPeriod(EXPIRATION_PERIOD)
                 .build();
 

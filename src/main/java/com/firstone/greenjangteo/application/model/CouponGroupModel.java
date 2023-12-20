@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @Builder
@@ -14,6 +14,6 @@ public class CouponGroupModel {
     private String amount;
     private String description;
     private String issueQuantity;
-    private LocalDateTime scheduledIssueDate;
+    private LocalDate scheduledIssueDate;
     private String expirationPeriod;
 }

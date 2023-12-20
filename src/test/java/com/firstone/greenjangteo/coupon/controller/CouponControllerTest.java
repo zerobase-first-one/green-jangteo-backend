@@ -16,7 +16,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
@@ -50,7 +50,7 @@ class CouponControllerTest {
         IssueCouponsRequestDto issueCouponsRequestDto
                 = CouponTestObjectFactory.createIssueCouponsRequestDto(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY,
-                LocalDateTime.now().plusDays(1), EXPIRATION_PERIOD
+                LocalDate.now().plusDays(1), EXPIRATION_PERIOD
         );
 
         // when, then
