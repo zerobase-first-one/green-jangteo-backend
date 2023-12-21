@@ -40,7 +40,8 @@ spring:
   batch:
     initialize-schema: always
     job:
-      names: ${job.name:createCouponJob}
+      enabled: false
+      names: ${job.name:NONE}
   jwt:
     secret: ${JWT_SECRET_KEY}
   frontend:

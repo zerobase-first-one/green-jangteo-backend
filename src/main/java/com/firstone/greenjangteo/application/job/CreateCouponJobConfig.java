@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -37,23 +36,29 @@ public class CreateCouponJobConfig {
 
     private static final String JOB_NAME = "createCouponJob";
     private static final String STEP_NAME = "createCouponStep";
+    private static final String PREPARING_BEFORE_STEP = "Preparing beforeStep";
     private static final String COUPON_INSERT_QUERY = "INSERT INTO coupon (coupon_group_id, created_at) VALUES (?, ?)";
+    private static final String UPDATING_COUPON = "coupon: {}";
 
     @Bean
     public Job createCouponJob() {
-        return jobBuilderFactory.get(JOB_NAME)
-                .incrementer(new RunIdIncrementer())
+        return jobBuilderFactory
+                .get(JOB_NAME)
                 .start(createCouponStep())
                 .build();
     }
 
     @Bean
     public Step createCouponStep() {
-        return stepBuilderFactory.get(STEP_NAME)
+        return stepBuilderFactory
+                .get(STEP_NAME)
                 .<CouponGroupModel, List<Coupon>>chunk(100)
                 .reader(createCouponReader())
                 .processor(createCouponProcessor())
                 .writer(createCouponWriter())
+                .faultTolerant()
+                .retryLimit(10)
+                .retry(Exception.class)
                 .build();
     }
 
@@ -68,6 +73,7 @@ public class CreateCouponJobConfig {
 
         @Override
         public void beforeStep(StepExecution stepExecution) {
+            log.info(PREPARING_BEFORE_STEP);
             String couponName = stepExecution.getJobParameters().getString("couponName");
             String amount = stepExecution.getJobParameters().getString("amount");
             String description = stepExecution.getJobParameters().getString("description");
@@ -95,7 +101,7 @@ public class CreateCouponJobConfig {
         public CouponGroupModel read() {
             if (!batchJobState) {
                 batchJobState = true;
-                return this.couponGroupModel;
+                return couponGroupModel;
             }
             return null;
         }
@@ -131,6 +137,8 @@ public class CreateCouponJobConfig {
                             @Override
                             public void setValues(PreparedStatement ps, int i) throws SQLException {
                                 Coupon coupon = coupons.get(i);
+                                log.info(UPDATING_COUPON, coupon);
+
                                 ps.setLong(1, coupon.getCouponGroup().getId());
                                 ps.setObject(2, coupon.getCreatedAt());
                             }

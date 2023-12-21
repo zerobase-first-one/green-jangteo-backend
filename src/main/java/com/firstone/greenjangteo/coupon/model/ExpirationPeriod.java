@@ -9,7 +9,7 @@ import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExcepti
 import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_PATTERN;
 
 public class ExpirationPeriod {
-    private int expirationPeriod;
+    private final int expirationPeriod;
 
     private ExpirationPeriod(int expirationPeriod) {
         this.expirationPeriod = expirationPeriod;
