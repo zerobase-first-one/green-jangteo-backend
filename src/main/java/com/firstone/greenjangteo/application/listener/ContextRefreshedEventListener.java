@@ -26,7 +26,7 @@ public class ContextRefreshedEventListener implements ApplicationListener<Contex
     private static final String STOPPING_JOB_COMPLETE = "Stopped running jobs.";
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         log.info(STOPPING_JOB_START);
         for (String jobName : jobExplorer.getJobNames()) {
             Set<JobExecution> runningJobExecutions = jobExplorer.findRunningJobExecutions(jobName);
