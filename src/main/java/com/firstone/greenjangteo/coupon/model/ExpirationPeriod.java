@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.coupon.model;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static com.firstone.greenjangteo.coupon.excpeption.message.BlankExceptionMessage.EXPIRATION_PERIOD_NO_VALUE_EXCEPTION;
@@ -31,6 +32,10 @@ public class ExpirationPeriod {
     @Override
     public int hashCode() {
         return Objects.hash(expirationPeriod);
+    }
+
+    public LocalDateTime computeExpirationTime(LocalDateTime now) {
+        return now.plusDays(expirationPeriod);
     }
 
     private static void validate(String expirationPeriod) {

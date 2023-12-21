@@ -74,4 +74,10 @@ public class Coupon {
     public int hashCode() {
         return Objects.hash(id, user, usedOrderId, couponGroup, createdAt, modifiedAt, issuedAt, expiredAt);
     }
+
+    public void issueCoupon(LocalDateTime now, LocalDateTime expirationDateTime) {
+        modifiedAt = now;
+        issuedAt = now;
+        expiredAt = expirationDateTime;
+    }
 }
