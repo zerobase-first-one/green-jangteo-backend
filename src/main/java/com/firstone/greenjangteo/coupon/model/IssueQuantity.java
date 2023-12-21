@@ -37,6 +37,11 @@ public class IssueQuantity {
         return issueQuantity;
     }
 
+    public IssueQuantity addQuantity(String issueQuantityToAdd) {
+        validate(issueQuantityToAdd);
+        return new IssueQuantity(issueQuantity + Integer.parseInt(issueQuantityToAdd));
+    }
+
     private static void validate(String issueQuantity) {
         checkIssueQuantityIsNotBlank(issueQuantity);
         checkIssueQuantityPattern(issueQuantity);

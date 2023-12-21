@@ -91,4 +91,9 @@ public class CouponGroup extends BaseEntity {
         return Objects.hash(id, couponName, amount, description, issueQuantity,
                 remainingQuantity, scheduledIssueDate, expirationPeriod, coupons);
     }
+
+    public void addIssueQuantity(String issueQuantityToAdd) {
+        issueQuantity = issueQuantity.addQuantity(issueQuantityToAdd);
+        remainingQuantity += Integer.parseInt(issueQuantityToAdd);
+    }
 }
