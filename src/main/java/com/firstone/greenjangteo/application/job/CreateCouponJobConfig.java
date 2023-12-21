@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @Slf4j
@@ -116,8 +117,7 @@ public class CreateCouponJobConfig {
     @Bean
     public ItemProcessor<CouponGroupModel, List<Coupon>> createCouponProcessor() {
         return couponGroupModel -> {
-            CouponGroup couponGroup = couponGroupRepository.findByCouponName(couponGroupModel.getCouponName())
-                    .orElseGet(() -> createCouponGroup(couponGroupModel));
+            CouponGroup couponGroup = createOrUpdateCouponGroup(couponGroupModel);
 
             List<Coupon> coupons = new ArrayList<>();
             for (int i = 0; i < Integer.parseInt(couponGroupModel.getIssueQuantity()); i++) {
@@ -157,10 +157,17 @@ public class CreateCouponJobConfig {
         return LocalDate.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
-    private CouponGroup createCouponGroup(CouponGroupModel couponGroupModel) {
-        CouponGroup couponGroup = couponGroupRepository.findByCouponName(couponGroupModel.getCouponName())
-                .orElse(CouponGroup.from(couponGroupModel));
+    private CouponGroup createOrUpdateCouponGroup(CouponGroupModel couponGroupModel) {
+        Optional<CouponGroup> existingCouponGroup
+                = couponGroupRepository.findByCouponName(couponGroupModel.getCouponName());
 
+        if (existingCouponGroup.isPresent()) {
+            CouponGroup couponGroup = existingCouponGroup.get();
+            couponGroup.addIssueQuantity(couponGroupModel.getIssueQuantity());
+            return couponGroupRepository.save(couponGroup);
+        }
+
+        CouponGroup couponGroup = CouponGroup.from(couponGroupModel);
         return couponGroupRepository.save(couponGroup);
     }
 }
