@@ -10,6 +10,7 @@ public class CouponTestConstant {
 
     public static final String COUPON_NAME1 = "연말 할인 이벤트 쿠폰";
     public static final String COUPON_NAME2 = "신규회원 할인 쿠폰";
+    public static final String COUPON_NAME3 = "할인 쿠폰";
 
     public static final String AMOUNT = "3000";
     public static final String DESCRIPTION = "모든 구매자 고객을 대상으로 지급되는 이벤트 쿠폰";
