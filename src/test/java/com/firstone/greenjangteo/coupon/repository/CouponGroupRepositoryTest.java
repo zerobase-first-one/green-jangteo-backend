@@ -10,10 +10,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -60,5 +62,34 @@ class CouponGroupRepositoryTest {
 
         // when, then
         assertThat(foundCouponGroup).isNotPresent();
+    }
+
+    @DisplayName("scheduledIssueDate를 통해 해당 날짜에 발행 예정인 쿠폰 그룹을 찾을 수 있다.")
+    @Test
+    void findByScheduledIssueDate() {
+        // given
+        CouponGroup createdCouponGroup1
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+        );
+        CouponGroup createdCouponGroup2
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow.plusDays(1), EXPIRATION_PERIOD
+        );
+        CouponGroup createdCouponGroup3
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME3, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+        );
+        couponGroupRepository.saveAll(List.of(createdCouponGroup1, createdCouponGroup2, createdCouponGroup3));
+
+        List<CouponGroup> foundCouponGroups = couponGroupRepository.findByScheduledIssueDate(tomorrow);
+
+        // when, then
+        assertThat(foundCouponGroups).hasSize(2)
+                .extracting("couponName", "issueQuantity")
+                .containsExactlyInAnyOrder(
+                        tuple(createdCouponGroup1.getCouponName(), createdCouponGroup1.getIssueQuantity()),
+                        tuple(createdCouponGroup3.getCouponName(), createdCouponGroup2.getIssueQuantity())
+                );
     }
 }
