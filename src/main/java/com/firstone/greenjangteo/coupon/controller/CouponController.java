@@ -29,7 +29,8 @@ public class CouponController {
     private final CouponService couponService;
 
     private static final String ISSUE_COUPONS = "쿠폰 발행";
-    private static final String ISSUE_COUPONS_DESCRIPTION = "쿠폰 발행 양식을 입력해 대량의 쿠폰을 발행할 수 있습니다.";
+    private static final String ISSUE_COUPONS_DESCRIPTION
+            = "쿠폰 발행 양식을 입력해 대량의 쿠폰을 최초 발행하거나 추가 발행할 수 있습니다.";
     private static final String ISSUE_COUPONS_FORM = "쿠폰 발행 양식";
 
 

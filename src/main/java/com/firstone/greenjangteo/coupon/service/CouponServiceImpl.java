@@ -17,10 +17,10 @@ public class CouponServiceImpl implements CouponService {
     private final JobLauncher jobLauncher;
     private final Job createCouponJob;
 
+    @Override
     public void createCoupons(IssueCouponsRequestDto issueCouponsRequestDto) throws JobExecutionException {
         String scheduledIssueDate = issueCouponsRequestDto.getScheduledIssueDate()
                 .format(DateTimeFormatter.ISO_LOCAL_DATE);
-
 
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("couponName", issueCouponsRequestDto.getCouponName())

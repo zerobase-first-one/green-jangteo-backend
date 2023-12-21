@@ -9,7 +9,7 @@ import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExcepti
 import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_PATTERN;
 
 public class IssueQuantity {
-    private int issueQuantity;
+    private final int issueQuantity;
 
     private IssueQuantity(int issueQuantity) {
         this.issueQuantity = issueQuantity;
