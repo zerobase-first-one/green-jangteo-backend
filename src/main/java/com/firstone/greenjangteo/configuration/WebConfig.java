@@ -10,19 +10,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${spring.frontend.url}")
     private String frontendUrl;
 
-    @Value("${spring.frontend.local.seunghak.url}")
-    private String frontendLocalUrlForSeunghak;
-
-    @Value("${spring.frontend.local.jiyoung.url}")
-    private String frontendLocalUrlForJiyoung;
+    @Value("${spring.frontend.local.url}")
+    private String frontendLocalUrl;
 
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOriginPatterns(
                         frontendUrl,
-                        frontendLocalUrlForSeunghak,
-                        frontendLocalUrlForJiyoung
+                        frontendLocalUrl
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")
                 .allowedHeaders("*")
