@@ -50,7 +50,7 @@ spring:
       seunghak:
         url: http://${FRONTEND_LOCAL_IP_FOR_SEUNGHAK}
       jiyoung:
-        url: https://${FRONTEND_LOCAL_IP_FOR_JIYOUNG}
+        url: http://${FRONTEND_LOCAL_IP_FOR_JIYOUNG}
 
 logging:
   config: classpath:logback-spring.xml
