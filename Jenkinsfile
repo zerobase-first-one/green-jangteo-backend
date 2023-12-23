@@ -70,8 +70,8 @@ pipeline {
                         string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_KEY'),
                         string(credentialsId: 'SSL_KEY_STORE_PASSWORD', variable: 'SSL_KEY_STORE_PASSWORD'),
                         string(credentialsId: 'FRONTEND_IP_FOR_GREEN_JANGTEO', variable: 'FRONTEND_IP_FOR_GREEN_JANGTEO'),
-                        string(credentialsId: 'FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO', variable: 'FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO'),
-                        string(credentialsId: 'FRONTEND_LOCAL_PORT_FOR_GREEN_JANGTEO', variable: 'FRONTEND_LOCAL_PORT_FOR_GREEN_JANGTEO')
+                        string(credentialsId: 'FRONTEND_LOCAL_IP_FOR_SEUNGHAK', variable: 'FRONTEND_LOCAL_IP_FOR_SEUNGHAK'),
+                        string(credentialsId: 'FRONTEND_LOCAL_IP_FOR_JIYOUNG', variable: 'FRONTEND_LOCAL_IP_FOR_JIYOUNG'),
                     ]) {
                         sh '''
                         scp -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" set-up-docker.sh ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
@@ -79,7 +79,7 @@ pipeline {
                         scp -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" "${WORKSPACE}/deploy.sh" "${WORKSPACE}/check-and-restart.sh" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO":"$EC2_DEPLOY_PATH"
                         ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "chmod +x ${EC2_DEPLOY_PATH}/deploy.sh"
                         ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "chmod +x ${EC2_DEPLOY_PATH}/set-up-docker.sh && PROJECT_NAME='$PROJECT_NAME' ${EC2_DEPLOY_PATH}/set-up-docker.sh $DB_ROOT_PASSWORD $DB_USER_NAME $DB_USER_PASSWORD"
-                        ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "export SSL_KEY_STORE_PASSWORD='$SSL_KEY_STORE_PASSWORD'; export DOCKER_HUB_USER_NAME='$DOCKER_HUB_USER_NAME'; export DB_USER_NAME='$DB_USER_NAME'; export DB_USER_PASSWORD='$DB_USER_PASSWORD'; export EC2_IP_FOR_GREEN_JANGTEO='$EC2_IP_FOR_GREEN_JANGTEO'; export FRONTEND_IP_FOR_GREEN_JANGTEO='$FRONTEND_IP_FOR_GREEN_JANGTEO'; export FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO='$FRONTEND_LOCAL_IP_FOR_GREEN_JANGTEO'; export REDIS_PASSWORD='$REDIS_PASSWORD'; export JWT_SECRET_KEY='$JWT_SECRET_KEY'; export PROJECT_NAME='$PROJECT_NAME'; export PROJECT_VERSION='$PROJECT_VERSION'; ${EC2_DEPLOY_PATH}/deploy.sh"
+                        ssh -i "$EC2_DEPLOY_KEY_FOR_GREEN_JANGTEO" ubuntu@"$EC2_IP_FOR_GREEN_JANGTEO" "export SSL_KEY_STORE_PASSWORD='$SSL_KEY_STORE_PASSWORD'; export DOCKER_HUB_USER_NAME='$DOCKER_HUB_USER_NAME'; export DB_USER_NAME='$DB_USER_NAME'; export DB_USER_PASSWORD='$DB_USER_PASSWORD'; export EC2_IP_FOR_GREEN_JANGTEO='$EC2_IP_FOR_GREEN_JANGTEO'; export FRONTEND_IP_FOR_GREEN_JANGTEO='$FRONTEND_IP_FOR_GREEN_JANGTEO'; export FRONTEND_LOCAL_IP_FOR_SEUNGHAK='$FRONTEND_LOCAL_IP_FOR_SEUNGHAK'; export FRONTEND_LOCAL_IP_FOR_JIYOUNG='$FRONTEND_LOCAL_IP_FOR_JIYOUNG'; export REDIS_PASSWORD='$REDIS_PASSWORD'; export JWT_SECRET_KEY='$JWT_SECRET_KEY'; export PROJECT_NAME='$PROJECT_NAME'; export PROJECT_VERSION='$PROJECT_VERSION'; ${EC2_DEPLOY_PATH}/deploy.sh"
                         '''
                     }
                 }
