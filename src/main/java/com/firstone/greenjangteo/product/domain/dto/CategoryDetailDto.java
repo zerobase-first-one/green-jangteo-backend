@@ -1,6 +1,6 @@
 package com.firstone.greenjangteo.product.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.firstone.greenjangteo.product.domain.model.Category;
 import lombok.*;
 
 @Getter
@@ -9,8 +9,15 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CategoryDetailDto {
-    @JsonProperty("category")
-    private String category;
-    @JsonProperty("level")
-    private int level;
+    private Long categoryId;
+    private String firstCategory;
+    private String secondCategory;
+
+    public static CategoryDetailDto of(Category category){
+        return CategoryDetailDto.builder()
+                .categoryId(category.getId())
+                .firstCategory(category.getFirstCategory())
+                .secondCategory(category.getSecondCategory())
+                .build();
+    }
 }
