@@ -1,6 +1,5 @@
 package com.firstone.greenjangteo.product.form;
 
-import com.firstone.greenjangteo.product.domain.dto.CategoryDetailDto;
 import com.firstone.greenjangteo.product.domain.dto.ProductImageDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -13,14 +12,14 @@ import java.util.List;
 @Getter
 public class AddProductForm {
 
-    @ApiModelProperty(value = "userId", example = "1")
+    @ApiModelProperty(value = "회원 ID", example = "1")
     private Long userId;
+
+    @ApiModelProperty(value = "카테고리", example = "2")
+    private Long categoryId;
 
     @ApiModelProperty(value = "상품명", example = "업사이클링 에코백")
     private String productName;
-
-    @ApiModelProperty(value = "카테고리", example = "[{\"category\": \"생활용품\"}, {\"category\": \"에코백\"}]")
-    private List<CategoryDetailDto> categories;
 
     @ApiModelProperty(value = "재고", example = "20")
     private int inventory;
