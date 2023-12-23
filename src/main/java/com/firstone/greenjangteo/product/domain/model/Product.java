@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.product.domain.model;
 
+import com.firstone.greenjangteo.product.domain.dto.search.ProductSaveRequest;
 import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.product.domain.dto.ProductDto;
@@ -47,6 +48,10 @@ public class Product {
 
     private int salesRate;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -55,13 +60,16 @@ public class Product {
     @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
-    public static Product of(ProductDto productDto, Store store) {
+    public static Product of(ProductSaveRequest productSaveRequest, Store store) {
         return Product.builder()
                 .store(store)
-                .name(productDto.getName())
-                .description(productDto.getDescription())
-                .price(productDto.getPrice())
-                .inventory(productDto.getInventory())
+                .name(productSaveRequest.getName())
+                .description(productSaveRequest.getDescription())
+                .price(productSaveRequest.getPrice())
+                .averageScore(builder().averageScore)
+                .inventory(productSaveRequest.getInventory())
+                .category(Category.builder().id(productSaveRequest.getCategoryId()).build())
+                .salesRate(builder().salesRate)
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();
@@ -73,6 +81,7 @@ public class Product {
                 .name(addProductForm.getProductName())
                 .description(addProductForm.getDescription())
                 .price(addProductForm.getPrice())
+                .category(Category.builder().id(addProductForm.getCategoryId()).build())
                 .inventory(addProductForm.getInventory())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())

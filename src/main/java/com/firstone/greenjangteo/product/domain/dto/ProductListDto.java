@@ -2,10 +2,8 @@ package com.firstone.greenjangteo.product.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.firstone.greenjangteo.product.domain.model.Product;
-import com.firstone.greenjangteo.product.domain.model.Review;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -22,7 +20,7 @@ public class ProductListDto {
     private String productName;
 
     @JsonProperty("categories")
-    private List<String> categories;
+    private CategoryDto category;
 
     @JsonProperty("price")
     private int price;
@@ -33,11 +31,11 @@ public class ProductListDto {
     @JsonProperty("images")
     private List<String> images;
 
-    public static ProductListDto of(Product product, List<String> images, List<String> categories) {
+    public static ProductListDto of(Product product, List<String> images, CategoryDto category) {
         return ProductListDto.builder()
                 .productId(product.getId())
                 .productName(product.getName())
-                .categories(categories)
+                .category(category)
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .images(images)
