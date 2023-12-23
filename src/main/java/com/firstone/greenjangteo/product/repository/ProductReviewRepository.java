@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductReviewRepository extends JpaRepository<Review, Long> {
-    List<ReviewDto> findAllByProduct(Product product);
+    List<Review> findAllByProduct(Product product);
 
-    List<ReviewDto> findAllByUser(User user);
+    List<Review> findAllByUser(User user);
 
     Optional<Review> findById(Long reviewId);
 }

@@ -1,6 +1,5 @@
 package com.firstone.greenjangteo.product.service;
 
-import com.firstone.greenjangteo.product.domain.dto.ReviewDto;
 import com.firstone.greenjangteo.product.domain.dto.response.ReviewResponseDto;
 import com.firstone.greenjangteo.product.domain.dto.response.ReviewsResponseDto;
 import com.firstone.greenjangteo.product.domain.model.Product;
@@ -35,19 +34,21 @@ public class ProductReviewService {
         Review createdReview = productReviewRepository.save(review);
         return ReviewResponseDto.of(createdReview);
     }
+
     @Transactional(readOnly = true)
     public List<ReviewsResponseDto> readAllReviewsForProducts(Long productId) {
         Product product = productService.getProduct(productId);
-        List<ReviewDto> reviews = productReviewRepository.findAllByProduct(product);
-        List<ReviewsResponseDto> resultReviews = reviews.stream().map(ReviewsResponseDto::of).collect(Collectors.toList());
+        List<Review> reviews = productReviewRepository.findAllByProduct(product);
+        List<ReviewsResponseDto> resultReviews = reviews.stream().map(ReviewsResponseDto::from).collect(Collectors.toList());
         if (resultReviews.size() == 0) throw new ReviewException(ErrorCode.REVIEW_IS_NOT_FOUND);
         return resultReviews;
     }
+
     @Transactional(readOnly = true)
     public List<ReviewsResponseDto> readAllReviewsForUser(Long userId) {
         User user = userService.getUser(userId);
-        List<ReviewDto> reviews = productReviewRepository.findAllByUser(user);
-        List<ReviewsResponseDto> resultReviews = reviews.stream().map(ReviewsResponseDto::of).collect(Collectors.toList());
+        List<Review> reviews = productReviewRepository.findAllByUser(user);
+        List<ReviewsResponseDto> resultReviews = reviews.stream().map(ReviewsResponseDto::from).collect(Collectors.toList());
         if (resultReviews.size() == 0) throw new ReviewException(ErrorCode.REVIEW_IS_NOT_FOUND);
         return resultReviews;
     }

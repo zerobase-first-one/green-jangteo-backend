@@ -8,6 +8,7 @@ import com.firstone.greenjangteo.product.domain.dto.response.ReviewsResponseDto;
 import com.firstone.greenjangteo.product.domain.model.Category;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.ProductImage;
+import com.firstone.greenjangteo.product.domain.model.Review;
 import com.firstone.greenjangteo.product.exception.ErrorCode;
 import com.firstone.greenjangteo.product.exception.ProductException;
 import com.firstone.greenjangteo.product.form.AddProductForm;
@@ -101,10 +102,10 @@ public class ProductService {
     public ProductDetailResponseDto getProductReviews(Long productId) {
         Optional<Product> product = productRepository.findById(productId);
         if (product.isEmpty()) throw new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND);
-        List<ReviewDto> reviews = productReviewRepository.findAllByProduct(product.get());
+        List<Review> reviews = productReviewRepository.findAllByProduct(product.get());
         List<ReviewsResponseDto> reviewsResponseDtoList = new ArrayList<>();
-        for (ReviewDto review : reviews) {
-            reviewsResponseDtoList.add(ReviewsResponseDto.of(review));
+        for (Review review : reviews) {
+            reviewsResponseDtoList.add(ReviewsResponseDto.from(review));
         }
         return ProductDetailResponseDto.reviewsOf(reviewsResponseDtoList);
     }
