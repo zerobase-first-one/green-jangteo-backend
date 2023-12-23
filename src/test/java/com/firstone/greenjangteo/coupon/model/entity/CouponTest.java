@@ -1,14 +1,22 @@
 package com.firstone.greenjangteo.coupon.model.entity;
 
+import com.firstone.greenjangteo.coupon.excpeption.serious.AlreadyProvidedCouponException;
+import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
+import com.firstone.greenjangteo.user.model.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.ALREADY_GIVEN_COUPON_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.mockito.Mockito.mock;
 
 class CouponTest {
     LocalDate tomorrow = LocalDate.now().plusDays(1);
@@ -21,7 +29,7 @@ class CouponTest {
         // given
         CouponGroup couponGroup
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
 
         // when
@@ -38,7 +46,7 @@ class CouponTest {
         // given
         CouponGroup couponGroup
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
 
         // when
@@ -56,12 +64,12 @@ class CouponTest {
         // given
         CouponGroup couponGroup1
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
 
         CouponGroup couponGroup2
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, dayAfterTomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, dayAfterTomorrow, EXPIRATION_PERIOD1
         );
 
         // when
@@ -71,5 +79,53 @@ class CouponTest {
         // then
         assertThat(coupon1).isNotEqualTo(coupon2);
         assertThat(coupon1.hashCode()).isNotEqualTo(coupon2.hashCode());
+    }
+
+    @DisplayName("회원에게 쿠폰을 지급한다.")
+    @Test
+    void addUser() {
+        // given
+        User user = mock(User.class);
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, QUANTITY_TO_PROVIDE, tomorrow, EXPIRATION_PERIOD1
+        );
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+
+        int requiredQuantity = Integer.parseInt(QUANTITY_TO_PROVIDE);
+
+        // when
+        for (Coupon coupon : coupons) {
+            coupon.addUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1));
+        }
+
+        // then
+        LocalDateTime issuedAt = coupons.get(0).getIssuedAt();
+        long expirationPeriod = Long.parseLong(EXPIRATION_PERIOD1);
+        LocalDateTime expiredAt = issuedAt.plusDays(expirationPeriod);
+
+        assertThat(coupons).hasSize(requiredQuantity)
+                .extracting("user", "expiredAt")
+                .containsOnly(tuple(user, expiredAt));
+    }
+
+    @DisplayName("회원이 비어 있지 않은 상태에서 쿠폰을 지급하려 하면 AlreadyProvidedCouponException이 발생한다.")
+    @Test
+    void addNotNullUser() {
+        // given
+        User user = mock(User.class);
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, QUANTITY_TO_PROVIDE, tomorrow, EXPIRATION_PERIOD1
+        );
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+
+        int requiredQuantity = Integer.parseInt(QUANTITY_TO_PROVIDE);
+        couponGroup.addUserToCoupons(user, coupons, requiredQuantity);
+
+        // when, then
+        for (Coupon coupon : coupons) {
+            assertThatThrownBy(() -> coupon.addUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1)))
+                    .isInstanceOf(AlreadyProvidedCouponException.class)
+                    .hasMessage(ALREADY_GIVEN_COUPON_EXCEPTION);
+        }
     }
 }

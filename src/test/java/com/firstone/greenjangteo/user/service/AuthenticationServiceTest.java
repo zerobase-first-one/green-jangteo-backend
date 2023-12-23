@@ -1,5 +1,10 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.coupon.model.entity.Coupon;
+import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
+import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
+import com.firstone.greenjangteo.coupon.repository.CouponRepository;
+import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
 import com.firstone.greenjangteo.product.domain.model.Category;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.repository.CategoryRepository;
@@ -36,9 +41,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_NAME;
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_QUANTITY;
 import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
@@ -68,6 +77,12 @@ class AuthenticationServiceTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CouponGroupRepository couponGroupRepository;
+
+    @Autowired
+    private CouponRepository couponRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -224,7 +239,7 @@ class AuthenticationServiceTest {
 
     @DisplayName("판매자가 회원 가입하면 가게가 함께 생성된다.")
     @Test
-    void createStore() {
+    void createStoreWhenSellerSignedUp() {
         // given
         SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
@@ -239,6 +254,39 @@ class AuthenticationServiceTest {
         // then
         assertThat((store).isPresent()).isTrue();
         assertThat(store.get().getStoreName()).isEqualTo(enteredStoreName);
+    }
+
+    @DisplayName("구매자가 회원 가입하면 신규회원 할인 쿠폰이 3장 지급된다.")
+    @Test
+    @Transactional
+    void provideCouponsToSignedUpBuyer() {
+        // given
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
+                EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                NEW_MEMBER_DISCOUNT_COUPON_NAME, AMOUNT, DESCRIPTION, ISSUE_QUANTITY3, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponGroupRepository.save(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        // when
+        User user = authenticationService.signUpUser(signUpForm);
+        entityManager.flush();
+        entityManager.refresh(user);
+
+        // then
+        List<Coupon> providedCoupons = user.getCoupons();
+        assertThat(providedCoupons.size()).isEqualTo(NEW_MEMBER_DISCOUNT_COUPON_QUANTITY);
+
+        for (Coupon providedCoupon : providedCoupons) {
+            assertThat(providedCoupon.getUser()).isEqualTo(user);
+            assertThat(providedCoupon.getCouponGroup().getCouponName()).isEqualTo(NEW_MEMBER_DISCOUNT_COUPON_NAME);
+        }
     }
 
     @DisplayName("가입된 이메일 주소 또는 사용자 이름과 올바른 비밀번호를 전송하면 로그인을 할 수 있다.")

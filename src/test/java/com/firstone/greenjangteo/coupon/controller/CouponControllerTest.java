@@ -49,8 +49,8 @@ class CouponControllerTest {
         // given
         IssueCouponsRequestDto issueCouponsRequestDto
                 = CouponTestObjectFactory.createIssueCouponsRequestDto(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY,
-                LocalDate.now().plusDays(1), EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1,
+                LocalDate.now().plusDays(1), EXPIRATION_PERIOD1
         );
 
         // when, then

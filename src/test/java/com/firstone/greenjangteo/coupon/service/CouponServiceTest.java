@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.coupon.service;
 
 import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
@@ -9,18 +10,32 @@ import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
 import com.firstone.greenjangteo.coupon.repository.CouponRepository;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
+import com.firstone.greenjangteo.user.model.entity.User;
+import com.firstone.greenjangteo.user.repository.UserRepository;
+import com.firstone.greenjangteo.user.service.AuthenticationService;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
+import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -29,20 +44,38 @@ class CouponServiceTest {
     private CouponService couponService;
 
     @Autowired
+    private AuthenticationService authenticationService;
+
+    @Autowired
     private CouponGroupRepository couponGroupRepository;
 
     @Autowired
     private CouponRepository couponRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    private final LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+    @AfterEach
+    void tearDown() {
+        couponGroupRepository.deleteAll();
+        couponRepository.deleteAll();
+    }
+
     @DisplayName("올바른 쿠폰 발행 양식을 전송하면 대량의 쿠폰을 등록할 수 있다.")
     @Test
     void createCoupons() throws JobExecutionException {
         // given
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-
         IssueCouponsRequestDto issueCouponsRequestDto
                 = CouponTestObjectFactory.createIssueCouponsRequestDto(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
 
         // when
@@ -54,9 +87,97 @@ class CouponServiceTest {
         assertThat(couponGroup.getCouponName()).isEqualTo(COUPON_NAME1);
         assertThat(couponGroup.getAmount()).isEqualTo(Amount.of(AMOUNT));
         assertThat(couponGroup.getDescription()).isEqualTo(DESCRIPTION);
-        assertThat(couponGroup.getIssueQuantity()).isEqualTo(IssueQuantity.of(ISSUE_QUANTITY));
+        assertThat(couponGroup.getIssueQuantity()).isEqualTo(IssueQuantity.of(ISSUE_QUANTITY1));
         assertThat(couponGroup.getScheduledIssueDate()).isEqualTo(tomorrow);
-        assertThat(couponGroup.getExpirationPeriod()).isEqualTo(ExpirationPeriod.of(EXPIRATION_PERIOD));
-        assertThat(coupons).hasSize(Integer.parseInt(ISSUE_QUANTITY));
+        assertThat(couponGroup.getExpirationPeriod()).isEqualTo(ExpirationPeriod.of(EXPIRATION_PERIOD1));
+        assertThat(coupons).hasSize(Integer.parseInt(ISSUE_QUANTITY1));
+    }
+
+    @DisplayName("쿠폰 이름을 통해 쿠폰 그룹을 찾을 수 있다.")
+    @Test
+    @Transactional
+    void getCouponGroupByCouponName() {
+        // given
+        CouponGroup createdCouponGroup
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(createdCouponGroup);
+
+        // when
+        CouponGroup foundCouponGroup = couponService.getCouponGroup(COUPON_NAME1);
+
+        // then
+        assertThat(foundCouponGroup.getCouponName()).isEqualTo(createdCouponGroup.getCouponName());
+        assertThat(foundCouponGroup.getAmount()).isEqualTo(createdCouponGroup.getAmount());
+        assertThat(foundCouponGroup.getDescription()).isEqualTo(createdCouponGroup.getDescription());
+        assertThat(foundCouponGroup.getIssueQuantity()).isEqualTo(createdCouponGroup.getIssueQuantity());
+        assertThat(foundCouponGroup.getScheduledIssueDate()).isEqualTo(createdCouponGroup.getScheduledIssueDate());
+        assertThat(foundCouponGroup.getExpirationPeriod()).isEqualTo(createdCouponGroup.getExpirationPeriod());
+    }
+
+    @DisplayName("전송된 쿠폰 이름을 가진 쿠폰 그룹이 존재하지 않으면 EntityNotFoundException이 발생한다.")
+    @Test
+    @Transactional
+    void getCouponGroupByNonExistentCouponName() {
+        // given, when, then
+        assertThatThrownBy(() -> couponService.getCouponGroup(COUPON_NAME1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(COUPON_NAME_NOT_FOUND_EXCEPTION + COUPON_NAME1);
+    }
+
+    @DisplayName("미리 발급된 쿠폰을 전송된 수량만큼 회원에게 지급할 수 있다.")
+    @Test
+    @Transactional
+    void provideCouponsToUserWhenSufficient() {
+        prepareAndProvideCouponsToUser(ISSUE_QUANTITY3);
+    }
+
+    @DisplayName("전송된 수량에 비해 발급된 쿠폰이 부족하면, 부족한 수량만큼 새로운 쿠폰을 발급해 회원에게 지급할 수 있다.")
+    @Test
+    @Transactional
+    void createAndProvideCouponsToUserWhenInsufficient() {
+        prepareAndProvideCouponsToUser(ISSUE_QUANTITY4);
+    }
+
+    private void prepareAndProvideCouponsToUser(String issueQuantity) {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        CouponGroup createdCouponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, issueQuantity, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(createdCouponGroup);
+        CouponGroup savedCouponGroup = couponGroupRepository.save(createdCouponGroup);
+        couponRepository.saveAll(coupons);
+        entityManager.refresh(savedCouponGroup);
+
+        ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto = new ProvideCouponsToUserRequestDto(
+                user, COUPON_NAME1, Integer.parseInt(QUANTITY_TO_PROVIDE)
+        );
+
+        LocalDateTime beforeGiving = LocalDateTime.now();
+
+        // when
+        couponService.provideCouponsToUser(provideCouponsToUserRequestDto);
+
+        // then
+        LocalDateTime afterGiving = LocalDateTime.now().plusNanos(1);
+        int providedQuantity = Integer.parseInt(QUANTITY_TO_PROVIDE);
+        List<Coupon> userAddedCoupons = savedCouponGroup.getCoupons();
+
+        for (int i = 0; i < providedQuantity; i++) {
+            LocalDateTime issuedAt = userAddedCoupons.get(0).getIssuedAt();
+            LocalDateTime expiredAt = userAddedCoupons.get(0).getExpiredAt();
+
+            assertThat(userAddedCoupons.get(i).getUser()).isEqualTo(user);
+            assertThat(issuedAt).isAfter(beforeGiving);
+            assertThat(issuedAt).isBefore(afterGiving);
+            assertThat(expiredAt).isEqualTo(issuedAt.plusDays(Long.parseLong(EXPIRATION_PERIOD1)));
+        }
     }
 }
