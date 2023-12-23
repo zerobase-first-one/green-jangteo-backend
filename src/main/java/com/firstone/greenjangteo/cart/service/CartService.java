@@ -70,7 +70,7 @@ public class CartService {
 
             List<CartProduct> cartProducts = cartProductRepository.findCartProductsByCartId(cart.get().getId());
             for (CartProduct curCartProduct : cartProducts) {
-                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getProduct().getId(), curCartProduct.getQuantity()));
+                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getProduct(), curCartProduct.getQuantity()));
             }
         }
 
