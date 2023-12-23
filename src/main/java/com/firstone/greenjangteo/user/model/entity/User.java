@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.model.entity;
 
 import com.firstone.greenjangteo.audit.BaseEntity;
+import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.Email;
@@ -18,7 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+
+import static javax.persistence.CascadeType.*;
 
 @Entity(name = "users")
 @Table(name = "users")
@@ -57,6 +61,10 @@ public class User extends BaseEntity {
 
     @Column
     private LocalDateTime lastLoggedInAt;
+
+    @OneToMany(mappedBy = "user", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
+    private List<Coupon> coupons;
+
 
     @Builder
     private User(Long id, Email email, Username username, Password password,
