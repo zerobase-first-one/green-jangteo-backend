@@ -81,9 +81,9 @@ class CouponTest {
         assertThat(coupon1.hashCode()).isNotEqualTo(coupon2.hashCode());
     }
 
-    @DisplayName("회원에게 쿠폰을 지급한다.")
+    @DisplayName("쿠폰을 발행하고 회원에게 지급한다.")
     @Test
-    void addUser() {
+    void issueAndAddUser() {
         // given
         User user = mock(User.class);
         CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
@@ -95,7 +95,7 @@ class CouponTest {
 
         // when
         for (Coupon coupon : coupons) {
-            coupon.addUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1));
+            coupon.issueAndAddUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1));
         }
 
         // then
@@ -119,11 +119,11 @@ class CouponTest {
         List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
 
         int requiredQuantity = Integer.parseInt(QUANTITY_TO_PROVIDE);
-        couponGroup.addUserToCoupons(user, coupons, requiredQuantity);
+        couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity);
 
         // when, then
         for (Coupon coupon : coupons) {
-            assertThatThrownBy(() -> coupon.addUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1)))
+            assertThatThrownBy(() -> coupon.issueAndAddUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1)))
                     .isInstanceOf(AlreadyProvidedCouponException.class)
                     .hasMessage(ALREADY_GIVEN_COUPON_EXCEPTION);
         }

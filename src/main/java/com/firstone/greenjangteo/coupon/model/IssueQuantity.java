@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import static com.firstone.greenjangteo.coupon.excpeption.message.BlankExceptionMessage.ISSUE_QUANTITY_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExceptionMessage.INVALID_ISSUE_QUANTITY_EXCEPTION;
-import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_PATTERN;
+import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_OR_MINUS_ONE_PATTERN;
 
 public class IssueQuantity {
     private final int issueQuantity;
@@ -17,7 +17,13 @@ public class IssueQuantity {
 
     public static IssueQuantity of(String issueQuantity) {
         validate(issueQuantity);
-        return new IssueQuantity(Integer.parseInt(issueQuantity));
+
+        int parsedIssueQuantity = Integer.parseInt(issueQuantity);
+        if (parsedIssueQuantity == -1) {
+            ++parsedIssueQuantity;
+        }
+
+        return new IssueQuantity(parsedIssueQuantity);
     }
 
     @Override
@@ -54,9 +60,13 @@ public class IssueQuantity {
     }
 
     private static void checkIssueQuantityPattern(String issueQuantity) {
-        if (!issueQuantity.matches(POSITIVE_INTEGER_PATTERN)) {
+        if (!issueQuantity.matches(POSITIVE_INTEGER_OR_MINUS_ONE_PATTERN)) {
             throw new IllegalArgumentException(INVALID_ISSUE_QUANTITY_EXCEPTION + issueQuantity);
         }
+    }
+
+    public boolean isZero() {
+        return issueQuantity == 0;
     }
 
     @Converter

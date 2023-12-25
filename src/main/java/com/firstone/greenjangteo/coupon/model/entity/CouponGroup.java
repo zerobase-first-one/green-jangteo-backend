@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.coupon.model.entity;
 
 import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.audit.BaseEntity;
+import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.excpeption.serious.InconsistentCouponSizeException;
 import com.firstone.greenjangteo.coupon.excpeption.serious.InsufficientRemainingQuantityException;
 import com.firstone.greenjangteo.coupon.model.Amount;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.*;
 import static javax.persistence.CascadeType.*;
@@ -50,6 +52,8 @@ public class CouponGroup extends BaseEntity {
     @Column(nullable = false)
     private LocalDate scheduledIssueDate;
 
+    private boolean isImmediateProvisionRequired;
+
     @Convert(converter = ExpirationPeriod.ExpirationPeriodConverter.class)
     private ExpirationPeriod expirationPeriod;
 
@@ -58,14 +62,28 @@ public class CouponGroup extends BaseEntity {
 
     @Builder
     private CouponGroup(String couponName, Amount amount, String description, IssueQuantity issueQuantity,
-                        LocalDate scheduledIssueDate, ExpirationPeriod expirationPeriod) {
+                        LocalDate scheduledIssueDate, boolean isImmediateProvisionRequired, ExpirationPeriod expirationPeriod) {
         this.couponName = couponName;
         this.amount = amount;
         this.description = description;
         this.issueQuantity = issueQuantity;
         remainingQuantity = issueQuantity.getValue();
         this.scheduledIssueDate = scheduledIssueDate;
+        this.isImmediateProvisionRequired = isImmediateProvisionRequired;
         this.expirationPeriod = expirationPeriod;
+    }
+
+    public static CouponGroup from
+            (IssueCouponsRequestDto issueCouponsRequestDto, boolean isImmediateProvisionRequired) {
+        return CouponGroup.builder()
+                .couponName(issueCouponsRequestDto.getCouponName())
+                .amount(Amount.of(issueCouponsRequestDto.getAmount()))
+                .description(issueCouponsRequestDto.getDescription())
+                .issueQuantity(IssueQuantity.of(issueCouponsRequestDto.getIssueQuantity()))
+                .scheduledIssueDate(issueCouponsRequestDto.getScheduledIssueDate())
+                .isImmediateProvisionRequired(isImmediateProvisionRequired)
+                .expirationPeriod(ExpirationPeriod.of(issueCouponsRequestDto.getExpirationPeriod()))
+                .build();
     }
 
     public static CouponGroup from(CouponGroupModel couponGroupModel) {
@@ -78,6 +96,7 @@ public class CouponGroup extends BaseEntity {
                 .expirationPeriod(ExpirationPeriod.of(couponGroupModel.getExpirationPeriod()))
                 .build();
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -97,6 +116,10 @@ public class CouponGroup extends BaseEntity {
                 remainingQuantity, scheduledIssueDate, expirationPeriod, coupons);
     }
 
+    public boolean isIssueToAllUsersRequired() {
+        return issueQuantity.isZero() && isImmediateProvisionRequired;
+    }
+
     public void addIssueQuantity(String issueQuantityToAdd) {
         issueQuantity = issueQuantity.addQuantity(issueQuantityToAdd);
         remainingQuantity += Integer.parseInt(issueQuantityToAdd);
@@ -104,6 +127,10 @@ public class CouponGroup extends BaseEntity {
 
     public boolean isCouponsRemained(int requiredQuantity) {
         return remainingQuantity >= requiredQuantity;
+    }
+
+    public void reduceRemainingQuantity(int assignedQuantity) {
+        remainingQuantity -= assignedQuantity;
     }
 
     public void addInsufficientCoupons(int requiredQuantity) {
@@ -116,15 +143,21 @@ public class CouponGroup extends BaseEntity {
         addIssueQuantity(String.valueOf(quantityToIssue));
     }
 
-    public void addUserToCoupons(User user, List<Coupon> coupons, int requiredQuantity) {
+    public void issueAndAddUserToCoupons(User user, List<Coupon> coupons, int requiredQuantity) {
         int couponsSize = coupons.size();
         validateCouponsSize(couponsSize, requiredQuantity);
         validateRemainingQuantity(remainingQuantity, couponsSize);
 
         for (Coupon coupon : coupons) {
-            coupon.addUser(user, expirationPeriod);
+            coupon.issueAndAddUser(user, expirationPeriod);
         }
-        remainingQuantity -= requiredQuantity;
+        reduceRemainingQuantity(requiredQuantity);
+    }
+
+    public List<Coupon> getUnassignedCoupons() {
+        return coupons.stream()
+                .filter(coupon -> coupon.getUser() == null)
+                .collect(Collectors.toList());
     }
 
     private void validateCouponsSize(int size, int requiredQuantity) {

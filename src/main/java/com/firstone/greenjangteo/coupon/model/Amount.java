@@ -33,6 +33,10 @@ public class Amount {
         return Objects.hash(amount);
     }
 
+    int getValue() {
+        return amount;
+    }
+
     private static void validate(String amount) {
         checkAmountIsNotBlank(amount);
         checkAmountPattern(amount);

@@ -9,8 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.coupon.excpeption.message.BlankExceptionMessage.ISSUE_QUANTITY_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExceptionMessage.INVALID_ISSUE_QUANTITY_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.ISSUE_QUANTITY1;
-import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.ISSUE_QUANTITY2;
+import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -39,6 +38,27 @@ class IssueQuantityTest {
         assertThat(issueQuantity1.hashCode()).isNotEqualTo(issueQuantity2.hashCode());
     }
 
+    @DisplayName("양의 정수를 전송하면 해당 발행 매수를 가지는 IssueQuantity 인스턴스를 생성한다.")
+    @ParameterizedTest
+    @CsvSource({"1", "2", "5", "99", "100"})
+    void ofPositiveInteger(String issueQuantity) {
+        // given, when
+        IssueQuantity createdIssueQuantity = IssueQuantity.of(issueQuantity);
+
+        // then
+        assertThat(createdIssueQuantity.getValue()).isEqualTo(Integer.parseInt(issueQuantity));
+    }
+
+    @DisplayName("-1을 전송하면 발행 매수가 0인 IssueQuantity 인스턴스를 생성한다.")
+    @Test
+    void ofMinusOne() {
+        // given, when
+        IssueQuantity createdIssueQuantity = IssueQuantity.of(MINUS_ONE_ISSUE_QUANTITY);
+
+        // then
+        assertThat(createdIssueQuantity.getValue()).isEqualTo(0);
+    }
+
     @DisplayName("발행 매수를 전송하지 않으면 IllegalArgumentException이 발생한다.")
     @ParameterizedTest
     @NullAndEmptySource
@@ -52,7 +72,7 @@ class IssueQuantityTest {
 
     @DisplayName("유효하지 않은 발행 매수를 전송하면 IllegalArgumentException이 발생한다.")
     @ParameterizedTest
-    @CsvSource({"-1", "0", "abc", "ㄱㄴㄷ", "가나다"})
+    @CsvSource({"-2", "0", "abc", "ㄱㄴㄷ", "가나다"})
     void ofInvalidValue(String issueQuantity) {
         // given, when, then
         assertThatThrownBy(() -> IssueQuantity.of(issueQuantity))

@@ -25,7 +25,7 @@ public class IssueCouponsRequestDto {
     private static final String ISSUE_QUANTITY_EXAMPLE = "100";
 
     private static final String SCHEDULED_ISSUE_DATE_VALUE = "쿠폰 발행 예정일";
-    private static final String SCHEDULED_ISSUE_DATE_EXAMPLE = "2024-12-25";
+    private static final String SCHEDULED_ISSUE_DATE_EXAMPLE = "2023-12-25";
     private static final String SCHEDULED_ISSUE_DATE_NO_VALUE = "발행 예정일은 필수값입니다.";
     private static final String NOT_FUTURE_SCHEDULED_ISSUE_DATE = "발행 예정일은 내일 이후의 날짜를 선택해야 합니다.";
 
@@ -51,4 +51,12 @@ public class IssueCouponsRequestDto {
 
     @ApiModelProperty(value = EXPIRATION_PERIOD_VALUE, example = EXPIRATION_PERIOD_EXAMPLE)
     private String expirationPeriod;
+
+    public boolean isIssueQuantityIsMinusOne() {
+        return issueQuantity.equals("-1");
+    }
+
+    public void setIssueQuantityToZero() {
+        issueQuantity = "0";
+    }
 }

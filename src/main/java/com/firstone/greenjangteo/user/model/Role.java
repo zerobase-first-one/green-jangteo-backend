@@ -11,4 +11,12 @@ public enum Role {
     ROLE_BUYER("구매자");
 
     private final String description;
+
+    public boolean isSeller() {
+        return this == ROLE_SELLER;
+    }
+
+    public boolean isBuyer() {
+        return this == ROLE_BUYER;
+    }
 }
