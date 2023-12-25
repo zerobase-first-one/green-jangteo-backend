@@ -5,9 +5,13 @@ import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
+import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CouponTestObjectFactory {
     public static IssueCouponsRequestDto createIssueCouponsRequestDto(
@@ -50,5 +54,14 @@ public class CouponTestObjectFactory {
                 .scheduledIssueDate(tomorrow)
                 .expirationPeriod(ExpirationPeriod.of(expirationPeriod))
                 .build();
+    }
+
+    public static List<Coupon> createCoupons(CouponGroup couponGroup) {
+        List<Coupon> coupons = new ArrayList<>();
+        for (int i = 0; i < couponGroup.getIssueQuantity().getValue(); i++) {
+            coupons.add(new Coupon(couponGroup, LocalDateTime.now()));
+        }
+
+        return coupons;
     }
 }

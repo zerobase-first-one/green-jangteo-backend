@@ -24,9 +24,9 @@ class IssueCouponsRequestDtoTest {
                 .couponName(COUPON_NAME1)
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
-                .issueQuantity(ISSUE_QUANTITY)
+                .issueQuantity(ISSUE_QUANTITY1)
                 .scheduledIssueDate(LocalDate.now().plusDays(1))
-                .expirationPeriod(EXPIRATION_PERIOD)
+                .expirationPeriod(EXPIRATION_PERIOD1)
                 .build();
 
         IssueCouponsRequestDto issueCouponsRequestDto2
@@ -34,9 +34,9 @@ class IssueCouponsRequestDtoTest {
                 .couponName(COUPON_NAME1)
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
-                .issueQuantity(ISSUE_QUANTITY)
+                .issueQuantity(ISSUE_QUANTITY1)
                 .scheduledIssueDate(LocalDate.now())
-                .expirationPeriod(EXPIRATION_PERIOD)
+                .expirationPeriod(EXPIRATION_PERIOD1)
                 .build();
 
         IssueCouponsRequestDto issueCouponsRequestDto3
@@ -44,9 +44,9 @@ class IssueCouponsRequestDtoTest {
                 .couponName(COUPON_NAME1)
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
-                .issueQuantity(ISSUE_QUANTITY)
+                .issueQuantity(ISSUE_QUANTITY1)
                 .scheduledIssueDate(LocalDate.now().minusDays(1))
-                .expirationPeriod(EXPIRATION_PERIOD)
+                .expirationPeriod(EXPIRATION_PERIOD1)
                 .build();
 
         IssueCouponsRequestDto issueCouponsRequestDto4
@@ -54,9 +54,9 @@ class IssueCouponsRequestDtoTest {
                 .couponName(COUPON_NAME1)
                 .amount(AMOUNT)
                 .description(DESCRIPTION)
-                .issueQuantity(ISSUE_QUANTITY)
+                .issueQuantity(ISSUE_QUANTITY1)
                 .scheduledIssueDate(null)
-                .expirationPeriod(EXPIRATION_PERIOD)
+                .expirationPeriod(EXPIRATION_PERIOD1)
                 .build();
 
         // when

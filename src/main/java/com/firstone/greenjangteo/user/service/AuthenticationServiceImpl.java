@@ -1,6 +1,8 @@
 package com.firstone.greenjangteo.user.service;
 
 
+import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
@@ -28,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_NAME;
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_QUANTITY;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.EMAIL_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USERNAME_NOT_FOUND_EXCEPTION;
@@ -42,6 +46,7 @@ import static org.springframework.transaction.annotation.Isolation.*;
 public class AuthenticationServiceImpl implements AuthenticationService, UserDetailsService {
     private final UserService userService;
     private final StoreService storeService;
+    private final CouponService couponService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -60,8 +65,15 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         User savedUser = userRepository.save(user);
 
-        if (user.getRoles().isSeller()) {
+        if (user.getRoles().containSeller()) {
             storeService.createStore(savedUser.getId(), signUpForm.getStoreName());
+        }
+
+        if (user.getRoles().containBuyer()) {
+            ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto = new ProvideCouponsToUserRequestDto(
+                    savedUser, NEW_MEMBER_DISCOUNT_COUPON_NAME, NEW_MEMBER_DISCOUNT_COUPON_QUANTITY
+            );
+            couponService.provideCouponsToUser(provideCouponsToUserRequestDto);
         }
 
         return savedUser;
@@ -115,7 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         validatePassword(user.getPassword(), deleteRequestDto.getPassword());
 
-        if (user.getRoles().isSeller()) {
+        if (user.getRoles().containSeller()) {
             storeService.deleteStore(id);
         }
         userRepository.delete(user);

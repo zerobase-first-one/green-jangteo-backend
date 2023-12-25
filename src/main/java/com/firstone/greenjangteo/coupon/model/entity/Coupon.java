@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.firstone.greenjangteo.coupon.excpeption.serious.AlreadyProvidedCouponException;
+import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,6 +17,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.ALREADY_GIVEN_COUPON_EXCEPTION;
+
 @Entity(name = "coupon")
 @Table(name = "coupon")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,15 +28,7 @@ public class Coupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     private Long usedOrderId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_group_id")
-    private CouponGroup couponGroup;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -52,6 +48,14 @@ public class Coupon {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime expiredAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_group_id")
+    private CouponGroup couponGroup;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Coupon(CouponGroup couponGroup, LocalDateTime createdAt) {
         this.couponGroup = couponGroup;
@@ -75,9 +79,25 @@ public class Coupon {
         return Objects.hash(id, user, usedOrderId, couponGroup, createdAt, modifiedAt, issuedAt, expiredAt);
     }
 
+    public void addUser(User user, ExpirationPeriod expirationPeriod) {
+        validateUserIsNull();
+        this.user = user;
+
+        LocalDateTime now = LocalDateTime.now();
+        issueCoupon(now, expirationPeriod.computeExpirationTime(now));
+    }
+
     public void issueCoupon(LocalDateTime now, LocalDateTime expirationDateTime) {
         modifiedAt = now;
         issuedAt = now;
         expiredAt = expirationDateTime;
+    }
+
+    private void validateUserIsNull() {
+        if (user == null) {
+            return;
+        }
+
+        throw new AlreadyProvidedCouponException(ALREADY_GIVEN_COUPON_EXCEPTION);
     }
 }
