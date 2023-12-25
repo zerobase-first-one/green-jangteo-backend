@@ -32,7 +32,7 @@ class CouponGroupRepositoryTest {
         // given
         CouponGroup createdCouponGroup
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
         couponGroupRepository.save(createdCouponGroup);
 
@@ -54,7 +54,7 @@ class CouponGroupRepositoryTest {
         // given
         CouponGroup createdCouponGroup
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
         couponGroupRepository.save(createdCouponGroup);
 
@@ -70,15 +70,15 @@ class CouponGroupRepositoryTest {
         // given
         CouponGroup createdCouponGroup1
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
         CouponGroup createdCouponGroup2
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow.plusDays(1), EXPIRATION_PERIOD
+                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow.plusDays(1), EXPIRATION_PERIOD1
         );
         CouponGroup createdCouponGroup3
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME3, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME3, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
         couponGroupRepository.saveAll(List.of(createdCouponGroup1, createdCouponGroup2, createdCouponGroup3));
 

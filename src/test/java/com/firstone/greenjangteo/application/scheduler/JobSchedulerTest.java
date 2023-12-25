@@ -43,12 +43,12 @@ class JobSchedulerTest {
 
         CouponGroup createdCouponGroup1
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
 
         CouponGroup createdCouponGroup2
                 = CouponTestObjectFactory.createCouponGroup(
-                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY, tomorrow, EXPIRATION_PERIOD
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
         );
 
         List<CouponGroup> couponGroups = List.of(createdCouponGroup1, createdCouponGroup2);

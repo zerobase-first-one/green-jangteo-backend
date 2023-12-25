@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.ROLE_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_ROLE_EXCEPTION;
-import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -63,9 +62,19 @@ public class Roles {
         return roles.get(index);
     }
 
-    public boolean isSeller() {
+    public boolean containSeller() {
         for (Role role : roles) {
-            if (role == ROLE_SELLER) {
+            if (role.isSeller()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean containBuyer() {
+        for (Role role : roles) {
+            if (role.isBuyer()) {
                 return true;
             }
         }

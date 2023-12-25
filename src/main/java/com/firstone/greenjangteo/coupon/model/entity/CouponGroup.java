@@ -2,9 +2,12 @@ package com.firstone.greenjangteo.coupon.model.entity;
 
 import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.audit.BaseEntity;
+import com.firstone.greenjangteo.coupon.excpeption.serious.InconsistentCouponSizeException;
+import com.firstone.greenjangteo.coupon.excpeption.serious.InsufficientRemainingQuantityException;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
+import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,9 +15,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.*;
 import static javax.persistence.CascadeType.*;
 
 @Entity(name = "coupon_group")
@@ -95,5 +100,45 @@ public class CouponGroup extends BaseEntity {
     public void addIssueQuantity(String issueQuantityToAdd) {
         issueQuantity = issueQuantity.addQuantity(issueQuantityToAdd);
         remainingQuantity += Integer.parseInt(issueQuantityToAdd);
+    }
+
+    public boolean isCouponsRemained(int requiredQuantity) {
+        return remainingQuantity >= requiredQuantity;
+    }
+
+    public void addInsufficientCoupons(int requiredQuantity) {
+        LocalDateTime now = LocalDateTime.now();
+        int quantityToIssue = requiredQuantity - remainingQuantity;
+        for (int i = 0; i < quantityToIssue; i++) {
+            coupons.add(new Coupon(this, now));
+        }
+
+        addIssueQuantity(String.valueOf(quantityToIssue));
+    }
+
+    public void addUserToCoupons(User user, List<Coupon> coupons, int requiredQuantity) {
+        int couponsSize = coupons.size();
+        validateCouponsSize(couponsSize, requiredQuantity);
+        validateRemainingQuantity(remainingQuantity, couponsSize);
+
+        for (Coupon coupon : coupons) {
+            coupon.addUser(user, expirationPeriod);
+        }
+        remainingQuantity -= requiredQuantity;
+    }
+
+    private void validateCouponsSize(int size, int requiredQuantity) {
+        if (size != requiredQuantity) {
+            throw new InconsistentCouponSizeException(INCONSISTENT_COUPON_SIZE_EXCEPTION + size
+                    + INCONSISTENT_COUPON_SIZE_EXCEPTION_REQUIRED_QUANTITY + requiredQuantity);
+        }
+    }
+
+    private void validateRemainingQuantity(int remainingQuantity, int size) {
+        if (remainingQuantity < size) {
+            throw new InsufficientRemainingQuantityException
+                    (INSUFFICIENT_REMAINING_QUANTITY_EXCEPTION + remainingQuantity
+                            + INSUFFICIENT_REMAINING_QUANTITY_EXCEPTION_QUANTITY_TO_PROVIDE + size);
+        }
     }
 }
