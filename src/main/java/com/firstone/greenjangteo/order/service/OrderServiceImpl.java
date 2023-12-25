@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrders(UserIdRequestDto userIdRequestDto) {
         User user = userService.getUser(Long.parseLong(userIdRequestDto.getUserId()));
 
-        if (user.getRoles().isSeller()) {
+        if (user.getRoles().containSeller()) {
             return orderRepository.findBySellerId(Long.parseLong(userIdRequestDto.getUserId()));
         }
 

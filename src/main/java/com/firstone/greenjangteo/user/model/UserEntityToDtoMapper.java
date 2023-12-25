@@ -12,7 +12,7 @@ public class UserEntityToDtoMapper {
                 .fullName(user.getFullName().getValue())
                 .phone(user.getPhone().getValue())
                 .addressDto(user.getAddress().toDto())
-                .roles(user.getRoles().toStrings())
+                .roleDescriptions(user.getRoles().toDescriptions())
                 .createdAt(user.getCreatedAt())
                 .modifiedAt(user.getModifiedAt())
                 .build();
@@ -21,7 +21,7 @@ public class UserEntityToDtoMapper {
     public static UserResponseDto toOthers(User user) {
         return UserResponseDto.builder()
                 .username(user.getUsername().getValue())
-                .roles(user.getRoles().toStrings())
+                .roleDescriptions(user.getRoles().toDescriptions())
                 .createdAt(user.getCreatedAt())
                 .modifiedAt(user.getModifiedAt())
                 .build();
