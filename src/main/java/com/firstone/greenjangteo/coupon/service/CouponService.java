@@ -11,10 +11,12 @@ public interface CouponService {
 
     void issueCoupons() throws JobExecutionException;
 
+    void provideCouponsToUsers(ProvideCouponsToUsersRequestDto provideCouponsToUsersRequestDto)
+            throws JobExecutionException;
+
+    void deleteExpiredCoupons() throws JobExecutionException;
+
     void provideCouponsToUser(ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto);
 
     CouponGroup getCouponGroup(String couponName);
-
-    void provideCouponsToUsers(ProvideCouponsToUsersRequestDto provideCouponsToUsersRequestDto)
-            throws JobExecutionException;
 }
