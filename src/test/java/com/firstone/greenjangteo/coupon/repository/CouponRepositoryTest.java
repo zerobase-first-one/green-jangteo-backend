@@ -3,22 +3,30 @@ package com.firstone.greenjangteo.coupon.repository;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
+import com.firstone.greenjangteo.user.model.entity.User;
+import com.firstone.greenjangteo.user.repository.UserRepository;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
+import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@Transactional
 class CouponRepositoryTest {
     @Autowired
     private CouponGroupRepository couponGroupRepository;
@@ -26,12 +34,18 @@ class CouponRepositoryTest {
     @Autowired
     private CouponRepository couponRepository;
 
-    @DisplayName("쿠폰 그룹과 사용자가 비어 있는 조건을 통해 일정 수량의 쿠폰 목록을 조회할 수 있다.")
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+    @DisplayName("쿠폰 그룹과 회원에게 지급되지 않은 조건을 통해 일정 수량의 쿠폰 목록을 조회할 수 있다.")
     @Test
     void findByCouponGroupAndUserIsNull() {
         // given
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-
         CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, QUANTITY_TO_PROVIDE, tomorrow, EXPIRATION_PERIOD1
         );
@@ -49,5 +63,38 @@ class CouponRepositoryTest {
         assertThat(foundCoupons).hasSize(requiredQuantity)
                 .extracting("user")
                 .containsNull();
+    }
+
+    @DisplayName("회원 ID를 통해 쿠폰 목록을 조회할 수 있다.")
+    @Test
+    void findByUserId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, QUANTITY_TO_PROVIDE, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        List<Coupon> createdCoupons1 = CouponTestObjectFactory.createCoupons(couponGroup);
+        List<Coupon> createdCoupons2 = CouponTestObjectFactory.createCoupons(couponGroup);
+
+        for (Coupon createdCoupon : createdCoupons2) {
+            createdCoupon.addUser(user);
+        }
+
+        couponGroupRepository.save(couponGroup);
+        couponRepository.saveAll(createdCoupons1);
+        couponRepository.saveAll(createdCoupons2);
+
+        // when
+        List<Coupon> coupons = couponRepository.findAllByUserId(1L);
+
+        // then
+        assertThat(coupons).hasSize(createdCoupons2.size())
+                .extracting("user")
+                .containsOnly(user);
     }
 }

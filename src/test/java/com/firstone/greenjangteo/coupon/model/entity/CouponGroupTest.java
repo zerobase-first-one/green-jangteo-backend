@@ -145,7 +145,7 @@ class CouponGroupTest {
 
     @DisplayName("쿠폰들에 회원을 추가하고, 남은 쿠폰 수량을 감소시킨다.")
     @Test
-    void addUserToCoupons() {
+    void issueAndAddUserToCoupons() {
         // given
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
@@ -163,7 +163,7 @@ class CouponGroupTest {
         int remainingQuantity = couponGroup.getRemainingQuantity();
 
         // when
-        couponGroup.addUserToCoupons(user, coupons, requiredQuantity);
+        couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity);
 
         // then
         assertThat(coupons).hasSize(requiredQuantity)
@@ -174,7 +174,7 @@ class CouponGroupTest {
 
     @DisplayName("전송된 쿠폰들의 수량이 필요로 하는 발행 매수와 일치하지 않으면 InconsistentCouponSizeException이 발생한다.")
     @Test
-    void addUserToCouponsWithInconsistentCouponSize() {
+    void issueAndAddUserToCouponsWithInconsistentCouponSize() {
         // given
         User user = mock(User.class);
         CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
@@ -185,7 +185,7 @@ class CouponGroupTest {
         int requiredQuantity = Integer.parseInt(QUANTITY_TO_PROVIDE);
 
         // when, then
-        assertThatThrownBy(() -> couponGroup.addUserToCoupons(user, coupons, requiredQuantity))
+        assertThatThrownBy(() -> couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity))
                 .isInstanceOf(InconsistentCouponSizeException.class)
                 .hasMessage(INCONSISTENT_COUPON_SIZE_EXCEPTION + coupons.size()
                         + INCONSISTENT_COUPON_SIZE_EXCEPTION_REQUIRED_QUANTITY + requiredQuantity);
@@ -193,7 +193,7 @@ class CouponGroupTest {
 
     @DisplayName("남은 쿠폰 수량이 지급하려는 쿠폰들의 수량보다 부족하면 InsufficientRemainingQuantityException이 발생한다.")
     @Test
-    void addUserToCouponsWithInsufficientRemainingQuantity() {
+    void issueAndAddUserToCouponsWithInsufficientRemainingQuantity() {
         // given
         User user = mock(User.class);
         CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
@@ -202,12 +202,44 @@ class CouponGroupTest {
         List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
 
         int requiredQuantity = Integer.parseInt(QUANTITY_TO_PROVIDE);
-        couponGroup.addUserToCoupons(user, coupons, requiredQuantity);
+        couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity);
 
         // when, then
-        assertThatThrownBy(() -> couponGroup.addUserToCoupons(user, coupons, requiredQuantity))
+        assertThatThrownBy(() -> couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity))
                 .isInstanceOf(InsufficientRemainingQuantityException.class)
                 .hasMessage(INSUFFICIENT_REMAINING_QUANTITY_EXCEPTION + couponGroup.getRemainingQuantity()
                         + INSUFFICIENT_REMAINING_QUANTITY_EXCEPTION_QUANTITY_TO_PROVIDE + coupons.size());
+    }
+
+    @DisplayName("회원에게 지급되지 않은 쿠폰들을 반환한다.")
+    @Test
+    void getUnassignedCoupons() {
+        // given
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY3, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+
+        User user1 = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        User user2 = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(user1, user2));
+
+        coupons.get(0).addUser(user1);
+        coupons.get(1).addUser(user2);
+        couponRepository.saveAll(coupons);
+
+        entityManager.refresh(couponGroup);
+
+        // when
+        List<Coupon> unassignedCoupons = couponGroup.getUnassignedCoupons();
+
+        // then
+        assertThat(unassignedCoupons).hasSize(Integer.parseInt(ISSUE_QUANTITY3) - 2);
     }
 }

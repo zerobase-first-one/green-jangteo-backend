@@ -7,6 +7,7 @@ public class CouponTestConstant {
     public static final String ISSUE_QUANTITY2 = "200";
     public static final String ISSUE_QUANTITY3 = "20";
     public static final String ISSUE_QUANTITY4 = "3";
+    public static final String MINUS_ONE_ISSUE_QUANTITY = "-1";
 
     public static final String EXPIRATION_PERIOD1 = "30";
     public static final String EXPIRATION_PERIOD2 = "60";

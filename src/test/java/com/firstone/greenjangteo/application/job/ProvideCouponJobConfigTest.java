@@ -18,35 +18,38 @@ import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class IssueCouponJobConfigTest {
+class ProvideCouponJobConfigTest {
     @Autowired
-    private IssueCouponJobConfig issueCouponJobConfig;
+    private ProvideCouponJobConfig provideCouponJobConfig;
 
     @MockBean
     private JobLauncher jobLauncher;
 
-    @MockBean(name = "issueCouponJob")
-    private Job issueCouponJob;
+    @MockBean(name = "provideCouponJob")
+    private Job provideCouponJob;
 
-    @DisplayName("쿠폰 발행을 위해 issueCouponJob을 실행한다.")
+    @DisplayName("쿠폰 지급을 위해 provideCouponJob을 실행한다.")
     @Test
     void run() throws Exception {
         // given, when
-        jobLauncher.run(issueCouponJob, new JobParameters());
+        jobLauncher.run(provideCouponJob, new JobParameters());
 
         // then
-        verify(jobLauncher, times(1)).run(eq(issueCouponJob), any(JobParameters.class));
+        verify(jobLauncher, times(1)).run(eq(provideCouponJob), any(JobParameters.class));
     }
 
-    @DisplayName("JobParameters를 전송해 issueCouponJob을 실행한다.")
+    @DisplayName("JobParameters를 전송해 provideCouponJob을 실행한다.")
     @Test
     void runWithParameters() throws Exception {
         // given
         JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("couponGroupId", 1L)
+                .addString("userIds", "1,2,3,4,5")
+                .addLong("quantity", 1L)
                 .addLong("time", System.currentTimeMillis())
                 .toJobParameters();
 
         // when, then
-        jobLauncher.run(issueCouponJob, jobParameters);
+        jobLauncher.run(provideCouponJob, jobParameters);
     }
 }
