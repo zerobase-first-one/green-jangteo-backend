@@ -5,7 +5,8 @@ import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -26,8 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.firstone.greenjangteo.application.job.utility.LogConstant.UPDATING_COUPON;
+
 @Configuration
-@Slf4j
 @RequiredArgsConstructor
 public class CreateCouponJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
@@ -35,11 +37,12 @@ public class CreateCouponJobConfig {
     private final CouponGroupRepository couponGroupRepository;
     private final JdbcTemplate jdbcTemplate;
 
+    private static final Logger log = LoggerFactory.getLogger(CreateCouponJobConfig.class);
+
     private static final String JOB_NAME = "createCouponJob";
     private static final String STEP_NAME = "createCouponStep";
     private static final String PREPARING_BEFORE_STEP = "Preparing beforeStep";
     private static final String COUPON_INSERT_QUERY = "INSERT INTO coupon (coupon_group_id, created_at) VALUES (?, ?)";
-    private static final String UPDATING_COUPON = "coupon: {}";
 
     @Bean
     public Job createCouponJob() {
@@ -137,7 +140,7 @@ public class CreateCouponJobConfig {
                             @Override
                             public void setValues(PreparedStatement ps, int i) throws SQLException {
                                 Coupon coupon = coupons.get(i);
-                                log.info(UPDATING_COUPON, coupon);
+                                log.info(UPDATING_COUPON, coupon.getId());
 
                                 ps.setLong(1, coupon.getCouponGroup().getId());
                                 ps.setObject(2, coupon.getCreatedAt());

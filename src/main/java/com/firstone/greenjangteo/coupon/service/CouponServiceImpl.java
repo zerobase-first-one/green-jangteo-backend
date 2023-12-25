@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.coupon.service;
 
 import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
@@ -31,7 +33,11 @@ import static org.springframework.transaction.annotation.Isolation.READ_COMMITTE
 @RequiredArgsConstructor
 public class CouponServiceImpl implements CouponService {
     private final JobLauncher jobLauncher;
+
     private final Job createCouponJob;
+    private final Job issueCouponJob;
+    private final Job provideCouponJob;
+
     private final CouponGroupRepository couponGroupRepository;
     private final CouponRepository couponRepository;
 
@@ -41,6 +47,12 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public void createCoupons(IssueCouponsRequestDto issueCouponsRequestDto) throws JobExecutionException {
+        if (issueCouponsRequestDto.isIssueQuantityIsMinusOne()) {
+            CouponGroup couponGroup = CouponGroup.from(issueCouponsRequestDto, true);
+            couponGroupRepository.save(couponGroup);
+            return;
+        }
+
         String scheduledIssueDate = issueCouponsRequestDto.getScheduledIssueDate()
                 .format(DateTimeFormatter.ISO_LOCAL_DATE);
 
@@ -55,6 +67,29 @@ public class CouponServiceImpl implements CouponService {
                 .toJobParameters();
 
         jobLauncher.run(createCouponJob, jobParameters);
+    }
+
+    @Override
+    public void issueCoupons() throws JobExecutionException {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+        jobLauncher.run(issueCouponJob, jobParameters);
+    }
+
+    @Override
+    public void provideCouponsToUsers(ProvideCouponsToUsersRequestDto provideCouponsToUsersRequestDto)
+            throws JobExecutionException {
+        String userIds = parseUserIdsToStringValue(provideCouponsToUsersRequestDto.getUserIds());
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("couponGroupId", provideCouponsToUsersRequestDto.getCouponGroupId())
+                .addString("userIds", userIds)
+                .addLong("quantity", (long) provideCouponsToUsersRequestDto.getQuantity())
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+
+        jobLauncher.run(provideCouponJob, jobParameters);
     }
 
     @Override
@@ -86,11 +121,17 @@ public class CouponServiceImpl implements CouponService {
                 .orElseThrow(() -> new EntityNotFoundException(COUPON_NAME_NOT_FOUND_EXCEPTION + couponName));
     }
 
+    private String parseUserIdsToStringValue(List<Long> userIds) {
+        return userIds.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(","));
+    }
+
     private void addUserToCoupons(User user, CouponGroup couponGroup, int requiredQuantity) {
         Pageable limit = PageRequest.of(0, requiredQuantity);
         List<Coupon> coupons
                 = couponRepository.findByCouponGroupAndUserIsNull(couponGroup, limit);
-        couponGroup.addUserToCoupons(user, coupons, requiredQuantity);
+        couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity);
 
         couponRepository.saveAll(coupons);
     }

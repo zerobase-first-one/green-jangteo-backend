@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.coupon.aop;
 
 import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.utility.MemoryUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,6 +33,13 @@ public class CouponLoggingAspect {
     private static final String PROVIDE_COUPONS_TO_USER_END
             = "'{}.{}' task was executed successfully by 'couponName: {}', userId: '{}', ";
 
+    private static final String PROVIDE_COUPONS_TO_USERS_POINTCUT
+            = "execution(* com.firstone.greenjangteo.coupon.service.*.*(..)) && args(provideCouponsToUsersRequestDto)";
+    private static final String PROVIDE_COUPONS_TO_USERS_START
+            = "Beginning to '{}.{}' task by couponGroupId: '{}'";
+    private static final String PROVIDE_COUPONS_TO_USERS_END
+            = "'{}.{}' task was executed successfully by 'couponGroupId: {}', ";
+
     @Around(ISSUE_COUPONS_POINTCUT)
     public Object logAroundForIssueCouponsRequestDto(ProceedingJoinPoint joinPoint,
                                                      IssueCouponsRequestDto issueCouponsRequestDto) throws Throwable {
@@ -56,9 +64,34 @@ public class CouponLoggingAspect {
         return process;
     }
 
+    @Around(PROVIDE_COUPONS_TO_USERS_POINTCUT)
+    public Object logAroundForProvideCouponsToUsersRequestDto
+            (ProceedingJoinPoint joinPoint, ProvideCouponsToUsersRequestDto provideCouponsToUsersRequestDto)
+            throws Throwable {
+        log.info(PROVIDE_COUPONS_TO_USERS_START,
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(), provideCouponsToUsersRequestDto.getCouponGroupId());
+
+        long beforeMemory = MemoryUtil.usedMemory();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        Object process = joinPoint.proceed();
+
+        stopWatch.stop();
+        long memoryUsage = MemoryUtil.usedMemory() - beforeMemory;
+
+        log.info(PROVIDE_COUPONS_TO_USERS_END + PERFORMANCE_MEASUREMENT,
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(), provideCouponsToUsersRequestDto.getCouponGroupId(),
+                stopWatch.getTotalTimeMillis(), memoryUsage);
+
+        return process;
+    }
+
     @Around(PROVIDE_COUPONS_TO_USER_POINTCUT)
-    public Object logAroundForGiveCouponsToUserRequestDto(ProceedingJoinPoint joinPoint,
-                                                          ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto)
+    public Object logAroundForProvideCouponsToUserRequestDto(ProceedingJoinPoint joinPoint,
+                                                             ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto)
             throws Throwable {
         log.info(PROVIDE_COUPONS_TO_USER_START,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
