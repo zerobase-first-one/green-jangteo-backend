@@ -38,6 +38,10 @@ public class ExpirationPeriod {
         return now.plusDays(expirationPeriod);
     }
 
+    int getValue() {
+        return expirationPeriod;
+    }
+
     private static void validate(String expirationPeriod) {
         checkExpirationPeriodIsNotBlank(expirationPeriod);
         checkExpirationPeriodPattern(expirationPeriod);

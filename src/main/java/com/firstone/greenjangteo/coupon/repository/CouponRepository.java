@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     List<Coupon> findByCouponGroupAndUserIsNull(CouponGroup couponGroup, Pageable pageable);
+
+    List<Coupon> findAllByUserId(Long userId);
 }

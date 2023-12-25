@@ -4,7 +4,8 @@ import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -25,14 +26,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.firstone.greenjangteo.application.job.utility.LogConstant.UPDATING_COUPON;
+
 @Configuration
-@Slf4j
 @RequiredArgsConstructor
 public class IssueCouponJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final CouponGroupRepository couponGroupRepository;
     private final JdbcTemplate jdbcTemplate;
+
+    private static final Logger log = LoggerFactory.getLogger(IssueCouponJobConfig.class);
 
     private static final String JOB_NAME = "issueCouponJob";
     private static final String STEP_NAME = "issueCouponStep";
@@ -84,7 +88,6 @@ public class IssueCouponJobConfig {
         }
     }
 
-
     public ItemProcessor<CouponGroup, List<Coupon>> issueCouponProcessor() {
         return couponGroup -> {
             LocalDateTime now = LocalDateTime.now();
@@ -108,12 +111,14 @@ public class IssueCouponJobConfig {
                             @Override
                             public void setValues(PreparedStatement ps, int i) throws SQLException {
                                 Coupon coupon = coupons.get(i);
-                                log.info("coupon : {}", coupon);
+                                Long couponId = coupon.getId();
+
+                                log.info(UPDATING_COUPON, couponId);
 
                                 ps.setObject(1, coupon.getModifiedAt());
                                 ps.setObject(2, coupon.getIssuedAt());
                                 ps.setObject(3, coupon.getExpiredAt());
-                                ps.setLong(4, coupon.getId());
+                                ps.setLong(4, couponId);
                             }
 
                             @Override

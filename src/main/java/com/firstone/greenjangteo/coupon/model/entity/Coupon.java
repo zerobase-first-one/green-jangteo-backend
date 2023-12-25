@@ -79,12 +79,16 @@ public class Coupon {
         return Objects.hash(id, user, usedOrderId, couponGroup, createdAt, modifiedAt, issuedAt, expiredAt);
     }
 
-    public void addUser(User user, ExpirationPeriod expirationPeriod) {
+    public void addUser(User user) {
         validateUserIsNull();
         this.user = user;
+    }
 
+    public void issueAndAddUser(User user, ExpirationPeriod expirationPeriod) {
         LocalDateTime now = LocalDateTime.now();
         issueCoupon(now, expirationPeriod.computeExpirationTime(now));
+
+        addUser(user);
     }
 
     public void issueCoupon(LocalDateTime now, LocalDateTime expirationDateTime) {

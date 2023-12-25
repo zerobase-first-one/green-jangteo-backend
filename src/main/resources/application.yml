@@ -38,7 +38,8 @@ spring:
     port: 6379
     password: ${REDIS_PASSWORD}
   batch:
-    initialize-schema: always
+    jdbc:
+      initialize-schema: always
     job:
       enabled: false
       names: ${job.name:NONE}

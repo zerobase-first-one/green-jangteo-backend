@@ -1,7 +1,8 @@
 package com.firstone.greenjangteo.application.listener;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -15,11 +16,12 @@ import java.util.Date;
 import java.util.Set;
 
 @Configuration
-@Slf4j
 @RequiredArgsConstructor
 public class ContextRefreshedEventListener implements ApplicationListener<ContextRefreshedEvent> {
     private final JobExplorer jobExplorer;
     private final JobRepository jobRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(ContextRefreshedEventListener.class);
 
     private static final String STOPPING_JOB_START = "Beginning to stop running jobs.";
     private static final String UPDATE_EXECUTION_STATUS = "Updated job execution status by jobId: {}";

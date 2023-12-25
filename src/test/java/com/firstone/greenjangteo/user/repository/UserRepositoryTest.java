@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -159,5 +159,31 @@ class UserRepositoryTest {
 
         // then
         assertThat(foundUser).isEmpty();
+    }
+
+    @DisplayName("저장된 모든 사용자의 ID를 조회할 수 있다.")
+    @Test
+    void findAllUserIds() {
+        // given
+        User user1 = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        User user2 = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.toString())
+        );
+
+        User user3 = UserTestObjectFactory.createUser(
+                EMAIL3, USERNAME3, PASSWORD3, passwordEncoder, FULL_NAME3, PHONE3, List.of(ROLE_BUYER.toString())
+        );
+
+        userRepository.saveAll(List.of(user1, user2, user3));
+
+        // when
+        List<Long> userIds = userRepository.findAllUserIds();
+
+        // then
+        assertThat(userIds).hasSize(3)
+                .containsExactlyInAnyOrder(user1.getId(), user2.getId(), user3.getId());
     }
 }
