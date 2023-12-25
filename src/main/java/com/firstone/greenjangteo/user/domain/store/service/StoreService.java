@@ -10,5 +10,5 @@ public interface StoreService {
 
     void updateStore(Long userId, StoreRequestDto storeRequestDto);
 
-    void deleteStore(long id);
+    void deleteStore(Long userId);
 }
