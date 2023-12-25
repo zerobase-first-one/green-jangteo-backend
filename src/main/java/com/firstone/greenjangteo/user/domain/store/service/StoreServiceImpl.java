@@ -46,14 +46,14 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void deleteStore(long id) {
-        if (storeRepository.existsById(id)) {
-            deleteCategories(id);
-            storeRepository.deleteById(id);
+    public void deleteStore(Long userId) {
+        if (storeRepository.existsById(userId)) {
+            deleteCategories(userId);
+            storeRepository.deleteById(userId);
             return;
         }
 
-        throw new EntityNotFoundException(STORE_NOT_FOUND_EXCEPTION + id);
+        throw new EntityNotFoundException(STORE_NOT_FOUND_EXCEPTION + userId);
     }
 
     private void validateNotDuplicateStoreName(String storeName) {
@@ -62,8 +62,8 @@ public class StoreServiceImpl implements StoreService {
         }
     }
 
-    private void deleteCategories(long id) {
-        getStore(id).getProducts().stream()
+    private void deleteCategories(Long userId) {
+        getStore(userId).getProducts().stream()
                 .map(Product::getId)
                 .forEach(categoryRepository::deleteAllByProductId);
     }

@@ -21,7 +21,7 @@ public class UserResponseDto {
     private String fullName;
     private String phone;
     private AddressDto addressDto;
-    private List<String> roles;
+    private List<String> roleDescriptions;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

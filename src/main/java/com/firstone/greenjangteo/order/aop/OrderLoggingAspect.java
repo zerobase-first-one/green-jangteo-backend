@@ -33,8 +33,8 @@ public class OrderLoggingAspect {
             = "'{}.{}' task was executed successfully by 'buyerId: {}', 'cartId: {}', ";
 
     @Around(ORDER_POINTCUT)
-    public Object logAroundForSignUpForm(ProceedingJoinPoint joinPoint,
-                                         OrderRequestDto orderRequestDto) throws Throwable {
+    public Object logAroundForOrderRequestDto(ProceedingJoinPoint joinPoint,
+                                              OrderRequestDto orderRequestDto) throws Throwable {
         log.info(ORDER_START,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), orderRequestDto.getSellerId(), orderRequestDto.getBuyerId());
