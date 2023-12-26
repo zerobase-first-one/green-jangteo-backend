@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.product.domain.model;
 
 
+import com.firstone.greenjangteo.product.domain.dto.CategoryDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,21 +19,14 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private String firstCategory;
 
-    @Column(nullable = false, length = 20)
-    private String categoryName;
+    private String secondCategory;
 
-    @Column(name = "level", nullable = false)
-    private int level;
-
-    public static Category of(Product product, String categoryName, int level) {
+    public static Category of(CategoryDto categoryDto) {
         return Category.builder()
-                .product(product)
-                .categoryName(categoryName)
-                .level(level)
+                .firstCategory(categoryDto.getFirstCategory())
+                .secondCategory(categoryDto.getSecondCategory())
                 .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.product.domain.dto.response;
 
+import com.firstone.greenjangteo.product.domain.dto.CategoryDto;
 import com.firstone.greenjangteo.product.domain.dto.ImageDto;
-import com.firstone.greenjangteo.product.domain.dto.ReviewDto;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class ProductDetailResponseDto {
     private String productName;
     private int price;
     private int count;
-    private List<String> categories;
+    private CategoryDto categories;
     private List<ImageDto> images;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
@@ -25,12 +25,12 @@ public class ProductDetailResponseDto {
     private List<ReviewsResponseDto> review;
     private String description;
 
-    public static ProductDetailResponseDto descriptionOf(Product product, List<String> categories, List<ImageDto> images) {
+    public static ProductDetailResponseDto descriptionOf(Product product, CategoryDto categoryDetailDto, List<ImageDto> images) {
         return ProductDetailResponseDto.builder()
                 .productName(product.getName())
                 .price(product.getPrice())
                 .count(product.getInventory())
-                .categories(categories)
+                .categories(categoryDetailDto)
                 .images(images)
                 .description(product.getDescription())
                 .createdAt(product.getCreatedAt())

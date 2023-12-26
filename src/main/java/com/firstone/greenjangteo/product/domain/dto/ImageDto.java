@@ -10,11 +10,9 @@ import lombok.*;
 @Builder
 public class ImageDto {
     private String url;
-    private int position;
     public static ImageDto toImageDto(ProductImage productImage) {
         return ImageDto.builder()
                 .url(productImage.getUrl())
-                .position(productImage.getPosition())
                 .build();
     }
 }

@@ -18,6 +18,10 @@ public class ProductImageService {
 
     private final ProductImageRepository productImageRepository;
 
+    public List<ProductImage> getProductImages(Long productId){
+        return productImageRepository.findByProductId(productId);
+    }
+
     public void saveProductImage(Product product, String productImageUrl, int position) {
         ProductImage productImage = ProductImageDto.toProductImage(product, productImageUrl, position);
         productImageRepository.save(productImage);

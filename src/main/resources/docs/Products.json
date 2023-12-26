@@ -1,0 +1,59 @@
+{
+  "productSaveRequestList": [
+    {
+      "userId": "20",
+      "sellerId": "20",
+      "categoryId": "1",
+      "images": [
+        "친환경 선풍기 사진1",
+        "친환경 선풍기 사진2",
+        "친환경 선풍기 사진3"
+      ],
+      "name": "친환경 선풍기",
+      "price": "20000",
+      "inventory": "10",
+      "description": "태양광으로 충전되는 선풍기입니다."
+    },
+    {
+      "userId": "20",
+      "sellerId": "20",
+      "categoryId": "1",
+      "images": [
+        "스마트 가습기 사진1",
+        "스마트 가습기 사진2"
+      ],
+      "name": "가습기",
+      "price": "50000",
+      "inventory": "25",
+      "description": "스마트 가습기"
+    },
+    {
+      "userId": "20",
+      "sellerId": "20",
+      "categoryId": "2",
+      "images": [
+        "에코백 사진1",
+        "에코백 사진2",
+        "에코백 사진3",
+        "에코백 사진4"
+      ],
+      "name": "에코백",
+      "price": "12000",
+      "inventory": "100",
+      "description": "폐의류를 가공해서 만든 에코백입니다."
+    },
+    {
+      "userId": "20",
+      "sellerId": "20",
+      "categoryId": "18",
+      "images": [
+        "친환경 소풍 나들이 바구니1",
+        "친환경 소풍 나들이 바구니2"
+      ],
+      "name": "소풍용 나들이 바구니",
+      "price": "30000",
+      "inventory": "20",
+      "description": "폐플라스틱으로 만든 바구니입니다."
+    }
+  ]
+}

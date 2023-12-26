@@ -1,11 +1,16 @@
 package com.firstone.greenjangteo.product.controller;
 
+import com.firstone.greenjangteo.product.domain.dto.ProductNameDto;
 import com.firstone.greenjangteo.product.domain.dto.response.AddProductResponseDto;
 import com.firstone.greenjangteo.product.domain.dto.response.ProductDetailResponseDto;
 import com.firstone.greenjangteo.product.domain.dto.response.ProductsResponseDto;
+import com.firstone.greenjangteo.product.domain.dto.search.ProductSaveAllRequest;
+import com.firstone.greenjangteo.product.domain.dto.search.ProductSearchResponse;
 import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.product.form.UpdateProductForm;
+import com.firstone.greenjangteo.product.service.ProductSearchService;
 import com.firstone.greenjangteo.product.service.ProductService;
+import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +25,9 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductSearchService productSearchService;
 
-    @PostMapping(value = "/products")
+    @PostMapping(value = "/product")
     public ResponseEntity<AddProductResponseDto> addProduct(
             @RequestBody AddProductForm addProductForm,
             BindingResult bindingResult
@@ -32,9 +38,38 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(addProductForm));
     }
 
+    @PostMapping(value = "/products")
+    public ResponseEntity<Void> addProducts(@RequestBody ProductSaveAllRequest productSaveAllRequest) {
+        productSearchService.saveAllProducts(productSaveAllRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @GetMapping(value = "/products")
-    public ResponseEntity<List<ProductsResponseDto>> productListAll() {
+    public ResponseEntity<List<ProductsResponseDto>> productListAll(
+            @RequestParam Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductList());
+    }
+
+    @PostMapping("/productDocuments")
+    public ResponseEntity<Void> saveProductDocument() {
+
+        productSearchService.saveAllProductDocument();
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/products/category")
+    public ResponseEntity<List<ProductSearchResponse>> searchByCategory(@RequestParam String category, Pageable pageable) {
+        return ResponseEntity.ok(productSearchService.findByCategory(category, pageable));
+    }
+
+    @GetMapping("/products/keyword")
+    public ResponseEntity<List<ProductSearchResponse>> searchByProductName(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok(productSearchService.findByProductName(keyword, pageable));
+    }
+
+    @GetMapping("/products/auto-complete")
+    public ResponseEntity<List<ProductNameDto>> findByStartWithProductName(@RequestParam String keyword) {
+        return ResponseEntity.ok(productSearchService.findByStartWithProductName(keyword));
     }
 
     @GetMapping(value = "/products/{productId}/description")
@@ -52,7 +87,7 @@ public class ProductController {
     }
 
     @PutMapping(value = "/products/{productId}")
-    public ResponseEntity productUpdate(
+    public ResponseEntity<Void> productUpdate(
             @RequestBody UpdateProductForm updateProductForm,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -64,7 +99,7 @@ public class ProductController {
 
 
     @DeleteMapping(value = "/products/{productId}")
-    public ResponseEntity productRemove(
+    public ResponseEntity<Void> productRemove(
             @PathVariable("productId") Long productId
     ) {
         productService.removeProduct(productId);

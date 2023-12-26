@@ -1,9 +1,8 @@
 package com.firstone.greenjangteo.product.domain.dto.response;
 
+import com.firstone.greenjangteo.product.domain.dto.CategoryDto;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,12 +13,12 @@ public class ProductsResponseDto {
 
     private Long productId;
     private String productName;
-    private List<String> categories;
+    private CategoryDto categories;
     private int price;
     private String description;
     private String image;
 
-    public static ProductsResponseDto of(Product product, String image, List<String> categories) {
+    public static ProductsResponseDto of(Product product, String image, CategoryDto categories) {
         return ProductsResponseDto.builder()
                 .productId(product.getId())
                 .productName(product.getName())
