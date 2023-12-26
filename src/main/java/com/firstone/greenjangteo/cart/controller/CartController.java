@@ -29,7 +29,7 @@ public class CartController {
         if (bindingResult.hasErrors()) {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
-        return ResponseEntity.ok().body(cartService.addCart(addCartProductRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addCart(addCartProductRequestDto));
     }
 
     @GetMapping(value = "/carts")
@@ -37,7 +37,7 @@ public class CartController {
             @RequestParam Long userId
     ) {
         List<CartProductListResponseDto> cartProductList = cartService.getCartList(userId);
-        return ResponseEntity.ok().body(cartProductList);
+        return ResponseEntity.status(HttpStatus.OK).body(cartProductList);
     }
 
     @PutMapping(value = "/carts/cart-products/{cartProductId}")
@@ -49,30 +49,30 @@ public class CartController {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
         cartService.updateCartProduct(updateCartProductRequestDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping(value = "/carts/cart-products/{cartProductId}")
-    public ResponseEntity<Object> deleteCartProduct(
+    public ResponseEntity<Void> deleteCartProduct(
             @RequestBody DeleteCartProductRequestDto deleteCartProductRequestDto
     ) {
         cartService.deleteCartList(deleteCartProductRequestDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping(value = "/carts/selects")
-    public ResponseEntity<Object> deleteSelectCartProductList(
+    public ResponseEntity<Void> deleteSelectCartProductList(
             @RequestBody DeleteSelectCartProductForm deleteSelectCartProductForm
     ) {
         cartService.deleteCartProductList(deleteSelectCartProductForm);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping(value = "/carts")
-    public ResponseEntity<Object> deleteCart(
+    public ResponseEntity<Void> deleteCart(
             @RequestParam Long userId
     ) {
         cartService.deleteCart(userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
