@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.coupon.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;

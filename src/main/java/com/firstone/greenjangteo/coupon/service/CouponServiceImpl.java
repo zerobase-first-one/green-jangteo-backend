@@ -1,8 +1,8 @@
 package com.firstone.greenjangteo.coupon.service;
 
-import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUsersRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
@@ -16,6 +16,7 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 
@@ -121,6 +123,17 @@ public class CouponServiceImpl implements CouponService {
         User user = provideCouponsToUserRequestDto.getUser();
 
         issueAndAddUserToCoupons(user, couponGroup, requiredQuantity);
+    }
+
+    @Override
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
+    public Page<Coupon> getCouponGroup(Long couponGroupId, Pageable pageable) {
+        if (couponGroupRepository.existsById(couponGroupId)) {
+            return couponRepository.findByCouponGroupId(couponGroupId, pageable);
+        }
+        ;
+
+        throw new EntityNotFoundException(COUPON_GROUP_ID_NOT_FOUND_EXCEPTION + couponGroupId);
     }
 
     @Override

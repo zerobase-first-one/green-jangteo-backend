@@ -1,8 +1,8 @@
 package com.firstone.greenjangteo.coupon.service;
 
-import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUsersRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;

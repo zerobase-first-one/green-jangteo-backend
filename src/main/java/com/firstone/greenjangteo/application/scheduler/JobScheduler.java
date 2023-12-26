@@ -1,8 +1,8 @@
 package com.firstone.greenjangteo.application.scheduler;
 
-import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUsersRequestDto;
-import com.firstone.greenjangteo.coupon.model.CouponAndGroupEntityToDtoMapper;
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
+import com.firstone.greenjangteo.coupon.model.CouponGroupEntityToDtoMapper;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
 import com.firstone.greenjangteo.coupon.service.CouponService;
@@ -78,7 +78,7 @@ public class JobScheduler {
         if (couponGroup.isIssueToAllUsersRequired()) {
             isIssueToAllUsersRequired = true;
             IssueCouponsRequestDto issueCouponsRequestDto
-                    = CouponAndGroupEntityToDtoMapper.toIssueCouponsRequestDto(couponGroup, userSize);
+                    = CouponGroupEntityToDtoMapper.toIssueCouponsRequestDto(couponGroup, userSize);
 
             couponService.createCoupons(issueCouponsRequestDto);
         }
