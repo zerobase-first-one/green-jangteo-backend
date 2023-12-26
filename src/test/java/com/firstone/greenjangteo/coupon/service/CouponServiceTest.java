@@ -204,6 +204,35 @@ class CouponServiceTest {
                 .isNotNull();
     }
 
+    @DisplayName("유효기간이 오늘 이전인 대량의 쿠폰을 삭제할 수 있다.")
+    @Test
+    void deleteExpiredCoupons() throws JobExecutionException {
+        // given
+        CouponGroup couponGroup1
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        CouponGroup couponGroup2
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY2, tomorrow, EXPIRATION_PERIOD2
+        );
+
+        List<Coupon> coupons1 = CouponTestObjectFactory.createAndIssueCoupons(couponGroup1, LocalDateTime.now());
+        List<Coupon> coupons2
+                = CouponTestObjectFactory.createAndIssueCoupons(couponGroup2, LocalDateTime.now().plusDays(1));
+
+        couponGroupRepository.saveAll(List.of(couponGroup1, couponGroup2));
+        couponRepository.saveAll(coupons1);
+        couponRepository.saveAll(coupons2);
+
+        // when
+        couponService.deleteExpiredCoupons();
+        List<Coupon> foundCoupons = couponRepository.findAll();
+
+        // then
+        assertThat(foundCoupons).hasSize(coupons2.size());
+    }
+
     @DisplayName("쿠폰 이름을 통해 쿠폰 그룹을 찾을 수 있다.")
     @Test
     @Transactional

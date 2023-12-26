@@ -37,6 +37,7 @@ public class CouponServiceImpl implements CouponService {
     private final Job createCouponJob;
     private final Job issueCouponJob;
     private final Job provideCouponJob;
+    private final Job deleteExpiredCouponJob;
 
     private final CouponGroupRepository couponGroupRepository;
     private final CouponRepository couponRepository;
@@ -93,6 +94,14 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    public void deleteExpiredCoupons() throws JobExecutionException {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+        jobLauncher.run(deleteExpiredCouponJob, jobParameters);
+    }
+
+    @Override
     public void provideCouponsToUser(ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto) {
         CouponGroup couponGroup;
         try {
@@ -111,7 +120,7 @@ public class CouponServiceImpl implements CouponService {
 
         User user = provideCouponsToUserRequestDto.getUser();
 
-        addUserToCoupons(user, couponGroup, requiredQuantity);
+        issueAndAddUserToCoupons(user, couponGroup, requiredQuantity);
     }
 
     @Override
@@ -127,7 +136,7 @@ public class CouponServiceImpl implements CouponService {
                 .collect(Collectors.joining(","));
     }
 
-    private void addUserToCoupons(User user, CouponGroup couponGroup, int requiredQuantity) {
+    private void issueAndAddUserToCoupons(User user, CouponGroup couponGroup, int requiredQuantity) {
         Pageable limit = PageRequest.of(0, requiredQuantity);
         List<Coupon> coupons
                 = couponRepository.findByCouponGroupAndUserIsNull(couponGroup, limit);

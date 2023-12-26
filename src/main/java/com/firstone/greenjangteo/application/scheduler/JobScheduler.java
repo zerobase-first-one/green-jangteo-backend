@@ -29,6 +29,10 @@ public class JobScheduler {
     private static final String CRON_MIDNIGHT_EXPRESSION = "0 0 0 * * *";
     private static final String SCHEDULED_ISSUE_JOB_START = "Beginning to scheduled issuing coupon job";
 
+    private static final String CRON_SIX_O_CLOCK_EXPRESSION = "0 0 6 * * *";
+    private static final String SCHEDULED_DELETE_EXPIRED_JOB_START
+            = "Beginning to scheduled deleting expired coupon job";
+
     private int userSize;
     private boolean isIssueToAllUsersRequired;
 
@@ -62,6 +66,12 @@ public class JobScheduler {
         }
 
         isIssueToAllUsersRequired = false;
+    }
+
+    @Scheduled(cron = CRON_SIX_O_CLOCK_EXPRESSION)
+    public void runDeleteExpiredCouponJob() throws JobExecutionException {
+        log.info(SCHEDULED_DELETE_EXPIRED_JOB_START);
+        couponService.deleteExpiredCoupons();
     }
 
     private void createRequiredCoupons(CouponGroup couponGroup) throws JobExecutionException {

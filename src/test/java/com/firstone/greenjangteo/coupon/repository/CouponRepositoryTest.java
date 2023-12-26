@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
@@ -96,5 +97,41 @@ class CouponRepositoryTest {
         assertThat(coupons).hasSize(createdCoupons2.size())
                 .extracting("user")
                 .containsOnly(user);
+    }
+
+    @DisplayName("만료 시간이 전송된 시간 이전인 쿠폰들을 검색할 수 있다.")
+    @Test
+    void findByExpiredAtBefore() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+
+        CouponGroup couponGroup1 = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        CouponGroup couponGroup2 = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY3, tomorrow, EXPIRATION_PERIOD2
+        );
+        CouponGroup couponGroup3 = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME3, AMOUNT, DESCRIPTION, ISSUE_QUANTITY4, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        List<Coupon> createdCoupons1 = CouponTestObjectFactory.createAndIssueCoupons(couponGroup1, now.minusSeconds(2));
+        List<Coupon> createdCoupons2 = CouponTestObjectFactory.createAndIssueCoupons(couponGroup2, now.minusSeconds(1));
+        List<Coupon> createdCoupons3 = CouponTestObjectFactory.createAndIssueCoupons(couponGroup3, now.plusSeconds(1));
+        List<Coupon> createdCoupons4 = CouponTestObjectFactory.createAndIssueCoupons(couponGroup3, now.plusSeconds(2));
+
+        couponGroupRepository.saveAll(List.of(couponGroup1, couponGroup2, couponGroup3));
+        couponRepository.saveAll(createdCoupons1);
+        couponRepository.saveAll(createdCoupons2);
+        couponRepository.saveAll(createdCoupons3);
+        couponRepository.saveAll(createdCoupons4);
+
+        // when
+        List<Coupon> coupons = couponRepository.findByExpiredAtBefore(now);
+
+        // then
+        assertThat(coupons).hasSize(createdCoupons1.size() + createdCoupons2.size())
+                .extracting("couponGroup")
+                .containsOnly(couponGroup1, couponGroup2);
     }
 }
