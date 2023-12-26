@@ -12,6 +12,8 @@ import com.firstone.greenjangteo.cart.form.DeleteSelectCartProductForm;
 import com.firstone.greenjangteo.cart.repository.CartProductRepository;
 import com.firstone.greenjangteo.cart.repository.CartRepository;
 import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.product.domain.model.ProductImage;
+import com.firstone.greenjangteo.product.service.ProductImageService;
 import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserServiceImpl;
@@ -31,6 +33,7 @@ public class CartService {
     private final CartProductRepository cartProductRepository;
     private final UserServiceImpl userService;
     private final ProductService productService;
+    private final ProductImageService productImageService;
 
     public AddCartProductResponseDto addCart(AddCartProductRequestDto addCartProductRequestDto) {
         User user = userService.getUser(addCartProductRequestDto.getUserId());
@@ -70,7 +73,8 @@ public class CartService {
 
             List<CartProduct> cartProducts = cartProductRepository.findCartProductsByCartId(cart.get().getId());
             for (CartProduct curCartProduct : cartProducts) {
-                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getProduct(), curCartProduct.getQuantity()));
+                List<ProductImage> imageDto = productImageService.getProductImages(curCartProduct.getProduct().getId());
+                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getProduct(), curCartProduct.getQuantity(), imageDto.get(0).getUrl()));
             }
         }
 

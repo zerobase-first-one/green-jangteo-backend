@@ -18,13 +18,22 @@ public class CartProductListResponseDto {
     private int price;
     @JsonProperty("quantity")
     private int quantity;
+    @JsonProperty("imageUrl")
+    private String imageUrl;
+    @JsonProperty("sellerId")
+    private Long sellerId;
+    @JsonProperty("storeName")
+    private String storeName;
 
-    public static CartProductListResponseDto of(Product product, int quantity) {
+    public static CartProductListResponseDto of(Product product, int quantity, String imageUrl) {
         return CartProductListResponseDto.builder()
                 .productId(product.getId())
                 .productName(product.getName())
                 .price(product.getPrice())
                 .quantity(quantity)
+                .imageUrl(imageUrl)
+                .sellerId(product.getStore().getSellerId())
+                .storeName(product.getStore().getStoreName().getValue())
                 .build();
     }
 }
