@@ -64,4 +64,14 @@ public class CouponTestObjectFactory {
 
         return coupons;
     }
+
+    public static List<Coupon> createAndIssueCoupons(CouponGroup couponGroup, LocalDateTime expirationTime) {
+        List<Coupon> coupons = createCoupons(couponGroup);
+
+        for (Coupon coupon : coupons) {
+            coupon.issueCoupon(LocalDateTime.now(), expirationTime);
+        }
+
+        return coupons;
+    }
 }
