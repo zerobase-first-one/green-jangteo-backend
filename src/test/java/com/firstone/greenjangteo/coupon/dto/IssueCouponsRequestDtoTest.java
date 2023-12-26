@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.coupon.dto;
 
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;

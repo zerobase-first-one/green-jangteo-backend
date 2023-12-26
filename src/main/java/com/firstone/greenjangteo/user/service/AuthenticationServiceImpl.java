@@ -1,7 +1,7 @@
 package com.firstone.greenjangteo.user.service;
 
 
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
 import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;

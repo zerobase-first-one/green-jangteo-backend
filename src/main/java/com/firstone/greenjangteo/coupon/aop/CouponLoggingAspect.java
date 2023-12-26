@@ -1,8 +1,8 @@
 package com.firstone.greenjangteo.coupon.aop;
 
-import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUserRequestDto;
-import com.firstone.greenjangteo.coupon.dto.ProvideCouponsToUsersRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.utility.MemoryUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
