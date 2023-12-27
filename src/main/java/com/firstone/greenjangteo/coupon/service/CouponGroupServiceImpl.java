@@ -50,4 +50,14 @@ public class CouponGroupServiceImpl implements CouponGroupService {
         return couponGroupRepository.findByCouponName(couponName)
                 .orElseThrow(() -> new EntityNotFoundException(COUPON_NAME_NOT_FOUND_EXCEPTION + couponName));
     }
+
+    @Override
+    public void deleteCouponGroup(Long couponGroupId) {
+        if (couponGroupRepository.existsById(couponGroupId)) {
+            couponGroupRepository.deleteById(couponGroupId);
+            return;
+        }
+
+        throw new EntityNotFoundException(COUPON_GROUP_ID_NOT_FOUND_EXCEPTION + couponGroupId);
+    }
 }
