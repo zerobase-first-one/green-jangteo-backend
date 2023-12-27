@@ -54,6 +54,30 @@ public class CouponGroupControllerTest {
     @MockBean
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    @DisplayName("쿠폰 그룹 목록을 조회할 수 있다.")
+    @Test
+    @WithMockUser(username = ID_EXAMPLE, roles = {"ADMIN"})
+    void getCouponGroups() throws Exception {
+        // given
+        CouponGroup couponGroup1
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, LocalDate.now(), EXPIRATION_PERIOD1
+        );
+        CouponGroup couponGroup2
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, LocalDate.now(), EXPIRATION_PERIOD1
+        );
+
+        List<CouponGroup> couponGroups = List.of(couponGroup1, couponGroup2);
+
+        when(couponGroupService.getCouponGroups()).thenReturn(couponGroups);
+
+        // when, then
+        mockMvc.perform(get("/coupon-groups"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("쿠폰 그룹 ID를 입력해 쿠폰을 페이징 처리한 쿠폰 그룹을 조회할 수 있다.")
     @Test
     @WithMockUser(username = ID_EXAMPLE, roles = {"ADMIN"})

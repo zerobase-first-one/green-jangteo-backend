@@ -26,6 +26,30 @@ public class CouponGroupEntityToDtoMapper {
                 .build();
     }
 
+    public static List<CouponGroupResponseDto> toCouponGroupResponseDtos(List<CouponGroup> couponGroups) {
+        List<CouponGroupResponseDto> couponGroupResponseDtos = new ArrayList<>();
+        for (CouponGroup couponGroup : couponGroups) {
+            couponGroupResponseDtos.add(toCouponGroupResponseDto(couponGroup));
+        }
+
+        return couponGroupResponseDtos;
+    }
+
+    public static CouponGroupResponseDto toCouponGroupResponseDto(CouponGroup couponGroup) {
+        return CouponGroupResponseDto.builder()
+                .couponGroupId(couponGroup.getId())
+                .couponName(couponGroup.getCouponName())
+                .amount(couponGroup.getAmount().getValue())
+                .description(couponGroup.getDescription())
+                .issuedQuantity(couponGroup.getIssueQuantity().getValue())
+                .remainingQuantity(couponGroup.getRemainingQuantity())
+                .scheduledIssueDate(couponGroup.getScheduledIssueDate())
+                .expirationPeriod(couponGroup.getExpirationPeriod().getValue())
+                .createdAt(couponGroup.getCreatedAt())
+                .modifiedAt(couponGroup.getModifiedAt())
+                .build();
+    }
+
     public static CouponGroupResponseDto toCouponGroupResponseDto(Page<Coupon> couponPage) {
         if (couponPage == null || couponPage.isEmpty()) {
             return null;
@@ -39,7 +63,7 @@ public class CouponGroupEntityToDtoMapper {
                 .couponName(couponGroup.getCouponName())
                 .amount(couponGroup.getAmount().getValue())
                 .description(couponGroup.getDescription())
-                .issuedQuantity(couponSize)
+                .issuedQuantity(couponGroup.getIssueQuantity().getValue())
                 .remainingQuantity(couponGroup.getRemainingQuantity())
                 .scheduledIssueDate(couponGroup.getScheduledIssueDate())
                 .expirationPeriod(couponGroup.getExpirationPeriod().getValue())
