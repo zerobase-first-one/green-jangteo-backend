@@ -6,6 +6,7 @@ import com.firstone.greenjangteo.coupon.model.CouponAndGroupEntityToDtoMapper;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
+import com.firstone.greenjangteo.utility.InputFormatValidator;
 import com.firstone.greenjangteo.utility.RoleValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 
 @RestController
 @RequestMapping("/coupons")
@@ -34,6 +37,10 @@ public class CouponController {
     private static final String GET_COUPONS_DESCRIPTION
             = "회원 ID를 입력해 쿠폰 목록을 조회할 수 있습니다.";
     private static final String GET_COUPONS_FORM = "쿠폰 목록 조회 양식";
+
+    private static final String COUPON_ID = "쿠폰 ID";
+    private static final String DELETE_COUPON = "쿠폰 삭제";
+    private static final String DELETE_COUPON_FROM_ID_DESCRIPTION = "쿠폰 ID를 입력해 쿠폰 그룹을 삭제할 수 있습니다.";
 
     @ApiOperation(value = ISSUE_COUPONS, notes = ISSUE_COUPONS_DESCRIPTION)
     @PostMapping()
@@ -60,5 +67,18 @@ public class CouponController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CouponAndGroupEntityToDtoMapper.toCouponResponseDtosForPrincipal(coupons));
+    }
+
+    @ApiOperation(value = DELETE_COUPON, notes = DELETE_COUPON_FROM_ID_DESCRIPTION)
+    @DeleteMapping("/{couponId}")
+    public ResponseEntity<Void> deleteCoupon
+            (@PathVariable("couponId")
+             @ApiParam(value = COUPON_ID, example = ID_EXAMPLE) String couponId) {
+        InputFormatValidator.validateId(couponId);
+        RoleValidator.checkAdminAuthentication();
+
+        couponService.deleteCoupon(Long.parseLong(couponId));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
