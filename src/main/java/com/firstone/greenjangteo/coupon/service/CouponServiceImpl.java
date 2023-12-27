@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_ID_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 
 @Service
@@ -124,6 +125,17 @@ public class CouponServiceImpl implements CouponService {
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
     public List<Coupon> getCoupons(long userId) {
         return couponRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    @Transactional(isolation = READ_COMMITTED, timeout = 10)
+    public void deleteCoupon(long couponId) {
+        if (couponRepository.existsById(couponId)) {
+            couponRepository.deleteById(couponId);
+            return;
+        }
+
+        throw new EntityNotFoundException(COUPON_ID_NOT_FOUND_EXCEPTION + couponId);
     }
 
     private String parseUserIdsToStringValue(List<Long> userIds) {
