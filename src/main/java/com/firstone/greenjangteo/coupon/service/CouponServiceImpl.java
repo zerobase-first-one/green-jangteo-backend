@@ -122,7 +122,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
     public List<Coupon> getCoupons(long userId) {
         return couponRepository.findAllByUserId(userId);
     }

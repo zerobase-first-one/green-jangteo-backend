@@ -148,15 +148,12 @@ class OrderControllerTest {
 
         List<Order> orders = List.of(order1, order2);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(store.getSellerId().toString());
-
-        when(orderService.getOrders(any(UserIdRequestDto.class))).thenReturn(orders);
+        when(orderService.getOrders(store.getSellerId())).thenReturn(orders);
 
         // when, then
         mockMvc.perform(get("/orders")
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(userIdRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .queryParam("userId", SELLER_ID1))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -179,15 +176,12 @@ class OrderControllerTest {
 
         List<Order> orders = List.of(order1, order2);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(buyer.getId().toString());
-
-        when(orderService.getOrders(any(UserIdRequestDto.class))).thenReturn(orders);
+        when(orderService.getOrders(buyer.getId())).thenReturn(orders);
 
         // when, then
         mockMvc.perform(get("/orders")
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(userIdRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .queryParam("userId", BUYER_ID))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -207,15 +201,12 @@ class OrderControllerTest {
 
         Order order = OrderTestObjectFactory.createOrder(1L, store, buyer, PRICE2);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(store.getSellerId().toString());
-
         when(orderService.getOrder(anyLong())).thenReturn(order);
 
         // when, then
         mockMvc.perform(get("/orders/{userId}", buyer.getId())
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(userIdRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .queryParam("userId", SELLER_ID1))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -235,15 +226,12 @@ class OrderControllerTest {
 
         Order order = OrderTestObjectFactory.createOrder(1L, store, buyer, PRICE2);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(buyer.getId().toString());
-
         when(orderService.getOrder(anyLong())).thenReturn(order);
 
         // when, then
         mockMvc.perform(get("/orders/{orderId}", order.getId())
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(userIdRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .queryParam("userId", BUYER_ID))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

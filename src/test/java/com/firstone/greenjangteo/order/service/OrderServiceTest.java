@@ -236,10 +236,8 @@ class OrderServiceTest {
         orderService.createOrder(orderRequestDto1);
         orderService.createOrder(orderRequestDto2);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(seller.getId().toString());
-
         // when
-        List<Order> orders = orderService.getOrders(userIdRequestDto);
+        List<Order> orders = orderService.getOrders(seller.getId());
 
         // then
         assertThat(orders).hasSize(2)
@@ -292,10 +290,8 @@ class OrderServiceTest {
         orderService.createOrder(orderRequestDto1);
         orderService.createOrder(orderRequestDto2);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(buyer.getId().toString());
-
         // when
-        List<Order> orders = orderService.getOrders(userIdRequestDto);
+        List<Order> orders = orderService.getOrders(buyer.getId());
 
         // then
         assertThat(orders).hasSize(2)

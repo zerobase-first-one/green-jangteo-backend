@@ -81,13 +81,11 @@ public class OrderController {
     @ApiOperation(value = GET_ORDERS, notes = GET_ORDERS_DESCRIPTION)
     @GetMapping()
     public ResponseEntity<List<OrdersResponseDto>> getOrders
-            (@RequestBody @ApiParam(value = SELLER_OR_BUYER_ID)
-             UserIdRequestDto userIdRequestDto) {
-        InputFormatValidator.validateId(userIdRequestDto.getUserId());
+            (@RequestParam(name = "userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
+        InputFormatValidator.validateId(userId);
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
 
-        RoleValidator.checkAdminOrPrincipalAuthentication(userIdRequestDto.getUserId());
-
-        List<Order> orders = orderService.getOrders(userIdRequestDto);
+        List<Order> orders = orderService.getOrders(Long.valueOf(userId));
 
         return transferToResponseEntity(orders);
     }
@@ -96,11 +94,11 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder
             (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
-             @RequestBody @ApiParam(value = SELLER_OR_BUYER_ID) UserIdRequestDto userIdRequestDto) {
+             @RequestParam(name = "userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
         InputFormatValidator.validateId(orderId);
-        InputFormatValidator.validateId(userIdRequestDto.getUserId());
+        InputFormatValidator.validateId(userId);
 
-        RoleValidator.checkAdminOrPrincipalAuthentication(userIdRequestDto.getUserId());
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
 
         Order order = orderService.getOrder(Long.parseLong(orderId));
 
