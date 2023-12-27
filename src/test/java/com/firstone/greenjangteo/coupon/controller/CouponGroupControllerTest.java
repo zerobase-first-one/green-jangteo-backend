@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.service.CouponGroupService;
-import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
@@ -44,9 +43,6 @@ public class CouponGroupControllerTest {
 
     @MockBean
     private CouponGroupService couponGroupService;
-
-    @MockBean
-    private CouponService couponService;
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;

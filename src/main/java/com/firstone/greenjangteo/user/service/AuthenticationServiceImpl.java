@@ -70,10 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         }
 
         if (user.getRoles().containBuyer()) {
-            ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto = new ProvideCouponsToUserRequestDto(
-                    savedUser, NEW_MEMBER_DISCOUNT_COUPON_NAME, NEW_MEMBER_DISCOUNT_COUPON_QUANTITY
-            );
-            couponService.provideCouponsToUser(provideCouponsToUserRequestDto);
+            provideNewMemberDiscountCoupons(savedUser);
         }
 
         return savedUser;
@@ -133,6 +130,12 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         userRepository.delete(user);
     }
 
+    private void validatePassword(Password certifiedPassword, String enteredPassword) {
+        if (!certifiedPassword.matchOriginalPassword(passwordEncoder, enteredPassword)) {
+            throw new IncorrectPasswordException();
+        }
+    }
+
     private void validateNotDuplicateUser(String username, String email, String phone) {
         checkUsername(username);
         checkEmail(email);
@@ -157,6 +160,13 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         }
     }
 
+    private void provideNewMemberDiscountCoupons(User user) {
+        ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto = new ProvideCouponsToUserRequestDto(
+                user, NEW_MEMBER_DISCOUNT_COUPON_NAME, NEW_MEMBER_DISCOUNT_COUPON_QUANTITY
+        );
+        couponService.provideCouponsToUser(provideCouponsToUserRequestDto);
+    }
+
     private User getUserFromEmailOrUsername(String emailOrUsername) {
         return emailOrUsername.contains("@")
                 ? userRepository.findByEmail(Email.of(emailOrUsername))
@@ -165,11 +175,5 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
                 : userRepository.findByUsername(Username.of(emailOrUsername))
                 .orElseThrow(() -> new EntityNotFoundException
                         (USERNAME_NOT_FOUND_EXCEPTION + emailOrUsername));
-    }
-
-    private void validatePassword(Password certifiedPassword, String enteredPassword) {
-        if (!certifiedPassword.matchOriginalPassword(passwordEncoder, enteredPassword)) {
-            throw new IncorrectPasswordException();
-        }
     }
 }
