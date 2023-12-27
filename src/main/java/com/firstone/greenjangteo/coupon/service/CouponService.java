@@ -21,4 +21,6 @@ public interface CouponService {
     void provideCouponsToUser(ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto);
 
     List<Coupon> getCoupons(long userId);
+
+    void deleteCoupon(long couponId);
 }
