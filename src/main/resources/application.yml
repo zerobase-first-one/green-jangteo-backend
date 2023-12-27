@@ -37,16 +37,21 @@ spring:
     host: redis-container
     port: 6379
     password: ${REDIS_PASSWORD}
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+      names: ${job.name:NONE}
   jwt:
     secret: ${JWT_SECRET_KEY}
   frontend:
-    url: http://${FRONTEND_IP_FOR_GREEN_JANGTEO}
-    port: ${FRONTEND_PORT_FOR_GREEN_JANGTEO}
-  data:
-    elasticsearch:
-      cluster:
-        name: greenjangteo
-        nodes: localhost:9200
+    url: https://${FRONTEND_IP_FOR_GREEN_JANGTEO}
+    local:
+      seunghak:
+        url: http://${FRONTEND_LOCAL_IP_FOR_SEUNGHAK}
+      jiyoung:
+        url: http://${FRONTEND_LOCAL_IP_FOR_JIYOUNG}
 
 logging:
   config: classpath:logback-spring.xml
