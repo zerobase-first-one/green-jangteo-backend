@@ -19,11 +19,11 @@ import static com.firstone.greenjangteo.aop.LogConstant.PERFORMANCE_MEASUREMENT;
 public class CouponLoggingAspect {
     private static final Logger log = LoggerFactory.getLogger(CouponLoggingAspect.class);
 
-    private static final String ISSUE_COUPONS_POINTCUT
+    private static final String CREATE_COUPONS_POINTCUT
             = "execution(* com.firstone.greenjangteo.coupon.service.*.*(..)) && args(issueCouponsRequestDto)";
-    private static final String ISSUE_COUPONS_START
+    private static final String CREATE_COUPONS_START
             = "Beginning to '{}.{}' task by couponName: '{}'";
-    private static final String ISSUE_COUPONS_END
+    private static final String CREATE_COUPONS_END
             = "'{}.{}' task was executed successfully by 'couponName: {}', ";
 
     private static final String PROVIDE_COUPONS_TO_USER_POINTCUT
@@ -40,10 +40,10 @@ public class CouponLoggingAspect {
     private static final String PROVIDE_COUPONS_TO_USERS_END
             = "'{}.{}' task was executed successfully by 'couponGroupId: {}', ";
 
-    @Around(ISSUE_COUPONS_POINTCUT)
+    @Around(CREATE_COUPONS_POINTCUT)
     public Object logAroundForIssueCouponsRequestDto(ProceedingJoinPoint joinPoint,
                                                      IssueCouponsRequestDto issueCouponsRequestDto) throws Throwable {
-        log.info(ISSUE_COUPONS_START,
+        log.info(CREATE_COUPONS_START,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), issueCouponsRequestDto.getCouponName());
 
@@ -56,7 +56,7 @@ public class CouponLoggingAspect {
         stopWatch.stop();
         long memoryUsage = MemoryUtil.usedMemory() - beforeMemory;
 
-        log.info(ISSUE_COUPONS_END + PERFORMANCE_MEASUREMENT,
+        log.info(CREATE_COUPONS_END + PERFORMANCE_MEASUREMENT,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), issueCouponsRequestDto.getCouponName(),
                 stopWatch.getTotalTimeMillis(), memoryUsage);

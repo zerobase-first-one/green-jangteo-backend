@@ -5,7 +5,6 @@ import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestD
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
-import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
 import com.firstone.greenjangteo.coupon.repository.CouponRepository;
 import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -16,20 +15,14 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
-import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +34,7 @@ public class CouponServiceImpl implements CouponService {
     private final Job provideCouponJob;
     private final Job deleteExpiredCouponJob;
 
-    private final CouponGroupRepository couponGroupRepository;
+    private final CouponGroupService couponGroupService;
     private final CouponRepository couponRepository;
 
     private static final Logger log = LoggerFactory.getLogger(CouponService.class);
@@ -51,8 +44,7 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public void createCoupons(IssueCouponsRequestDto issueCouponsRequestDto) throws JobExecutionException {
         if (issueCouponsRequestDto.isIssueQuantityIsMinusOne()) {
-            CouponGroup couponGroup = CouponGroup.from(issueCouponsRequestDto, true);
-            couponGroupRepository.save(couponGroup);
+            couponGroupService.addCouponGroupToImmediatelyIssue(issueCouponsRequestDto);
             return;
         }
 
@@ -107,7 +99,7 @@ public class CouponServiceImpl implements CouponService {
     public void provideCouponsToUser(ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto) {
         CouponGroup couponGroup;
         try {
-            couponGroup = getCouponGroup(provideCouponsToUserRequestDto.getCouponName());
+            couponGroup = couponGroupService.getCouponGroup(provideCouponsToUserRequestDto.getCouponName());
         } catch (EntityNotFoundException e) {
             log.warn(e.getMessage());
             return;
@@ -123,24 +115,6 @@ public class CouponServiceImpl implements CouponService {
         User user = provideCouponsToUserRequestDto.getUser();
 
         issueAndAddUserToCoupons(user, couponGroup, requiredQuantity);
-    }
-
-    @Override
-    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
-    public Page<Coupon> getCouponGroup(Long couponGroupId, Pageable pageable) {
-        if (couponGroupRepository.existsById(couponGroupId)) {
-            return couponRepository.findByCouponGroupId(couponGroupId, pageable);
-        }
-        ;
-
-        throw new EntityNotFoundException(COUPON_GROUP_ID_NOT_FOUND_EXCEPTION + couponGroupId);
-    }
-
-    @Override
-    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
-    public CouponGroup getCouponGroup(String couponName) {
-        return couponGroupRepository.findByCouponName(couponName)
-                .orElseThrow(() -> new EntityNotFoundException(COUPON_NAME_NOT_FOUND_EXCEPTION + couponName));
     }
 
     private String parseUserIdsToStringValue(List<Long> userIds) {
