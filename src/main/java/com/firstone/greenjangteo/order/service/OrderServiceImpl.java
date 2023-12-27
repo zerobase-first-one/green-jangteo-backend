@@ -72,14 +72,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(isolation = SERIALIZABLE, readOnly = true, timeout = 20)
-    public List<Order> getOrders(UserIdRequestDto userIdRequestDto) {
-        User user = userService.getUser(Long.parseLong(userIdRequestDto.getUserId()));
+    public List<Order> getOrders(Long userId) {
+        User user = userService.getUser(userId);
 
         if (user.getRoles().containSeller()) {
-            return orderRepository.findBySellerId(Long.parseLong(userIdRequestDto.getUserId()));
+            return orderRepository.findBySellerId(userId);
         }
 
-        return orderRepository.findByBuyerId(Long.parseLong(userIdRequestDto.getUserId()));
+        return orderRepository.findByBuyerId(userId);
     }
 
     @Override

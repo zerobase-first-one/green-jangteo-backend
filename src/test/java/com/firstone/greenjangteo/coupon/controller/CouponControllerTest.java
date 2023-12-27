@@ -7,7 +7,6 @@ import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.service.CouponGroupService;
 import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
-import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -77,7 +76,6 @@ class CouponControllerTest {
     @WithMockUser(username = ID_EXAMPLE, roles = {"BUYER"})
     void getCoupons() throws Exception {
         // given
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(ID_EXAMPLE);
         CouponGroup couponGroup
                 = CouponTestObjectFactory.createCouponGroup(
                 COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, LocalDate.now(), EXPIRATION_PERIOD1
@@ -89,8 +87,7 @@ class CouponControllerTest {
 
         // when, then
         mockMvc.perform(get("/coupons")
-                        .content(objectMapper.writeValueAsString(userIdRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .queryParam("userId", ID_EXAMPLE))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

@@ -5,7 +5,6 @@ import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.service.CouponGroupService;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
-import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -112,13 +110,10 @@ public class CouponGroupControllerTest {
     void deleteCouponGroup() throws Exception {
         // given
         doNothing().when(couponGroupService).deleteCouponGroup(Long.parseLong(ID_EXAMPLE));
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(ID_EXAMPLE);
 
         // when, then
         mockMvc.perform(delete("/coupon-groups/{couponGroupId}", ID_EXAMPLE)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(userIdRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

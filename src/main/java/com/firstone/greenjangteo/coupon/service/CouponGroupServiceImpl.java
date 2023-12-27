@@ -20,23 +20,25 @@ import static org.springframework.transaction.annotation.Isolation.READ_COMMITTE
 
 @Service
 @RequiredArgsConstructor
-@Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
 public class CouponGroupServiceImpl implements CouponGroupService {
     private final CouponGroupRepository couponGroupRepository;
     private final CouponRepository couponRepository;
 
     @Override
+    @Transactional(isolation = READ_COMMITTED, timeout = 10)
     public void addCouponGroupToImmediatelyIssue(IssueCouponsRequestDto issueCouponsRequestDto) {
         CouponGroup couponGroup = CouponGroup.from(issueCouponsRequestDto, true);
         couponGroupRepository.save(couponGroup);
     }
 
     @Override
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
     public List<CouponGroup> getCouponGroups() {
         return couponGroupRepository.findAll();
     }
 
     @Override
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
     public Page<Coupon> getCouponGroup(Long couponGroupId, Pageable pageable) {
         if (couponGroupRepository.existsById(couponGroupId)) {
             return couponRepository.findByCouponGroupId(couponGroupId, pageable);
@@ -52,6 +54,7 @@ public class CouponGroupServiceImpl implements CouponGroupService {
     }
 
     @Override
+    @Transactional(isolation = READ_COMMITTED, timeout = 10)
     public void deleteCouponGroup(Long couponGroupId) {
         if (couponGroupRepository.existsById(couponGroupId)) {
             couponGroupRepository.deleteById(couponGroupId);
