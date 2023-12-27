@@ -77,6 +77,7 @@ ELASTICSEARCH_CLUSTER_NAME=green-jangteo-backend
 ELASTICSEARCH_DISCOVERY_TYPE=single-node
 ELASTICSEARCH_HTTP_PORT=9200
 ELASTICSEARCH_TRANSPORT_PORT=9300
+ES_JAVA_OPTS="-Xms128m -Xmx128m"
 
 if [ ! "$(docker ps -a | grep es-container)" ]; then
     echo "Starting Elasticsearch container..."
@@ -88,8 +89,10 @@ if [ ! "$(docker ps -a | grep es-container)" ]; then
         -e node.name=$ELASTICSEARCH_NODE_NAME \
         -e cluster.name=$ELASTICSEARCH_CLUSTER_NAME \
         -e discovery.type=$ELASTICSEARCH_DISCOVERY_TYPE \
+        -e ES_JAVA_OPTS=$ES_JAVA_OPTS \
         -p $ELASTICSEARCH_HTTP_PORT:9200 \
         -p $ELASTICSEARCH_TRANSPORT_PORT:9300 \
+
         es:latest
 
     sudo docker exec es-container elasticsearch-plugin install analysis-nori https://github.com/skyer9/elasticsearch-jaso-analyzer/releases/download/v7.15.1/jaso-analyzer-plugin-7.15.1-plugin.zip
