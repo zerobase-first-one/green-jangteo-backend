@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CouponGroupEntityToDtoMapper {
+public class CouponAndGroupEntityToDtoMapper {
     public static IssueCouponsRequestDto toIssueCouponsRequestDto(CouponGroup couponGroup, int requiredQuantity) {
         String amount = String.valueOf(couponGroup.getAmount().getValue());
         String issueQuantity = String.valueOf(requiredQuantity);
@@ -56,7 +56,6 @@ public class CouponGroupEntityToDtoMapper {
         }
 
         CouponGroup couponGroup = couponPage.getContent().get(0).getCouponGroup();
-        int couponSize = couponGroup.getCoupons() == null ? 0 : couponGroup.getCoupons().size();
 
         return CouponGroupResponseDto.builder()
                 .couponGroupId(couponGroup.getId())
@@ -69,14 +68,23 @@ public class CouponGroupEntityToDtoMapper {
                 .expirationPeriod(couponGroup.getExpirationPeriod().getValue())
                 .createdAt(couponGroup.getCreatedAt())
                 .modifiedAt(couponGroup.getModifiedAt())
-                .couponResponseDtos(toCouponResponseDtos(couponPage.getContent()))
+                .couponResponseDtos(toCouponResponseDtosForAdmin(couponPage.getContent()))
                 .build();
     }
 
-    private static List<CouponResponseDto> toCouponResponseDtos(List<Coupon> coupons) {
+    public static List<CouponResponseDto> toCouponResponseDtosForAdmin(List<Coupon> coupons) {
         List<CouponResponseDto> couponResponseDtos = new ArrayList<>();
         for (Coupon coupon : coupons) {
-            couponResponseDtos.add(CouponResponseDto.from(coupon));
+            couponResponseDtos.add(CouponResponseDto.toAdmin(coupon));
+        }
+
+        return couponResponseDtos;
+    }
+
+    public static List<CouponResponseDto> toCouponResponseDtosForPrincipal(List<Coupon> coupons) {
+        List<CouponResponseDto> couponResponseDtos = new ArrayList<>();
+        for (Coupon coupon : coupons) {
+            couponResponseDtos.add(CouponResponseDto.toPrincipal(coupon));
         }
 
         return couponResponseDtos;

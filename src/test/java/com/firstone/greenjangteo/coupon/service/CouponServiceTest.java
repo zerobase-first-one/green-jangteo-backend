@@ -243,6 +243,40 @@ class CouponServiceTest {
         prepareAndProvideCouponsToUser(ISSUE_QUANTITY4);
     }
 
+    @DisplayName("회원 ID를 통해 쿠폰 목록을 검색할 수 있다.")
+    @Test
+    @Transactional
+    void getCoupons() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        CouponGroup couponGroup1 = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        CouponGroup couponGroup2 = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY2, tomorrow, EXPIRATION_PERIOD2
+        );
+
+        List<Coupon> coupons1 = CouponTestObjectFactory.createCoupons(couponGroup1);
+        List<Coupon> coupons2 = CouponTestObjectFactory.createAndProvideCoupons(couponGroup2, user);
+
+        couponGroupRepository.saveAll(List.of(couponGroup1, couponGroup2));
+        couponRepository.saveAll(coupons1);
+        couponRepository.saveAll(coupons2);
+
+        // when
+        List<Coupon> foundCoupons = couponService.getCoupons(user.getId());
+
+        // then
+        assertThat(foundCoupons).hasSize(coupons2.size())
+                .extracting("couponGroup")
+                .containsOnly(couponGroup2);
+    }
+
     private void prepareAndProvideCouponsToUser(String issueQuantity) {
         // given
         User user = UserTestObjectFactory.createUser(

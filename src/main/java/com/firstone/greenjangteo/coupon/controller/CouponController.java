@@ -1,26 +1,22 @@
 package com.firstone.greenjangteo.coupon.controller;
 
 import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.response.CouponResponseDto;
+import com.firstone.greenjangteo.coupon.model.CouponAndGroupEntityToDtoMapper;
+import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.service.CouponService;
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
+import com.firstone.greenjangteo.utility.RoleValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
-import static com.firstone.greenjangteo.exception.message.AccessDeniedMessage.ADMIN_ONLY;
-import static com.firstone.greenjangteo.user.model.Role.ROLE_ADMIN;
+import java.util.List;
 
 @RestController
 @RequestMapping("/coupons")
@@ -34,25 +30,35 @@ public class CouponController {
             "issueQuantity에 -1을 입력하면 발행일에 모든 회원에게 자동 지급됩니다.";
     private static final String ISSUE_COUPONS_FORM = "쿠폰 발행 양식";
 
+    private static final String GET_COUPONS = "회원 쿠폰 목록 조회;";
+    private static final String GET_COUPONS_DESCRIPTION
+            = "회원 ID를 입력해 쿠폰 목록을 조회할 수 있습니다.";
+    private static final String GET_COUPONS_FORM = "쿠폰 목록 조회 양식";
+
     @ApiOperation(value = ISSUE_COUPONS, notes = ISSUE_COUPONS_DESCRIPTION)
     @PostMapping()
     public ResponseEntity<Void> issueCoupons
             (@Valid @RequestBody @ApiParam(value = ISSUE_COUPONS_FORM) IssueCouponsRequestDto issueCouponsRequestDto)
             throws JobExecutionException {
-        checkAuthentication();
+        RoleValidator.checkAdminAuthentication();
 
         couponService.createCoupons(issueCouponsRequestDto);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
-    private void checkAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @ApiOperation(value = GET_COUPONS, notes = GET_COUPONS_DESCRIPTION)
+    @GetMapping()
+    public ResponseEntity<List<CouponResponseDto>> getCoupons
+            (@Valid @RequestBody @ApiParam(value = GET_COUPONS_FORM) UserIdRequestDto userIdRequestDto)
+            throws JobExecutionException {
+        String userId = userIdRequestDto.getUserId();
 
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(ROLE_ADMIN.name()))) {
-            return;
-        }
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
 
-        throw new AccessDeniedException(ADMIN_ONLY);
+        List<Coupon> coupons = couponService.getCoupons(Long.parseLong(userId));
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CouponAndGroupEntityToDtoMapper.toCouponResponseDtosForPrincipal(coupons));
     }
 }

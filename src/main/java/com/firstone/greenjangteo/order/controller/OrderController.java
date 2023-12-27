@@ -8,16 +8,13 @@ import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.service.OrderService;
 import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
+import com.firstone.greenjangteo.utility.RoleValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,9 +22,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.firstone.greenjangteo.exception.message.AccessDeniedMessage.ACCESS_DENIED_LOGIN_ID;
-import static com.firstone.greenjangteo.exception.message.AccessDeniedMessage.ACCESS_DENIED_REQUEST_ID;
-import static com.firstone.greenjangteo.user.model.Role.ROLE_ADMIN;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_VALUE;
 
@@ -63,7 +57,7 @@ public class OrderController {
         InputFormatValidator.validateId(orderRequestDto.getSellerId());
         InputFormatValidator.validateId(orderRequestDto.getBuyerId());
 
-        checkAuthentication(orderRequestDto.getBuyerId());
+        RoleValidator.checkAdminOrPrincipalAuthentication(orderRequestDto.getBuyerId());
 
         Order order = orderService.createOrder(orderRequestDto);
 
@@ -77,7 +71,7 @@ public class OrderController {
         InputFormatValidator.validateId(cartOrderRequestDto.getBuyerId());
         InputFormatValidator.validateId(cartOrderRequestDto.getCartId());
 
-        checkAuthentication(cartOrderRequestDto.getBuyerId());
+        RoleValidator.checkAdminOrPrincipalAuthentication(cartOrderRequestDto.getBuyerId());
 
         Order order = orderService.createOrderFromCart(cartOrderRequestDto);
 
@@ -91,7 +85,7 @@ public class OrderController {
              UserIdRequestDto userIdRequestDto) {
         InputFormatValidator.validateId(userIdRequestDto.getUserId());
 
-        checkAuthentication(userIdRequestDto.getUserId());
+        RoleValidator.checkAdminOrPrincipalAuthentication(userIdRequestDto.getUserId());
 
         List<Order> orders = orderService.getOrders(userIdRequestDto);
 
@@ -106,7 +100,7 @@ public class OrderController {
         InputFormatValidator.validateId(orderId);
         InputFormatValidator.validateId(userIdRequestDto.getUserId());
 
-        checkAuthentication(userIdRequestDto.getUserId());
+        RoleValidator.checkAdminOrPrincipalAuthentication(userIdRequestDto.getUserId());
 
         Order order = orderService.getOrder(Long.parseLong(orderId));
 
@@ -121,25 +115,11 @@ public class OrderController {
         InputFormatValidator.validateId(orderId);
         InputFormatValidator.validateId(userIdRequestDto.getUserId());
 
-        checkAuthentication(userIdRequestDto.getUserId());
+        RoleValidator.checkAdminOrPrincipalAuthentication(userIdRequestDto.getUserId());
 
         orderService.deleteOrder(Long.parseLong(orderId), userIdRequestDto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    private void checkAuthentication(String requestedId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-
-        if (requestedId.equals(currentUsername)
-                || authentication.getAuthorities().contains(new SimpleGrantedAuthority(ROLE_ADMIN.name()))) {
-            return;
-        }
-
-        throw new AccessDeniedException(
-                ACCESS_DENIED_REQUEST_ID + requestedId + ACCESS_DENIED_LOGIN_ID + currentUsername
-        );
     }
 
     private ResponseEntity<OrderResponseDto> buildResponse(OrderResponseDto orderResponseDto) {
