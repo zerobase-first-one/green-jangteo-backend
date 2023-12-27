@@ -64,7 +64,6 @@ public class CouponGroupServiceTest {
 
     @DisplayName("쿠폰 그룹 ID를 통해 쿠폰 목록을 페이징 처리한 쿠폰 그룹을 찾을 수 있다.")
     @Test
-    @Transactional
     void getCouponGroupByCouponGroupId() {
         // given
         CouponGroup createdCouponGroup
@@ -95,7 +94,6 @@ public class CouponGroupServiceTest {
 
     @DisplayName("전송된 쿠폰 그룹 ID를 가진 쿠폰 그룹이 존재하지 않으면 EntityNotFoundException이 발생한다.")
     @Test
-    @Transactional
     void getCouponGroupByNonExistentCouponGroupId() {
         // given
         Long couponGroupId = 1L;
@@ -109,7 +107,6 @@ public class CouponGroupServiceTest {
 
     @DisplayName("쿠폰 이름을 통해 쿠폰 그룹을 찾을 수 있다.")
     @Test
-    @Transactional
     void getCouponGroupByCouponName() {
         // given
         CouponGroup createdCouponGroup
@@ -132,7 +129,6 @@ public class CouponGroupServiceTest {
 
     @DisplayName("전송된 쿠폰 이름을 가진 쿠폰 그룹이 존재하지 않으면 EntityNotFoundException이 발생한다.")
     @Test
-    @Transactional
     void getCouponGroupByNonExistentCouponName() {
         // given, when, then
         assertThatThrownBy(() -> couponGroupService.getCouponGroup(COUPON_NAME1))

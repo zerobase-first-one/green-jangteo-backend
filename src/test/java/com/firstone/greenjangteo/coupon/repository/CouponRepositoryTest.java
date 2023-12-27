@@ -69,7 +69,7 @@ class CouponRepositoryTest {
 
     @DisplayName("회원 ID를 통해 쿠폰 목록을 조회할 수 있다.")
     @Test
-    void findByUserId() {
+    void findAllByUserId() {
         // given
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
