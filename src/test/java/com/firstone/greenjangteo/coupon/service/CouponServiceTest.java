@@ -277,6 +277,29 @@ class CouponServiceTest {
                 .containsOnly(couponGroup2);
     }
 
+    @DisplayName("쿠폰 ID를 통해 쿠폰을 삭제할 수 있다.")
+    @Test
+    void deleteCoupon() {
+        // given
+        CouponGroup couponGroup
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        Coupon coupon = new Coupon(couponGroup, LocalDateTime.now());
+
+        couponGroupRepository.save(couponGroup);
+        couponRepository.save(coupon);
+
+        Long couponId = coupon.getId();
+
+        // when
+        couponService.deleteCoupon(couponId);
+        boolean result = couponRepository.existsById(couponId);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
     private void prepareAndProvideCouponsToUser(String issueQuantity) {
         // given
         User user = UserTestObjectFactory.createUser(

@@ -25,10 +25,10 @@ import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -93,5 +93,19 @@ class CouponControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("쿠폰 ID를 입력해 쿠폰을 삭제할 수 있다.")
+    @Test
+    @WithMockUser(username = ID_EXAMPLE, roles = {"ADMIN"})
+    void deleteCoupon() throws Exception {
+        // given
+        doNothing().when(couponService).deleteCoupon(Long.parseLong(ID_EXAMPLE));
+
+        // when, then
+        mockMvc.perform(delete("/coupons/{couponId}", ID_EXAMPLE)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 }
