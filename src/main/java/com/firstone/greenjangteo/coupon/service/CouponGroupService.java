@@ -16,4 +16,6 @@ public interface CouponGroupService {
     Page<Coupon> getCouponGroup(Long couponGroupId, Pageable pageable);
 
     CouponGroup getCouponGroup(String couponName);
+
+    void deleteCouponGroup(Long couponGroupId);
 }

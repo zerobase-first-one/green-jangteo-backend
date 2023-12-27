@@ -36,6 +36,10 @@ public class CouponGroupController {
     private static final String GET_COUPON_GROUP_FROM_ID_DESCRIPTION
             = "쿠폰 그룹 ID를 입력해 쿠폰 그룹을 조회할 수 있습니다.\n쿠폰 목록의 페이징 옵션을 선택할 수 있습니다.";
 
+    private static final String DELETE_COUPON_GROUP = "쿠폰 그룹 삭제";
+    private static final String DELETE_COUPON_GROUP_FROM_ID_DESCRIPTION
+            = "쿠폰 그룹 ID를 입력해 쿠폰 그룹을 삭제할 수 있습니다.";
+
     @ApiOperation(value = GET_COUPON_GROUPS, notes = GET_COUPON_GROUPS_DESCRIPTION)
     @GetMapping()
     public ResponseEntity<List<CouponGroupResponseDto>> getCouponGroups() {
@@ -65,6 +69,19 @@ public class CouponGroupController {
         Page<Coupon> couponPage = couponGroupService.getCouponGroup(Long.parseLong(couponGroupId), pageable);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CouponAndGroupEntityToDtoMapper.toCouponGroupResponseDto(couponPage));
+    }
+
+    @ApiOperation(value = DELETE_COUPON_GROUP, notes = DELETE_COUPON_GROUP_FROM_ID_DESCRIPTION)
+    @DeleteMapping("/{couponGroupId}")
+    public ResponseEntity<Void> deleteCouponGroup
+            (@PathVariable("couponGroupId")
+             @ApiParam(value = COUPON_GROUP_ID, example = ID_EXAMPLE) String couponGroupId) {
+        InputFormatValidator.validateId(couponGroupId);
+        RoleValidator.checkAdminAuthentication();
+
+        couponGroupService.deleteCouponGroup(Long.parseLong(couponGroupId));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Sort parseSortString(String sort) {

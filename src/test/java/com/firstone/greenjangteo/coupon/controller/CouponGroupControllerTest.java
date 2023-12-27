@@ -5,6 +5,7 @@ import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.service.CouponGroupService;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +29,10 @@ import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -99,5 +104,22 @@ public class CouponGroupControllerTest {
                         .param("sort", "id,asc"))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("쿠폰 그룹 ID를 입력해 쿠폰 그룹을 삭제할 수 있다.")
+    @Test
+    @WithMockUser(username = ID_EXAMPLE, roles = {"ADMIN"})
+    void deleteCouponGroup() throws Exception {
+        // given
+        doNothing().when(couponGroupService).deleteCouponGroup(Long.parseLong(ID_EXAMPLE));
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(ID_EXAMPLE);
+
+        // when, then
+        mockMvc.perform(delete("/coupon-groups/{couponGroupId}", ID_EXAMPLE)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(userIdRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 }

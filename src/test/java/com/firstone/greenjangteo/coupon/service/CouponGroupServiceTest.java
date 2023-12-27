@@ -135,4 +135,24 @@ public class CouponGroupServiceTest {
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(COUPON_NAME_NOT_FOUND_EXCEPTION + COUPON_NAME1);
     }
+
+    @DisplayName("쿠폰 그룹 ID를 통해 쿠폰 그룹을 삭제할 수 있다.")
+    @Test
+    void deleteCouponGroup() {
+        // given
+        CouponGroup couponGroup
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        Long couponGroupId = couponGroup.getId();
+
+        // when
+        couponGroupService.deleteCouponGroup(couponGroupId);
+        boolean result = couponGroupRepository.existsById(couponGroupId);
+
+        // then
+        assertThat(result).isFalse();
+    }
 }
