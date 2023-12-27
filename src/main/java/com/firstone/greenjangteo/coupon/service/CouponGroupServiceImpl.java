@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
@@ -28,6 +29,11 @@ public class CouponGroupServiceImpl implements CouponGroupService {
     public void addCouponGroupToImmediatelyIssue(IssueCouponsRequestDto issueCouponsRequestDto) {
         CouponGroup couponGroup = CouponGroup.from(issueCouponsRequestDto, true);
         couponGroupRepository.save(couponGroup);
+    }
+
+    @Override
+    public List<CouponGroup> getCouponGroups() {
+        return couponGroupRepository.findAll();
     }
 
     @Override
