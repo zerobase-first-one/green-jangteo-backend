@@ -55,7 +55,7 @@ public class IssueCouponJobConfig {
     public Step issueCouponStep() {
         return stepBuilderFactory
                 .get(STEP_NAME)
-                .<CouponGroup, List<Coupon>>chunk(10)
+                .<CouponGroup, List<Coupon>>chunk(30) // 상대적으로 복잡한 작업이므로 30으로 설정
                 .reader(issueCouponReader())
                 .processor(issueCouponProcessor())
                 .writer(issueCouponWriter())
@@ -82,9 +82,9 @@ public class IssueCouponJobConfig {
 
             if (couponGroupIterator.hasNext()) {
                 return couponGroupIterator.next();
-            } else {
-                return null;
             }
+
+            return null;
         }
     }
 
