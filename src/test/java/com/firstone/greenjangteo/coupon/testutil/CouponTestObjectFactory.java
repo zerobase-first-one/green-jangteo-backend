@@ -7,6 +7,7 @@ import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
+import com.firstone.greenjangteo.user.model.entity.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,6 +71,15 @@ public class CouponTestObjectFactory {
 
         for (Coupon coupon : coupons) {
             coupon.issueCoupon(LocalDateTime.now(), expirationTime);
+        }
+
+        return coupons;
+    }
+
+    public static List<Coupon> createAndProvideCoupons(CouponGroup couponGroup, User user) {
+        List<Coupon> coupons = createCoupons(couponGroup);
+        for (Coupon coupon : coupons) {
+            coupon.addUser(user);
         }
 
         return coupons;
