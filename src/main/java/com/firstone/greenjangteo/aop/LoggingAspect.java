@@ -29,6 +29,13 @@ public class LoggingAspect {
     private static final String END
             = "'{}.{}' task was executed successfully by '{}: {}', ";
 
+    private static final String NO_VALUE_POINTCUT
+            = "execution(* com.firstone.greenjangteo..service.*.*())";
+    private static final String NO_VALUE_START
+            = "Beginning to '{}.{}' task";
+    private static final String NO_VALUE_END
+            = "'{}.{}' task was executed successfully, ";
+
     private static final String USER_ID_REQUEST_DTO_POINTCUT
             = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(userIdRequestDto)";
     private static final String USER_ID_REQUEST_DTO_START
@@ -81,6 +88,29 @@ public class LoggingAspect {
         log.info(END + PERFORMANCE_MEASUREMENT,
                 joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(), parameterName, longValue,
+                stopWatch.getTotalTimeMillis(), memoryUsage);
+
+        return process;
+    }
+
+    @Around(NO_VALUE_POINTCUT)
+    public Object logAroundForNoValue(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.info(NO_VALUE_START,
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName());
+
+        long beforeMemory = MemoryUtil.usedMemory();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        Object process = joinPoint.proceed();
+
+        stopWatch.stop();
+        long memoryUsage = MemoryUtil.usedMemory() - beforeMemory;
+
+        log.info(NO_VALUE_END + PERFORMANCE_MEASUREMENT,
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(),
                 stopWatch.getTotalTimeMillis(), memoryUsage);
 
         return process;

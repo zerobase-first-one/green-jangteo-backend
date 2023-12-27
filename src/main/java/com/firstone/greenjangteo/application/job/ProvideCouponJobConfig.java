@@ -45,9 +45,9 @@ public class ProvideCouponJobConfig {
     private static final String UPDATE_USER_QUERY = "UPDATE coupon SET user_id = ? WHERE id = ?";
 
     @Bean
-    public Job provideCouponJob(Step provideCouponStep) {
+    public Job provideCouponJob() {
         return jobBuilderFactory.get(JOB_NAME)
-                .start(provideCouponStep)
+                .start(provideCouponStep())
                 .build();
     }
 
@@ -55,10 +55,13 @@ public class ProvideCouponJobConfig {
     public Step provideCouponStep() {
         CouponGroupReader reader = new CouponGroupReader();
         return stepBuilderFactory.get(STEP_NAME)
-                .<CouponGroup, List<Coupon>>chunk(100)
+                .<CouponGroup, List<Coupon>>chunk(100) // 비교적 단순한 작업이므로 100으로 설정
                 .reader(reader)
                 .processor(couponProcessor(reader))
                 .writer(couponWriter())
+                .faultTolerant()
+                .retryLimit(10)
+                .retry(Exception.class)
                 .build();
     }
 
@@ -70,9 +73,9 @@ public class ProvideCouponJobConfig {
         @Override
         public void beforeStep(StepExecution stepExecution) {
             JobParameters jobParameters = stepExecution.getJobParameters();
-            this.couponGroupId = jobParameters.getLong("couponGroupId");
-            this.parsedUserIds = jobParameters.getString("userIds");
-            this.read = false; // 각 Step 실행 전에 read를 false로 설정
+            couponGroupId = jobParameters.getLong("couponGroupId");
+            parsedUserIds = jobParameters.getString("userIds");
+            read = false;
         }
 
         @Override
@@ -80,9 +83,9 @@ public class ProvideCouponJobConfig {
             if (!read) {
                 read = true;
                 return couponGroupRepository.findById(couponGroupId).orElse(null);
-            } else {
-                return null;
             }
+
+            return null;
         }
 
         @Override

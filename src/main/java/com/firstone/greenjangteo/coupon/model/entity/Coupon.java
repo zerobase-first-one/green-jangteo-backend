@@ -91,10 +91,10 @@ public class Coupon {
         addUser(user);
     }
 
-    public void issueCoupon(LocalDateTime now, LocalDateTime expirationDateTime) {
+    public void issueCoupon(LocalDateTime now, LocalDateTime expirationTime) {
         modifiedAt = now;
         issuedAt = now;
-        expiredAt = expirationDateTime;
+        expiredAt = expirationTime;
     }
 
     private void validateUserIsNull() {

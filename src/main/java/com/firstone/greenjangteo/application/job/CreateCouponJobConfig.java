@@ -56,7 +56,7 @@ public class CreateCouponJobConfig {
     public Step createCouponStep() {
         return stepBuilderFactory
                 .get(STEP_NAME)
-                .<CouponGroupModel, List<Coupon>>chunk(100)
+                .<CouponGroupModel, List<Coupon>>chunk(100) // 비교적 단순한 작업이므로 100으로 설정
                 .reader(createCouponReader())
                 .processor(createCouponProcessor())
                 .writer(createCouponWriter())
