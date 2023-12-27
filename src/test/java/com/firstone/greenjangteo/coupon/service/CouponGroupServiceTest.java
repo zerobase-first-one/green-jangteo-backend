@@ -39,6 +39,29 @@ public class CouponGroupServiceTest {
 
     private final LocalDate tomorrow = LocalDate.now().plusDays(1);
 
+    @DisplayName("쿠폰 그룹 목록을 조회할 수 있다.")
+    @Test
+    void getCouponGroups() {
+        // given
+        CouponGroup couponGroup1
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        CouponGroup couponGroup2
+                = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME2, AMOUNT, DESCRIPTION, ISSUE_QUANTITY2, tomorrow, EXPIRATION_PERIOD2
+        );
+        couponGroupRepository.saveAll(List.of(couponGroup1, couponGroup2));
+
+        // when
+        List<CouponGroup> couponGroups = couponGroupService.getCouponGroups();
+
+        // then
+        assertThat(couponGroups).hasSize(2)
+                .extracting("couponName")
+                .containsExactlyInAnyOrder(COUPON_NAME1, COUPON_NAME2);
+    }
+
     @DisplayName("쿠폰 그룹 ID를 통해 쿠폰 목록을 페이징 처리한 쿠폰 그룹을 찾을 수 있다.")
     @Test
     @Transactional
