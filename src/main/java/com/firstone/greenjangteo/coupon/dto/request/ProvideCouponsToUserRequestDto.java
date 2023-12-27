@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.coupon.dto;
+package com.firstone.greenjangteo.coupon.dto.request;
 
 import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.AllArgsConstructor;

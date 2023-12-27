@@ -2,7 +2,7 @@ package com.firstone.greenjangteo.coupon.model.entity;
 
 import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.audit.BaseEntity;
-import com.firstone.greenjangteo.coupon.dto.IssueCouponsRequestDto;
+import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.excpeption.serious.InconsistentCouponSizeException;
 import com.firstone.greenjangteo.coupon.excpeption.serious.InsufficientRemainingQuantityException;
 import com.firstone.greenjangteo.coupon.model.Amount;

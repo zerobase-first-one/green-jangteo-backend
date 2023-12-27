@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.coupon.dto;
+package com.firstone.greenjangteo.coupon.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

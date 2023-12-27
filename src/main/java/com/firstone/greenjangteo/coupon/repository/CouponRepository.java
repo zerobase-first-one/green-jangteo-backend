@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.coupon.repository;
 
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     List<Coupon> findAllByUserId(Long userId);
 
     List<Coupon> findByExpiredAtBefore(LocalDateTime localDateTime);
+
+    Page<Coupon> findByCouponGroupId(Long couponGroupId, Pageable pageable);
 }

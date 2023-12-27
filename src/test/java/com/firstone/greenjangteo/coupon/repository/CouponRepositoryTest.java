@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -133,5 +134,24 @@ class CouponRepositoryTest {
         assertThat(coupons).hasSize(createdCoupons1.size() + createdCoupons2.size())
                 .extracting("couponGroup")
                 .containsOnly(couponGroup1, couponGroup2);
+    }
+
+    @DisplayName("쿠폰 그룹 ID를 통해 페이징 처리한 쿠폰 목록을 검색할 수 있다.")
+    @Test
+    void findByCouponGroupId() {
+        // given
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        List<Coupon> createdCoupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponGroupRepository.save(couponGroup);
+        couponRepository.saveAll(createdCoupons);
+
+        // when
+        Page<Coupon> couponPage = couponRepository.findByCouponGroupId(couponGroup.getId(), PageRequest.of(0, 10));
+
+        // then
+        assertThat(couponPage).hasSize(10);
     }
 }
