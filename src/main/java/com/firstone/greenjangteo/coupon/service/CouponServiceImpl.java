@@ -18,11 +18,14 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 
 @Service
 @RequiredArgsConstructor
@@ -115,6 +118,12 @@ public class CouponServiceImpl implements CouponService {
         User user = provideCouponsToUserRequestDto.getUser();
 
         issueAndAddUserToCoupons(user, couponGroup, requiredQuantity);
+    }
+
+    @Override
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
+    public List<Coupon> getCoupons(long userId) {
+        return couponRepository.findAllByUserId(userId);
     }
 
     private String parseUserIdsToStringValue(List<Long> userIds) {

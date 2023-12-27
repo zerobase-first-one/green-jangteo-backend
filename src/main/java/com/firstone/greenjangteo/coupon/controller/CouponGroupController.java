@@ -1,12 +1,12 @@
 package com.firstone.greenjangteo.coupon.controller;
 
 import com.firstone.greenjangteo.coupon.dto.response.CouponGroupResponseDto;
-import com.firstone.greenjangteo.coupon.model.CouponGroupEntityToDtoMapper;
+import com.firstone.greenjangteo.coupon.model.CouponAndGroupEntityToDtoMapper;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
 import com.firstone.greenjangteo.coupon.service.CouponGroupService;
-import com.firstone.greenjangteo.coupon.utility.AdminRoleValidator;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
+import com.firstone.greenjangteo.utility.RoleValidator;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +39,10 @@ public class CouponGroupController {
     @ApiOperation(value = GET_COUPON_GROUPS, notes = GET_COUPON_GROUPS_DESCRIPTION)
     @GetMapping()
     public ResponseEntity<List<CouponGroupResponseDto>> getCouponGroups() {
-        AdminRoleValidator.checkAuthentication();
+        RoleValidator.checkAdminAuthentication();
         List<CouponGroup> couponGroups = couponGroupService.getCouponGroups();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CouponGroupEntityToDtoMapper.toCouponGroupResponseDtos(couponGroups));
+                .body(CouponAndGroupEntityToDtoMapper.toCouponGroupResponseDtos(couponGroups));
     }
 
     @ApiOperation(value = GET_COUPON_GROUP, notes = GET_COUPON_GROUP_FROM_ID_DESCRIPTION)
@@ -59,12 +59,12 @@ public class CouponGroupController {
              @RequestParam(defaultValue = "id,asc")
              @ApiParam(value = "정렬 방식", example = "id,asc") String sort) {
         InputFormatValidator.validateId(couponGroupId);
-        AdminRoleValidator.checkAuthentication();
+        RoleValidator.checkAdminAuthentication();
         Pageable pageable = paged ? PageRequest.of(page, size, parseSortString(sort)) : Pageable.unpaged();
 
         Page<Coupon> couponPage = couponGroupService.getCouponGroup(Long.parseLong(couponGroupId), pageable);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CouponGroupEntityToDtoMapper.toCouponGroupResponseDto(couponPage));
+                .body(CouponAndGroupEntityToDtoMapper.toCouponGroupResponseDto(couponPage));
     }
 
     private Sort parseSortString(String sort) {

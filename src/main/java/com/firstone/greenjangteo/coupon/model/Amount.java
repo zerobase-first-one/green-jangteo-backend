@@ -33,7 +33,7 @@ public class Amount {
         return Objects.hash(amount);
     }
 
-    int getValue() {
+    public int getValue() {
         return amount;
     }
 
