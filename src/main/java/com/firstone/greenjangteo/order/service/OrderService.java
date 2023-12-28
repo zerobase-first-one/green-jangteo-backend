@@ -12,7 +12,7 @@ public interface OrderService {
 
     Order createOrderFromCart(CartOrderRequestDto cartOrderRequestDto);
 
-    List<Order> getOrders(UserIdRequestDto userIdRequestDto);
+    List<Order> getOrders(Long userId);
 
     Order getOrder(Long orderId);
 

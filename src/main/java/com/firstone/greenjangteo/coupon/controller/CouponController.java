@@ -5,7 +5,6 @@ import com.firstone.greenjangteo.coupon.dto.response.CouponResponseDto;
 import com.firstone.greenjangteo.coupon.model.CouponAndGroupEntityToDtoMapper;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.coupon.service.CouponService;
-import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
 import com.firstone.greenjangteo.utility.RoleValidator;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +19,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
+import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_VALUE;
 
 @RestController
 @RequestMapping("/coupons")
@@ -33,10 +33,9 @@ public class CouponController {
             "issueQuantity에 -1을 입력하면 발행일에 모든 회원에게 자동 지급됩니다.";
     private static final String ISSUE_COUPONS_FORM = "쿠폰 발행 양식";
 
-    private static final String GET_COUPONS = "회원 쿠폰 목록 조회;";
+    private static final String GET_COUPONS = "회원 쿠폰 목록 조회";
     private static final String GET_COUPONS_DESCRIPTION
             = "회원 ID를 입력해 쿠폰 목록을 조회할 수 있습니다.";
-    private static final String GET_COUPONS_FORM = "쿠폰 목록 조회 양식";
 
     private static final String COUPON_ID = "쿠폰 ID";
     private static final String DELETE_COUPON = "쿠폰 삭제";
@@ -57,10 +56,8 @@ public class CouponController {
     @ApiOperation(value = GET_COUPONS, notes = GET_COUPONS_DESCRIPTION)
     @GetMapping()
     public ResponseEntity<List<CouponResponseDto>> getCoupons
-            (@Valid @RequestBody @ApiParam(value = GET_COUPONS_FORM) UserIdRequestDto userIdRequestDto)
+            (@RequestParam(name = "userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId)
             throws JobExecutionException {
-        String userId = userIdRequestDto.getUserId();
-
         RoleValidator.checkAdminOrPrincipalAuthentication(userId);
 
         List<Coupon> coupons = couponService.getCoupons(Long.parseLong(userId));
