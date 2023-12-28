@@ -36,6 +36,8 @@ public class SocketIOServerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        log.info("Server URL: " + serverUrl);
+        
         Configuration config = new Configuration();
         config.setHostname(serverUrl);
         config.setPort(serverPort);
