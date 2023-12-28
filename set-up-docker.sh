@@ -71,11 +71,15 @@ if [ ! "$(docker ps -a | grep redis-container)" ]; then
     redis:latest
 fi
 
+# pull ElasticSearch image if not exists
+if [ ! "$(docker images -q docker.elastic.co/elasticsearch/elasticsearch:7.15.1)" ]; then
+    echo "Pulling ElasticSearch Docker image..."
+    sudo docker pull docker.elastic.co/elasticsearch/elasticsearch:7.15.1
+fi
 
-# run Elastic container if not exists
+# run ElasticSearch container if not exists
 if [ ! "$(docker ps -a | grep es-container)" ]; then
     echo "Starting Elasticsearch container..."
-    sudo docker pull docker.elastic.co/elasticsearch/elasticsearch:7.15.1
 
     sudo docker run -d \
         -p 9200:9200 -p 9300:9300 \
@@ -88,14 +92,13 @@ if [ ! "$(docker ps -a | grep es-container)" ]; then
         --network=docker-network \
         docker.elastic.co/elasticsearch/elasticsearch:7.15.1
 
-    sudo docker exec -it es-container \
+    docker exec -it es-container \
          elasticsearch-plugin install analysis-nori \
          https://github.com/skyer9/elasticsearch-jaso-analyzer/releases/download/v7.15.1/jaso-analyzer-plugin-7.15.1-plugin.zip
 
     sudo docker stop es-container
-    sudo docker start es-container
 
-    es:latest
+    sudo docker start es-container
 
 else
     echo "Elasticsearch container already exists."
