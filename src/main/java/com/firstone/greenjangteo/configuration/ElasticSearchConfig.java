@@ -20,6 +20,7 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
         ClientConfiguration clientConfiguration = ClientConfiguration.builder()
                 .connectedTo(elasticSearchHost + ":9200")
                 .build();
+
         return RestClients.create(clientConfiguration).rest();
     }
 }
