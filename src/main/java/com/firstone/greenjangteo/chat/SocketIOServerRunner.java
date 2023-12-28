@@ -17,11 +17,8 @@ import org.springframework.stereotype.Component;
 public class SocketIOServerRunner implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(SocketIOServerRunner.class);
 
-    @Value("${server.url}")
-    private String serverUrl;
-
     @Value("${server.socket-io.port}")
-    private int serverPort;
+    private int socketIoPort;
 
     @Value("${spring.frontend.url}")
     private String frontendUrl;
@@ -36,11 +33,10 @@ public class SocketIOServerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Server URL: " + serverUrl);
-        
+        log.info("Socket IO Port: " + socketIoPort);
+
         Configuration config = new Configuration();
-        config.setHostname(serverUrl);
-        config.setPort(serverPort);
+        config.setPort(socketIoPort);
 
         config.setAuthorizationListener(handshakeData -> {
             String origin = handshakeData.getHttpHeaders().get("Origin");
