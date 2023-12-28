@@ -1,7 +1,5 @@
 server:
   port: 8443
-  socket-io:
-    port: 3001
   ssl:
     key-store: file:/app/keystore.p12
     key-store-password: ${SSL_KEY_STORE_PASSWORD}

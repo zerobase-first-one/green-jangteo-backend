@@ -47,8 +47,8 @@ dependencies {
     // spring batch
     implementation 'org.springframework.boot:spring-boot-starter-batch:2.7.12'
 
-    // socket-io
-    implementation 'com.corundumstudio.socketio:netty-socketio:1.7.22'
+    // socket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket:2.7.12'
 
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security:2.7.8'
