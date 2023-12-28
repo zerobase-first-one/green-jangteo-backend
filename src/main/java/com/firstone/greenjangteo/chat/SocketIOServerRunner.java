@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class SocketIOServerRunner implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(SocketIOServerRunner.class);
 
-    @Value("${server.url}")
+    @Value("${server.socket-io.url}")
     private String serverUrl;
 
     @Value("${server.socket-io.port}")
@@ -36,8 +36,6 @@ public class SocketIOServerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Server URL: " + serverUrl);
-        
         Configuration config = new Configuration();
         config.setHostname(serverUrl);
         config.setPort(serverPort);
