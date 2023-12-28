@@ -1,5 +1,5 @@
 server:
-  url: 172.31.9.41
+  url: ${EC2_IP_FOR_GREEN_JANGTEO}
   port: 8443
   socket-io:
     port: 3001
