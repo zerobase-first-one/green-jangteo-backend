@@ -1,0 +1,6 @@
+server:
+  socket-io:
+    port: 9092
+
+logging:
+  config: classpath:logback-spring.xml
