@@ -52,14 +52,6 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping(value = "/carts/cart-products/{cartProductId}")
-    public ResponseEntity<Void> deleteCartProduct(
-            @RequestBody DeleteCartProductRequestDto deleteCartProductRequestDto
-    ) {
-        cartService.deleteCartList(deleteCartProductRequestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
     @DeleteMapping(value = "/carts/selects")
     public ResponseEntity<Void> deleteSelectCartProductList(
             @RequestBody DeleteSelectCartProductForm deleteSelectCartProductForm
