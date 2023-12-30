@@ -20,6 +20,8 @@ import com.firstone.greenjangteo.product.repository.ProductReviewRepository;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,12 +62,13 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductsResponseDto> getProductList() {
+    public List<ProductsResponseDto> getProductList(int page, int size) {
         if (productRepository.findAll().isEmpty()) {
             throw new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND);
         }
 
-        List<Product> productList = productRepository.findAll();
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Product> productList = productRepository.findAll(pageRequest);
         List<ProductsResponseDto> products = new ArrayList<>();
 
         for (Product product : productList) {
