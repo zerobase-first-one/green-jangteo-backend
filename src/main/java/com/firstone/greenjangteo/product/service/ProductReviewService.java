@@ -5,7 +5,7 @@ import com.firstone.greenjangteo.product.domain.dto.response.ReviewsResponseDto;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.Review;
 import com.firstone.greenjangteo.product.exception.ErrorCode;
-import com.firstone.greenjangteo.product.exception.ReviewException;
+import com.firstone.greenjangteo.product.exception.ProductRelatedException;
 import com.firstone.greenjangteo.product.form.CreateReviewForm;
 import com.firstone.greenjangteo.product.form.UpdateReviewForm;
 import com.firstone.greenjangteo.product.repository.ProductReviewRepository;
@@ -40,7 +40,7 @@ public class ProductReviewService {
         Product product = productService.getProduct(productId);
         List<Review> reviews = productReviewRepository.findAllByProduct(product);
         List<ReviewsResponseDto> resultReviews = reviews.stream().map(ReviewsResponseDto::from).collect(Collectors.toList());
-        if (resultReviews.size() == 0) throw new ReviewException(ErrorCode.REVIEW_IS_NOT_FOUND);
+        if (resultReviews.size() == 0) throw new ProductRelatedException(ErrorCode.REVIEW_IS_NOT_FOUND.getDescription());
         return resultReviews;
     }
 
@@ -49,7 +49,7 @@ public class ProductReviewService {
         User user = userService.getUser(userId);
         List<Review> reviews = productReviewRepository.findAllByUser(user);
         List<ReviewsResponseDto> resultReviews = reviews.stream().map(ReviewsResponseDto::from).collect(Collectors.toList());
-        if (resultReviews.size() == 0) throw new ReviewException(ErrorCode.REVIEW_IS_NOT_FOUND);
+        if (resultReviews.size() == 0) throw new ProductRelatedException(ErrorCode.REVIEW_IS_NOT_FOUND.getDescription());
         return resultReviews;
     }
 
