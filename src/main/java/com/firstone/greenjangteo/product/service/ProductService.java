@@ -10,7 +10,7 @@ import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.ProductImage;
 import com.firstone.greenjangteo.product.domain.model.Review;
 import com.firstone.greenjangteo.product.exception.ErrorCode;
-import com.firstone.greenjangteo.product.exception.ProductException;
+import com.firstone.greenjangteo.product.exception.ProductRelatedException;
 import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.product.form.UpdateProductForm;
 import com.firstone.greenjangteo.product.repository.CategoryRepository;
@@ -58,13 +58,13 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Product getProduct(Long productId) {
-        return productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+        return productRepository.findById(productId).orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
     }
 
     @Transactional(readOnly = true)
     public List<ProductsResponseDto> getProductList(int page, int size) {
         if (productRepository.findAll().isEmpty()) {
-            throw new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND);
+            throw new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription());
         }
 
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -87,7 +87,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductDetailResponseDto getProductDescription(Long productId) {
-        Product products = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+        Product products = productRepository.findById(productId).orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
 
         Optional<Category> category = categoryRepository.findById(products.getCategory().getId());
         CategoryDto categoryDetailDto = CategoryDto.of(category.get());
@@ -104,7 +104,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductDetailResponseDto getProductReviews(Long productId) {
         Optional<Product> product = productRepository.findById(productId);
-        if (product.isEmpty()) throw new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND);
+        if (product.isEmpty()) throw new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription());
         List<Review> reviews = productReviewRepository.findAllByProduct(product.get());
         List<ReviewsResponseDto> reviewsResponseDtoList = new ArrayList<>();
         for (Review review : reviews) {
@@ -115,7 +115,7 @@ public class ProductService {
 
     public void updateProduct(UpdateProductForm updateProductForm) {
         Product product = productRepository.findById(updateProductForm.getProductId())
-                .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+                .orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
         ProductDto productDto = ProductDto.updateProductRequestDtoToProductDto(product, updateProductForm);
         product.updateProduct(productDto);
         productImageService.updateProductImage(product.getId(), updateProductForm.getImages());
@@ -123,7 +123,7 @@ public class ProductService {
 
     public void removeProduct(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+                .orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
 
         product.setStore(null);
 
