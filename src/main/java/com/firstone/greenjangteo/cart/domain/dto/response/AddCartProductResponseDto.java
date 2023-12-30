@@ -13,12 +13,15 @@ import java.time.LocalDateTime;
 public class AddCartProductResponseDto {
     @JsonProperty("cartId")
     private Long cartId;
+    @JsonProperty("cartProductId")
+    private Long cartProductId;
     @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
-    public static AddCartProductResponseDto of(Long cartId, LocalDateTime createdAt) {
+    public static AddCartProductResponseDto of(Long cartId, Long cartProductId, LocalDateTime createdAt) {
         return AddCartProductResponseDto.builder()
                 .cartId(cartId)
+                .cartProductId(cartProductId)
                 .createdAt(createdAt)
                 .build();
     }

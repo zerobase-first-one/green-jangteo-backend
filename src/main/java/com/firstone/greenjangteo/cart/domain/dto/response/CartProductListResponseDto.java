@@ -12,6 +12,8 @@ import lombok.*;
 public class CartProductListResponseDto {
     @JsonProperty("productId")
     private Long productId;
+    @JsonProperty("cartProductId")
+    private Long cartProductId;
     @JsonProperty("productName")
     private String productName;
     @JsonProperty("price")
@@ -25,9 +27,10 @@ public class CartProductListResponseDto {
     @JsonProperty("storeName")
     private String storeName;
 
-    public static CartProductListResponseDto of(Product product, int quantity, String imageUrl) {
+    public static CartProductListResponseDto of(Long cartProductId, Product product, int quantity, String imageUrl) {
         return CartProductListResponseDto.builder()
                 .productId(product.getId())
+                .cartProductId(cartProductId)
                 .productName(product.getName())
                 .price(product.getPrice())
                 .quantity(quantity)

@@ -2,12 +2,13 @@ package com.firstone.greenjangteo.cart.service;
 
 import com.firstone.greenjangteo.cart.domain.dto.request.AddCartProductRequestDto;
 import com.firstone.greenjangteo.cart.domain.dto.request.CartProductRequestDto;
-import com.firstone.greenjangteo.cart.domain.dto.request.DeleteCartProductRequestDto;
 import com.firstone.greenjangteo.cart.domain.dto.request.UpdateCartProductRequestDto;
 import com.firstone.greenjangteo.cart.domain.dto.response.AddCartProductResponseDto;
 import com.firstone.greenjangteo.cart.domain.dto.response.CartProductListResponseDto;
 import com.firstone.greenjangteo.cart.domain.model.Cart;
 import com.firstone.greenjangteo.cart.domain.model.CartProduct;
+import com.firstone.greenjangteo.cart.exception.CartException;
+import com.firstone.greenjangteo.cart.exception.ErrorCode;
 import com.firstone.greenjangteo.cart.form.DeleteSelectCartProductForm;
 import com.firstone.greenjangteo.cart.repository.CartProductRepository;
 import com.firstone.greenjangteo.cart.repository.CartRepository;
@@ -35,7 +36,7 @@ public class CartService {
     private final ProductService productService;
     private final ProductImageService productImageService;
 
-    public AddCartProductResponseDto addCart(AddCartProductRequestDto addCartProductRequestDto) {
+    public AddCartProductResponseDto addCart(AddCartProductRequestDto addCartProductRequestDto) throws Exception {
         User user = userService.getUser(addCartProductRequestDto.getUserId());
         Optional<Cart> addCart = cartRepository.findByUserId(addCartProductRequestDto.getUserId());
 
@@ -50,7 +51,7 @@ public class CartService {
 
         int quantity = addCartProductRequestDto.getCartProduct().getQuantity();
         CartProduct addCartProduct = null;
-        if(!cartProduct.isPresent()) {
+        if (!cartProduct.isPresent()) {
             addCartProduct = CartProduct.cartProductCreatedOf(cart.get(), product, quantity);
         } else {
             quantity += cartProduct.get().getQuantity();
@@ -58,7 +59,7 @@ public class CartService {
         }
 
         cartProductRepository.save(addCartProduct);
-        return AddCartProductResponseDto.of(addCartProduct.getCart().getId(), addCartProduct.getCreatedAt());
+        return AddCartProductResponseDto.of(addCartProduct.getCart().getId(), addCartProduct.getId(), addCartProduct.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
@@ -74,7 +75,7 @@ public class CartService {
             List<CartProduct> cartProducts = cartProductRepository.findCartProductsByCartId(cart.get().getId());
             for (CartProduct curCartProduct : cartProducts) {
                 List<ProductImage> imageDto = productImageService.getProductImages(curCartProduct.getProduct().getId());
-                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getProduct(), curCartProduct.getQuantity(), imageDto.get(0).getUrl()));
+                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getId(), curCartProduct.getProduct(), curCartProduct.getQuantity(), imageDto.get(0).getUrl()));
             }
         }
 
@@ -84,17 +85,12 @@ public class CartService {
     public void updateCartProduct(UpdateCartProductRequestDto updateCartProductRequestDto) {
         Optional<Cart> cart = cartRepository.findByUserId(updateCartProductRequestDto.getUserId());
         Optional<CartProduct> cartProduct = cartProductRepository.findByCartIdAndProductId(cart.get().getId(),
-                                            updateCartProductRequestDto.getCartProduct().getProductId());
+                updateCartProductRequestDto.getCartProduct().getProductId());
         CartProduct updateCartProductDto = CartProduct.cartProductModifiedOf(cartProduct.get(),
-                                            updateCartProductRequestDto.getCartProduct().getQuantity());
+                updateCartProductRequestDto.getCartProduct().getQuantity());
         cartProductRepository.save(updateCartProductDto);
     }
 
-
-    public void deleteCartList(DeleteCartProductRequestDto deleteCartProductRequestDto) {
-        Optional<CartProduct> cartProduct = cartProductRepository.findById(deleteCartProductRequestDto.getCartProductId());
-        cartProductRepository.deleteById(cartProduct.get().getId());
-    }
 
     public void deleteCartProductList(DeleteSelectCartProductForm deleteSelectCartProductForm) {
         for (CartProductRequestDto cartProductDto : deleteSelectCartProductForm.getCartProducts()) {
@@ -105,6 +101,11 @@ public class CartService {
 
     public void deleteCart(Long userId) {
         Optional<Cart> cart = cartRepository.findByUserId(userId);
+        List<CartProduct> cartProduct = cartProductRepository.findAll();
+        if (!cartProduct.isEmpty()) {
+            throw new CartException(ErrorCode.CART_PRODUCT_IS_NOT_EMPTY.getDescription());
+        }
+
         cart.get().setUser(null);
         cartRepository.deleteById(cart.get().getId());
     }
