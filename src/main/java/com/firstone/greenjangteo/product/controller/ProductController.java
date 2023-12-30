@@ -45,9 +45,8 @@ public class ProductController {
     }
 
     @GetMapping(value = "/products")
-    public ResponseEntity<List<ProductsResponseDto>> productListAll(
-            @RequestParam Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductList());
+    public ResponseEntity<List<ProductsResponseDto>> productListAll(@RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductList(page, size));
     }
 
     @PostMapping("/productDocuments")
