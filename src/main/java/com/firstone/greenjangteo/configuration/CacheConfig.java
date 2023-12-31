@@ -1,5 +1,10 @@
 package com.firstone.greenjangteo.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.firstone.greenjangteo.hibernate.HibernateCollectionMixIn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -16,6 +21,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.Collection;
 
 import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
 
@@ -32,13 +38,27 @@ public class CacheConfig {
     @Value("${spring.redis.password}")
     private String password;
 
+    private ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+
+        mapper.registerModule(new Jdk8Module());
+        mapper.registerModule(new JavaTimeModule());
+
+        mapper.addMixIn(Collection.class, HibernateCollectionMixIn.class);
+
+        return mapper;
+    }
+
+
     @Bean
     public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheConfiguration redisCacheConfiguration = defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext
                         .SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext
-                        .SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                        .SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper())))
                 .entryTtl(defaultCacheConfig().entryTtl(Duration.ofMinutes(30)).getTtl());
 
         return RedisCacheManager.RedisCacheManagerBuilder

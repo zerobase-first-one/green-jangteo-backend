@@ -1,5 +1,8 @@
 package com.firstone.greenjangteo.user.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Objects;
@@ -15,7 +18,8 @@ public class Username {
         this.username = username;
     }
 
-    public static Username of(String username) {
+    @JsonCreator
+    public static Username of(@JsonProperty("username") String username) {
         validate(username);
 
         return new Username(username);
@@ -34,6 +38,7 @@ public class Username {
         return Objects.hash(username);
     }
 
+    @JsonProperty(value = "username")
     public String getValue() {
         return username;
     }

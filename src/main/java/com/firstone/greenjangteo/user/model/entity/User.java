@@ -1,5 +1,10 @@
 package com.firstone.greenjangteo.user.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
 import com.firstone.greenjangteo.user.dto.AddressDto;
@@ -35,6 +40,7 @@ public class User extends BaseEntity {
 
     @Convert(converter = Email.EmailConverter.class)
     @Column(nullable = false, unique = true, length = 30)
+    @JsonIgnore
     private Email email;
 
     @Convert(converter = Username.UsernameConverter.class)
@@ -43,14 +49,17 @@ public class User extends BaseEntity {
 
     @Convert(converter = Password.PasswordConverter.class)
     @Column(nullable = false)
+    @JsonIgnore
     private Password password;
 
     @Convert(converter = FullName.FullNameConverter.class)
     @Column(nullable = false, length = 5)
+    @JsonIgnore
     private FullName fullName;
 
     @Convert(converter = Phone.PhoneConverter.class)
     @Column(unique = true, length = 11)
+    @JsonIgnore
     private Phone phone;
 
     @Embedded
@@ -60,6 +69,8 @@ public class User extends BaseEntity {
     private Roles roles;
 
     @Column
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime lastLoggedInAt;
 
     @OneToMany(mappedBy = "user", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
