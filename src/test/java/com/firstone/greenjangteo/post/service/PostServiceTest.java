@@ -141,6 +141,55 @@ class PostServiceTest {
                 );
     }
 
+    @DisplayName("페이징 처리한 모든 게시글 목록을 게시글 생성 순서 내림차순으로 조회할 수 있다.")
+    @Test
+    void getPosts() {
+        // given
+        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
+        Post post3 = PostTestObjectFactory.createPost(SUBJECT3, CONTENT3);
+
+        postRepository.saveAll(List.of(post1, post2, post3));
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(0, 2, sort);
+
+        // when
+        List<Post> posts = postService.getPosts(pageable).getContent();
+
+        // then
+        assertThat(posts).hasSize(2)
+                .extracting("subject", "content")
+                .containsExactlyInAnyOrder(tuple(SUBJECT2, CONTENT2), tuple(SUBJECT3, CONTENT3));
+    }
+
+    @DisplayName("페이징 처리한 자신의 게시글 목록을 게시글 생성 순서 내림차순으로 조회할 수 있다.")
+    @Test
+    void getMyPosts() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1, user);
+        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
+        Post post3 = PostTestObjectFactory.createPost(SUBJECT3, CONTENT3, user);
+
+        postRepository.saveAll(List.of(post1, post2, post3));
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(0, 2, sort);
+
+        // when
+        List<Post> posts = postService.getPosts(pageable, user.getId()).getContent();
+
+        // then
+        assertThat(posts).hasSize(2)
+                .extracting("subject", "content")
+                .containsExactly(tuple(SUBJECT3, CONTENT3), tuple((SUBJECT1), CONTENT1));
+    }
+
     @DisplayName("게시물 ID와 게시자 ID를 전송해 게시글과 이미지들을 조회할 수 있다.")
     @ParameterizedTest
     @CsvSource({
@@ -204,27 +253,5 @@ class PostServiceTest {
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(POST_NOT_FOUND_EXCEPTION + post.getId()
                         + POSTED_USER_ID_NOT_FOUND_EXCEPTION + (user.getId() + 1));
-    }
-
-    @DisplayName("페이징 처리한 모든 게시글 목록을 게시글 생성 순서 내림차순으로 조회할 수 있다.")
-    @Test
-    void getPosts() {
-        // given
-        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
-        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
-        Post post3 = PostTestObjectFactory.createPost(SUBJECT3, CONTENT3);
-
-        postRepository.saveAll(List.of(post1, post2, post3));
-
-        Sort sort = Sort.by("createdAt").descending();
-        Pageable pageable = PageRequest.of(0, 2, sort);
-
-        // when
-        List<Post> posts = postService.getPosts(pageable).getContent();
-
-        // then
-        assertThat(posts).hasSize(2)
-                .extracting("subject", "content")
-                .containsExactlyInAnyOrder(tuple(SUBJECT2, CONTENT2), tuple(SUBJECT3, CONTENT3));
     }
 }
