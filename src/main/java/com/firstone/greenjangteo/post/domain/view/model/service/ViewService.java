@@ -15,4 +15,8 @@ public class ViewService {
         view.addViewCount();
         return viewRepository.save(view);
     }
+
+    public View getView(Long postId) {
+        return viewRepository.findById(postId).orElse(new View(postId));
+    }
 }

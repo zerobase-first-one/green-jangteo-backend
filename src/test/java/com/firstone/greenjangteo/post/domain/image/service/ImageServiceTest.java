@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.firstone.greenjangteo.post.domain.image.testutil.ImageTestConstant.*;
-import static com.firstone.greenjangteo.post.utility.PostTestConstant.CONTENT;
-import static com.firstone.greenjangteo.post.utility.PostTestConstant.SUBJECT;
+import static com.firstone.greenjangteo.post.utility.PostTestConstant.CONTENT1;
+import static com.firstone.greenjangteo.post.utility.PostTestConstant.SUBJECT1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
@@ -39,7 +39,7 @@ class ImageServiceTest {
     @Test
     void saveImages() {
         // given
-        Post post = PostTestObjectFactory.createPost(SUBJECT, CONTENT);
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
         postRepository.save(post);
 
         List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageRequestDtos();
