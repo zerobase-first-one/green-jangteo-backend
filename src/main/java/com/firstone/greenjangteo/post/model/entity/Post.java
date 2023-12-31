@@ -34,8 +34,6 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private int view;
-
     @OneToMany(mappedBy = "post", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Image> images;
@@ -53,6 +51,15 @@ public class Post extends BaseEntity {
         return Post.builder()
                 .subject(postRequestDto.getSubject())
                 .content(postRequestDto.getContent())
+                .user(user)
+                .build();
+    }
+
+    public Post updateFrom(PostRequestDto postRequestDto, User user) {
+        return Post.builder()
+                .id(id)
+                .content(postRequestDto.getContent())
+                .images(images)
                 .user(user)
                 .build();
     }
