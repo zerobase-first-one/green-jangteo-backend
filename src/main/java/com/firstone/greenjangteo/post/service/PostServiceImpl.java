@@ -54,7 +54,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Transactional(isolation = READ_COMMITTED, timeout = 15)
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
     @Cacheable(key = REQUEST_KEY, condition = GET_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
     public Post getPost(Long postId, Long writerId) {
         Post post = postRepository.findByIdAndUserId(postId, writerId)

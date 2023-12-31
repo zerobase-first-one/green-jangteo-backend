@@ -1,5 +1,7 @@
 package com.firstone.greenjangteo.post.controller;
 
+import com.firstone.greenjangteo.post.domain.view.model.entity.View;
+import com.firstone.greenjangteo.post.domain.view.model.service.ViewService;
 import com.firstone.greenjangteo.post.dto.PostRequestDto;
 import com.firstone.greenjangteo.post.dto.PostResponseDto;
 import com.firstone.greenjangteo.post.model.entity.Post;
@@ -25,6 +27,7 @@ import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+    private final ViewService viewService;
 
     private static final String CREATE_POST = "게시물 등록";
     private static final String CREATE_POST_DESCRIPTION = "회원 ID와 게시물 내용을 입력해 게시물을 등록할 수 있습니다.";
@@ -56,8 +59,9 @@ public class PostController {
         InputFormatValidator.validateId(writerId);
 
         Post post = postService.getPost(Long.parseLong(postId), Long.parseLong(writerId));
+        View view = viewService.addAndGetView(post.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post));
+        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount()));
     }
 
     private ResponseEntity<PostResponseDto> buildResponse(PostResponseDto postResponseDto) {

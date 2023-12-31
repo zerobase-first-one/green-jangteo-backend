@@ -26,7 +26,7 @@ public class PostResponseDto {
     private String username;
     private String subject;
     private String content;
-    private int view;
+    private int viewCount;
     private List<ImageResponseDto> imageResponseDtos;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -46,6 +46,27 @@ public class PostResponseDto {
                 .username(user.getUsername().getValue())
                 .subject(post.getSubject())
                 .content(post.getContent())
+                .imageResponseDtos(
+                        post.getImages() == null
+                                ? null
+                                : post.getImages().stream().map(ImageResponseDto::from)
+                                .collect(Collectors.toList())
+                )
+                .createdAt(post.getCreatedAt())
+                .modifiedAt(post.getModifiedAt())
+                .build();
+    }
+
+    public static PostResponseDto from(Post post, int viewCount) {
+        User user = post.getUser();
+
+        return PostResponseDto.builder()
+                .postId(post.getId())
+                .userId(user.getId())
+                .username(user.getUsername().getValue())
+                .subject(post.getSubject())
+                .content(post.getContent())
+                .viewCount(viewCount)
                 .imageResponseDtos(
                         post.getImages() == null
                                 ? null
