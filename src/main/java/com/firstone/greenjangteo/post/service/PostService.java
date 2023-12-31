@@ -5,4 +5,6 @@ import com.firstone.greenjangteo.post.model.entity.Post;
 
 public interface PostService {
     Post createPost(PostRequestDto postRegisterDto);
+
+    Post getPost(Long postId, Long writerId);
 }
