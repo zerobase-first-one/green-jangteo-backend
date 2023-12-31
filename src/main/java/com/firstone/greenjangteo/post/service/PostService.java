@@ -10,5 +10,7 @@ public interface PostService {
 
     Page<Post> getPosts(Pageable pageable);
 
+    Page<Post> getPosts(Pageable pageable, Long userId);
+
     Post getPost(Long postId, Long writerId);
 }

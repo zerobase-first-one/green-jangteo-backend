@@ -93,7 +93,7 @@ public class CouponGroupControllerTest {
         Pageable pageable = PageRequest.of(0, 20);
         Page<Coupon> couponPage = new PageImpl<>(coupons, pageable, coupons.size());
 
-        when(couponGroupService.getCouponGroup(eq(1L), any(Pageable.class))).thenReturn(couponPage);
+        when(couponGroupService.getCouponGroup(any(Pageable.class), eq(1L))).thenReturn(couponPage);
 
         // when, then
         mockMvc.perform(get("/coupon-groups/{couponGroupId}", ID_EXAMPLE)

@@ -69,7 +69,7 @@ public class CouponGroupController {
                 ? PageRequest.of(page, size, FormatConverter.parseSortString(sort))
                 : Pageable.unpaged();
 
-        Page<Coupon> couponPage = couponGroupService.getCouponGroup(Long.parseLong(couponGroupId), pageable);
+        Page<Coupon> couponPage = couponGroupService.getCouponGroup(pageable, Long.parseLong(couponGroupId));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CouponAndGroupEntityToDtoMapper.toCouponGroupResponseDto(couponPage));
     }

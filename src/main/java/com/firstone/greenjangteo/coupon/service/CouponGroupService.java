@@ -13,7 +13,7 @@ public interface CouponGroupService {
 
     List<CouponGroup> getCouponGroups();
 
-    Page<Coupon> getCouponGroup(Long couponGroupId, Pageable pageable);
+    Page<Coupon> getCouponGroup(Pageable pageable, Long couponGroupId);
 
     CouponGroup getCouponGroup(String couponName);
 

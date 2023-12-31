@@ -62,6 +62,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<Post> getPosts(Pageable pageable, Long userId) {
+        return postRepository.findByUserId(userId, pageable);
+    }
+
+    @Override
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
     @Cacheable(key = REQUEST_KEY, condition = GET_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
     public Post getPost(Long postId, Long writerId) {
