@@ -3,6 +3,8 @@ package com.firstone.greenjangteo.post.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
+import com.firstone.greenjangteo.post.domain.view.model.entity.View;
+import com.firstone.greenjangteo.post.domain.view.model.service.ViewService;
 import com.firstone.greenjangteo.post.dto.PostRequestDto;
 import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.post.service.PostService;
@@ -50,6 +52,9 @@ class PostControllerTest {
     private PostService postService;
 
     @MockBean
+    private ViewService viewService;
+
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
@@ -86,8 +91,10 @@ class PostControllerTest {
         // given
         User user = mock(User.class);
         Post post = PostTestObjectFactory.createPost(Long.parseLong(POST_ID), SUBJECT, CONTENT, user);
+        View view = mock(View.class);
 
         when(postService.getPost(anyLong(), anyLong())).thenReturn(post);
+        when(viewService.addAndGetView(anyLong())).thenReturn(view);
         when(user.getId()).thenReturn(Long.parseLong(BUYER_ID));
         when(user.getUsername()).thenReturn(Username.of(USERNAME1));
 
