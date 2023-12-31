@@ -18,6 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,6 +33,7 @@ import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.BUYER_I
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.SELLER_ID1;
 import static com.firstone.greenjangteo.post.utility.PostTestConstant.*;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.USERNAME1;
+import static com.firstone.greenjangteo.utility.PagingConstant.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -68,9 +73,9 @@ class PostControllerTest {
         User user = mock(User.class);
         List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageRequestDtos();
         PostRequestDto postRequestDto = PostTestObjectFactory
-                .createPostRequestDto(BUYER_ID, SUBJECT, CONTENT, imageRequestDtos);
+                .createPostRequestDto(BUYER_ID, SUBJECT1, CONTENT1, imageRequestDtos);
 
-        Post post = PostTestObjectFactory.createPost(Long.parseLong(POST_ID), SUBJECT, CONTENT, user);
+        Post post = PostTestObjectFactory.createPost(Long.parseLong(POST_ID), SUBJECT1, CONTENT1, user);
 
         when(postService.createPost(any(PostRequestDto.class))).thenReturn(post);
         when(user.getId()).thenReturn(Long.parseLong(BUYER_ID));
@@ -90,7 +95,7 @@ class PostControllerTest {
     void getPost() throws Exception {
         // given
         User user = mock(User.class);
-        Post post = PostTestObjectFactory.createPost(Long.parseLong(POST_ID), SUBJECT, CONTENT, user);
+        Post post = PostTestObjectFactory.createPost(Long.parseLong(POST_ID), SUBJECT1, CONTENT1, user);
         View view = mock(View.class);
 
         when(postService.getPost(anyLong(), anyLong())).thenReturn(post);
@@ -101,6 +106,39 @@ class PostControllerTest {
         // when, then
         mockMvc.perform(get("/posts/{postId}", POST_ID)
                         .queryParam("writerId", SELLER_ID1))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("전체 게시글 목록을 페이징 처리해 조회할 수 있다.")
+    @Test
+    @WithMockUser
+    void getAllPosts() throws Exception {
+        // given
+        User user = mock(User.class);
+
+        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1, user);
+        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2, user);
+        Post post3 = PostTestObjectFactory.createPost(SUBJECT3, CONTENT3, user);
+
+        List<Post> posts = List.of(post1, post2, post3);
+
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Post> postPage = new PageImpl<>(posts, pageable, posts.size());
+        View view = mock(View.class);
+
+        when(postService.getPosts(any(Pageable.class))).thenReturn(postPage);
+        when(viewService.getView(post1.getId())).thenReturn(view);
+        when(viewService.getView(post2.getId())).thenReturn(view);
+        when(viewService.getView(post3.getId())).thenReturn(view);
+        when(user.getUsername()).thenReturn(Username.of(USERNAME1));
+
+        // when, then
+        mockMvc.perform(get("/posts")
+                        .param("paged", TRUE)
+                        .param("page", ZERO)
+                        .param("size", FIVE)
+                        .param("sort", ORDER_BY_CREATED_AT_DESCENDING))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

@@ -12,6 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +23,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.firstone.greenjangteo.post.domain.image.testutil.ImageTestConstant.*;
-import static com.firstone.greenjangteo.post.utility.PostTestConstant.CONTENT;
-import static com.firstone.greenjangteo.post.utility.PostTestConstant.SUBJECT;
+import static com.firstone.greenjangteo.post.utility.PostTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +57,7 @@ class PostRepositoryTest {
         );
         userRepository.save(user);
 
-        Post createdPost = PostTestObjectFactory.createPost(SUBJECT, CONTENT, user);
+        Post createdPost = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1, user);
         postRepository.save(createdPost);
 
         List<Image> images = ImageTestObjectFactory.createImages(createdPost);
@@ -81,5 +83,27 @@ class PostRepositoryTest {
                         tuple(IMAGE_URL2, POSITION_IN_CONTENT + 1),
                         tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2)
                 );
+    }
+
+    @DisplayName("모든 게시글 목록을 페이징 처리해 생성 순서 내림차순으로 검색할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
+        Post post3 = PostTestObjectFactory.createPost(SUBJECT3, CONTENT3);
+
+        postRepository.saveAll(List.of(post1, post2, post3));
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(0, 2, sort);
+
+        // when
+        List<Post> posts = postRepository.findAll(pageable).getContent();
+
+        // then
+        assertThat(posts).hasSize(2)
+                .extracting("subject", "content")
+                .containsExactlyInAnyOrder(tuple(SUBJECT2, CONTENT2), tuple(SUBJECT3, CONTENT3));
     }
 }

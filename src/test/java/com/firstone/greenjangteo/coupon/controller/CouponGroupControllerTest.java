@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
+import static com.firstone.greenjangteo.utility.PagingConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -96,10 +97,10 @@ public class CouponGroupControllerTest {
 
         // when, then
         mockMvc.perform(get("/coupon-groups/{couponGroupId}", ID_EXAMPLE)
-                        .param("paged", "true")
-                        .param("page", "0")
-                        .param("size", "20")
-                        .param("sort", "id,asc"))
+                        .param("paged", TRUE)
+                        .param("page", ZERO)
+                        .param("size", TWENTY)
+                        .param("sort", ORDER_BY_ID_ASCENDING))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
