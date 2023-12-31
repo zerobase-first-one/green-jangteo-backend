@@ -83,28 +83,6 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(postsResponseDtos);
     }
 
-//    @ApiOperation(value = GET_ALL_POSTS, notes = GET_ALL_POSTS_DESCRIPTION)
-//    @GetMapping()
-//    public ResponseEntity<Page<PostResponseDto>> getAllPosts
-//            (@PathVariable("couponGroupId")
-//             @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId,
-//             @RequestParam(defaultValue = TRUE)
-//             @ApiParam(value = IS_PAGINATION_USED, example = TRUE) boolean paged,
-//             @RequestParam(defaultValue = ZERO)
-//             @ApiParam(value = CURRENT_PAGE_NUMBER, example = ZERO) int page,
-//             @RequestParam(defaultValue = FIVE)
-//             @ApiParam(value = NUMBER_OF_ITEMS_PER_PAGE, example = FIVE) int size,
-//             @RequestParam(defaultValue = ORDER_BY_ID_ASCENDING)
-//             @ApiParam(value = SORTING_METHOD, example = ORDER_BY_ID_DESCENDING) String sort) {
-//        InputFormatValidator.validateId(couponGroupId);
-//        RoleValidator.checkAdminAuthentication();
-//        Pageable pageable = paged ? PageRequest.of(page, size, parseSortString(sort)) : Pageable.unpaged();
-//
-//        Page<Coupon> couponPage = couponGroupService.getCouponGroup(Long.parseLong(couponGroupId), pageable);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(CouponAndGroupEntityToDtoMapper.toCouponGroupResponseDto(couponPage));
-//    }
-
     @ApiOperation(value = GET_POST, notes = GET_POST_DESCRIPTION)
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost
