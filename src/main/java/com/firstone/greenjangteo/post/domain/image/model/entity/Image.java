@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.post.domain.image.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.model.entity.Post;
@@ -22,11 +23,12 @@ public class Image extends BaseEntity {
     @Column(nullable = false)
     private String url;
 
-    @Column(name = "position", unique = true)
+    @Column(name = "position")
     private int positionInContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+    @JsonBackReference
     private Post post;
 
     @Builder

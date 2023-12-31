@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.post.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
 import com.firstone.greenjangteo.post.dto.PostRequestDto;
@@ -36,6 +37,7 @@ public class Post extends BaseEntity {
     private int view;
 
     @OneToMany(mappedBy = "post", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Image> images;
 
     @Builder
