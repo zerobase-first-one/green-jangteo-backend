@@ -36,6 +36,14 @@ public class PostTestObjectFactory {
                 .build();
     }
 
+    public static Post createPost(String subject, String content, User user) {
+        return Post.builder()
+                .subject(subject)
+                .content(content)
+                .user(user)
+                .build();
+    }
+
     public static Post createPost(String subject, String content) {
         return Post.builder()
                 .subject(subject)
