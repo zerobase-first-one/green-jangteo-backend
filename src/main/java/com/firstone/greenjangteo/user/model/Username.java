@@ -34,7 +34,7 @@ public class Username {
         return Objects.hash(username);
     }
 
-    String getValue() {
+    public String getValue() {
         return username;
     }
 
