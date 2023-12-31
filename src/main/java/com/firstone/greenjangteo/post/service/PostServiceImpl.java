@@ -24,16 +24,15 @@ public class PostServiceImpl implements PostService {
 
     private final EntityManager entityManager;
 
-    private static final String RESULT_KEY = "#result.postId";
-    private static final String CREATE_KEY_CONDITION = "#userId != null && #postRequestDto != null";
+    private static final String RESULT_KEY = "#result.id";
+    private static final String CREATE_KEY_CONDITION = "#postRequestDto != null &&#postRequestDto.userId != null";
 
     private static final String KEY_VALUE = "post";
     private static final String UNLESS_CONDITION = "#result == null";
 
     @Override
     @Transactional(isolation = READ_UNCOMMITTED, timeout = 20)
-    @CachePut(key = RESULT_KEY, condition = CREATE_KEY_CONDITION,
-            unless = UNLESS_CONDITION, value = KEY_VALUE)
+    @CachePut(key = RESULT_KEY, condition = CREATE_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
     public Post createPost(PostRequestDto postRequestDto) {
         User user = userService.getUser(Long.parseLong(postRequestDto.getUserId()));
         Post post = postRepository.save(Post.from(postRequestDto, user));
