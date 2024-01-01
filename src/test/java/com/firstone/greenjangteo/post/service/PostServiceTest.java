@@ -2,7 +2,7 @@ package com.firstone.greenjangteo.post.service;
 
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
-import com.firstone.greenjangteo.post.domain.image.model.repository.ImageRepository;
+import com.firstone.greenjangteo.post.domain.image.repository.ImageRepository;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
 import com.firstone.greenjangteo.post.dto.PostRequestDto;
 import com.firstone.greenjangteo.post.model.entity.Post;
@@ -71,7 +71,7 @@ class PostServiceTest {
         Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().flushDb();
     }
 
-    @DisplayName("사용자 ID와 게시글 제목, 내용을 전송해 이미지가 없는 게시물을 등록할 수 있다.")
+    @DisplayName("사용자 ID와 게시글 제목, 내용을 전송해 이미지가 없는 게시글을 등록할 수 있다.")
     @ParameterizedTest
     @CsvSource({
             "안녕하세요?, 12345",
@@ -190,7 +190,7 @@ class PostServiceTest {
                 .containsExactly(tuple(SUBJECT3, CONTENT3), tuple((SUBJECT1), CONTENT1));
     }
 
-    @DisplayName("게시물 ID와 게시자 ID를 전송해 게시글과 이미지들을 조회할 수 있다.")
+    @DisplayName("게시글 ID와 게시자 ID를 전송해 게시글과 이미지들을 조회할 수 있다.")
     @ParameterizedTest
     @CsvSource({
             "안녕하세요?, 12345",
