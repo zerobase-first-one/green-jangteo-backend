@@ -31,10 +31,10 @@ public class PostServiceImpl implements PostService {
 
     private final EntityManager entityManager;
 
-    private static final String RESULT_KEY = "#result.id";
+    private static final String CREATE_POST_KEY = "#result.id + '_' + #postRequestDto.userId";
     private static final String CREATE_KEY_CONDITION = "#postRequestDto != null &&#postRequestDto.userId != null";
 
-    private static final String REQUEST_KEY = "#postId";
+    private static final String GET_POST_KEY = "#postId + '_' + #writerId";
     private static final String GET_KEY_CONDITION = "#postId != null && #writerId != null";
 
     private static final String KEY_VALUE = "post";
@@ -42,7 +42,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(isolation = READ_UNCOMMITTED, timeout = 20)
-    @CachePut(key = RESULT_KEY, condition = CREATE_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
+    @CachePut(key = CREATE_POST_KEY, condition = CREATE_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
     public Post createPost(PostRequestDto postRequestDto) {
         User user = userService.getUser(Long.parseLong(postRequestDto.getUserId()));
         Post post = postRepository.save(Post.from(postRequestDto, user));
@@ -68,7 +68,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
-    @Cacheable(key = REQUEST_KEY, condition = GET_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
+    @Cacheable(key = GET_POST_KEY, condition = GET_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
     public Post getPost(Long postId, Long writerId) {
         Post post = postRepository.findByIdAndUserId(postId, writerId)
                 .orElseThrow(() -> new EntityNotFoundException
