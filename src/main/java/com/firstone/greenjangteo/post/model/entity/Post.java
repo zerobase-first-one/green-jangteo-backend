@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -30,11 +31,11 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "post", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Image> images;
 
@@ -62,5 +63,11 @@ public class Post extends BaseEntity {
                 .images(images)
                 .user(user)
                 .build();
+    }
+
+    @PostLoad
+    private void init() {
+        Hibernate.initialize(user);
+        Hibernate.initialize(images);
     }
 }
