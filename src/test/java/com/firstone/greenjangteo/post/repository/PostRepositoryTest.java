@@ -104,6 +104,33 @@ class PostRepositoryTest {
         // then
         assertThat(posts).hasSize(2)
                 .extracting("subject", "content")
-                .containsExactlyInAnyOrder(tuple(SUBJECT2, CONTENT2), tuple(SUBJECT3, CONTENT3));
+                .containsExactly(tuple(SUBJECT3, CONTENT3), tuple(SUBJECT2, CONTENT2));
+    }
+
+    @DisplayName("자신의 게시글 목록을 페이징 처리해 생성 순서 내림차순으로 검색할 수 있다.")
+    @Test
+    void findByUserId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1, user);
+        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
+        Post post3 = PostTestObjectFactory.createPost(SUBJECT3, CONTENT3, user);
+
+        postRepository.saveAll(List.of(post1, post2, post3));
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(0, 1, sort);
+
+        // when
+        List<Post> posts = postRepository.findByUserId(user.getId(), pageable).getContent();
+
+        // then
+        assertThat(posts).hasSize(1)
+                .extracting("subject", "content")
+                .containsExactly(tuple(SUBJECT3, CONTENT3));
     }
 }

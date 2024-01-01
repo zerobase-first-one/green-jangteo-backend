@@ -76,7 +76,7 @@ public class CouponGroupServiceTest {
         couponRepository.saveAll(createdCoupons);
 
         // when
-        List<Coupon> foundCoupons = couponGroupService.getCouponGroup(createdCouponGroup.getId(), Pageable.ofSize(2))
+        List<Coupon> foundCoupons = couponGroupService.getCouponGroup(Pageable.ofSize(2), createdCouponGroup.getId())
                 .getContent();
 
         // then
@@ -100,7 +100,7 @@ public class CouponGroupServiceTest {
         Pageable pageable = mock(Pageable.class);
 
         // when, then
-        assertThatThrownBy(() -> couponGroupService.getCouponGroup(couponGroupId, pageable))
+        assertThatThrownBy(() -> couponGroupService.getCouponGroup(pageable, couponGroupId))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(COUPON_GROUP_ID_NOT_FOUND_EXCEPTION + couponGroupId);
     }

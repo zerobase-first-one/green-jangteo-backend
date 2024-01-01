@@ -39,7 +39,7 @@ public class CouponGroupServiceImpl implements CouponGroupService {
 
     @Override
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
-    public Page<Coupon> getCouponGroup(Long couponGroupId, Pageable pageable) {
+    public Page<Coupon> getCouponGroup(Pageable pageable, Long couponGroupId) {
         if (couponGroupRepository.existsById(couponGroupId)) {
             return couponRepository.findByCouponGroupId(couponGroupId, pageable);
         }
