@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.configuration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.firstone.greenjangteo.hibernate.HibernateCollectionMixIn;
@@ -44,6 +45,7 @@ public class CacheConfig {
         mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 
         mapper.registerModule(new Jdk8Module());
+        mapper.registerModule(new Hibernate5Module());
         mapper.registerModule(new JavaTimeModule());
 
         mapper.addMixIn(Collection.class, HibernateCollectionMixIn.class);

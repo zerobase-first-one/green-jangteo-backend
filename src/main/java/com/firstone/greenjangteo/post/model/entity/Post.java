@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -62,5 +63,11 @@ public class Post extends BaseEntity {
                 .images(images)
                 .user(user)
                 .build();
+    }
+
+    @PostLoad
+    private void init() {
+        Hibernate.initialize(user);
+        Hibernate.initialize(images);
     }
 }
