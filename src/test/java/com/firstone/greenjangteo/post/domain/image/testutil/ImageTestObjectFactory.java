@@ -19,6 +19,16 @@ public class ImageTestObjectFactory {
         return List.of(imageRequestDto1, imageRequestDto2, imageRequestDto3);
     }
 
+    public static List<ImageRequestDto> createImageUpdateRequestDtos() {
+        int position = POSITION_IN_CONTENT;
+
+        ImageRequestDto imageRequestDto2 = createImageRequestDto(IMAGE_URL3, position++);
+        ImageRequestDto imageRequestDto3 = createImageRequestDto(IMAGE_URL2, ++position);
+        ImageRequestDto imageRequestDto1 = createImageRequestDto(IMAGE_URL1, ++position);
+
+        return List.of(imageRequestDto1, imageRequestDto2, imageRequestDto3);
+    }
+
     public static List<Image> createImages(Post post) {
         int position = POSITION_IN_CONTENT;
 

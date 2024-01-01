@@ -254,4 +254,54 @@ class PostServiceTest {
                 .hasMessage(POST_NOT_FOUND_EXCEPTION + post.getId()
                         + POSTED_USER_ID_NOT_FOUND_EXCEPTION + (user.getId() + 1));
     }
+
+    @DisplayName("게시글 ID와 회원 ID를 전송해 게시글을 수정할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abc, 안녕하세요?, 안뇽하세요?",
+            "12345, abcde, 가나다라abc마바 123454321 aBc 가나다 ab 123",
+            "가나다, 가나다라 12345 aBc 가나다 ab 123, 안냥하세요?"
+    })
+    void updatePost(String subjectToUpdate, String content, String contentToUpdate) {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post createdPost = PostTestObjectFactory.createPost(SUBJECT1, content, user);
+        postRepository.save(createdPost);
+
+        List<Image> images = ImageTestObjectFactory.createImages(createdPost);
+        imageRepository.saveAll(images);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageUpdateRequestDtos();
+
+        PostRequestDto postRequestDto = PostTestObjectFactory
+                .createPostRequestDto(user.getId().toString(), subjectToUpdate, contentToUpdate, imageRequestDtos);
+
+        // when
+        Post updatedPost = postService.updatePost(createdPost.getId(), postRequestDto);
+        Post foundPost = postRepository.findById(createdPost.getId()).get();
+
+        // then
+        assertThat(foundPost.getSubject()).isEqualTo(subjectToUpdate);
+        assertThat(foundPost.getSubject()).isEqualTo(updatedPost.getSubject());
+
+        assertThat(foundPost.getContent()).isEqualTo(contentToUpdate);
+        assertThat(foundPost.getContent()).isEqualTo(updatedPost.getContent());
+
+        assertThat(foundPost.getCreatedAt()).isEqualTo(updatedPost.getCreatedAt());
+        assertThat(foundPost.getModifiedAt()).isEqualTo(updatedPost.getModifiedAt());
+        assertThat(foundPost.getModifiedAt()).isNotEqualTo(updatedPost.getCreatedAt());
+
+        assertThat(foundPost.getImages()).isEqualTo(updatedPost.getImages());
+        assertThat(foundPost.getImages()).hasSize(3)
+                .extracting("url", "positionInContent")
+                .containsExactlyInAnyOrder(
+                        tuple(IMAGE_URL3, POSITION_IN_CONTENT),
+                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 2),
+                        tuple(IMAGE_URL1, POSITION_IN_CONTENT + 3)
+                );
+    }
 }

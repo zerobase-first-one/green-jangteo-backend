@@ -87,7 +87,7 @@ class PostRepositoryTest {
 
     @DisplayName("모든 게시글 목록을 페이징 처리해 생성 순서 내림차순으로 검색할 수 있다.")
     @Test
-    void findAll() {
+    void findAllWithPaging() {
         // given
         Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
         Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
@@ -109,7 +109,7 @@ class PostRepositoryTest {
 
     @DisplayName("자신의 게시글 목록을 페이징 처리해 생성 순서 내림차순으로 검색할 수 있다.")
     @Test
-    void findByUserId() {
+    void findByUserIdWithPaging() {
         // given
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())

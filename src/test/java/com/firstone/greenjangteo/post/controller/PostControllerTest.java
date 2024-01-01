@@ -39,8 +39,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -173,6 +172,31 @@ class PostControllerTest {
         // when, then
         mockMvc.perform(get("/posts/{postId}", POST_ID)
                         .queryParam("writerId", SELLER_ID1))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("게시글 ID와 회원 ID를 전송해 게시글을 수정할 수 있다.")
+    @Test
+    @WithMockUser
+    void updatePost() throws Exception {
+        // given
+        User user = mock(User.class);
+        Post post = PostTestObjectFactory.createPost(Long.parseLong(POST_ID), SUBJECT2, CONTENT2, user);
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageRequestDtos();
+        PostRequestDto postRequestDto = PostTestObjectFactory
+                .createPostRequestDto(BUYER_ID, SUBJECT2, CONTENT2, imageRequestDtos);
+        View view = mock(View.class);
+
+        when(postService.updatePost(anyLong(), any(PostRequestDto.class))).thenReturn(post);
+        when(viewService.getView(post.getId())).thenReturn(view);
+        when(user.getUsername()).thenReturn(Username.of(USERNAME1));
+
+        // when, then
+        mockMvc.perform(put("/posts/{postId}", post.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(postRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
