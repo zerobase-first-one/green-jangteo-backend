@@ -133,14 +133,16 @@ public class PostController {
     }
 
     @ApiOperation(value = UPDATE_POST, notes = UPDATE_POST_DESCRIPTION)
-    @PreAuthorize(PRINCIPAL_POINTCUT)
     @PutMapping("{postId}")
     public ResponseEntity<PostResponseDto> updatePost
             (@PathVariable @ApiParam(value = POST_ID, example = ID_EXAMPLE) String postId,
              @Valid @RequestBody @ApiParam(value = UPDATE_POST_FORM) PostRequestDto postRequestDto) {
+        String userId = postRequestDto.getUserId();
 
         InputFormatValidator.validateId(postId);
-        InputFormatValidator.validateId(postRequestDto.getUserId());
+        InputFormatValidator.validateId(userId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
 
         Post post = postService.updatePost(Long.parseLong(postId), postRequestDto);
         View view = viewService.getView(post.getId());
