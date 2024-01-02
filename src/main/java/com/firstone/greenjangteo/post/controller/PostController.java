@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.post.controller;
 
+import com.firstone.greenjangteo.post.domain.comment.service.CommentService;
 import com.firstone.greenjangteo.post.domain.view.model.entity.View;
 import com.firstone.greenjangteo.post.domain.view.model.service.ViewService;
 import com.firstone.greenjangteo.post.dto.PostRequestDto;
@@ -7,6 +8,7 @@ import com.firstone.greenjangteo.post.dto.PostResponseDto;
 import com.firstone.greenjangteo.post.dto.PostsResponseDto;
 import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.post.service.PostService;
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.utility.FormatConverter;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
 import com.firstone.greenjangteo.utility.RoleValidator;
@@ -36,6 +38,7 @@ import static com.firstone.greenjangteo.web.ApiConstant.*;
 public class PostController {
     private final PostService postService;
     private final ViewService viewService;
+    private final CommentService commentService;
 
     private static final String CREATE_POST = "게시글 등록";
     private static final String CREATE_POST_DESCRIPTION = "회원 ID와 게시글 내용을 입력해 게시글을 등록할 수 있습니다.";
@@ -57,6 +60,9 @@ public class PostController {
     private static final String UPDATE_POST = "게시글 수정";
     private static final String UPDATE_POST_DESCRIPTION = "게시글 ID와 회원 ID를 입력해 게시글을 수정할 수 있습니다.";
     private static final String UPDATE_POST_FORM = "게시글 수정 양식";
+
+    private static final String DELETE_POST = "게시글 삭제";
+    private static final String DELETE_POST_DESCRIPTION = "게시글 ID와 회원 ID를 입력해 게시글을 삭제할 수 있습니다.";
 
     @ApiOperation(value = CREATE_POST, notes = CREATE_POST_DESCRIPTION)
     @PostMapping
@@ -128,8 +134,9 @@ public class PostController {
 
         Post post = postService.getPost(Long.parseLong(postId), Long.parseLong(writerId));
         View view = viewService.addAndGetView(post.getId());
+        int commentCount = commentService.getCommentCountForPost(post.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount()));
+        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount(), commentCount));
     }
 
     @ApiOperation(value = UPDATE_POST, notes = UPDATE_POST_DESCRIPTION)
@@ -138,14 +145,30 @@ public class PostController {
     public ResponseEntity<PostResponseDto> updatePost
             (@PathVariable @ApiParam(value = POST_ID, example = ID_EXAMPLE) String postId,
              @Valid @RequestBody @ApiParam(value = UPDATE_POST_FORM) PostRequestDto postRequestDto) {
-
         InputFormatValidator.validateId(postId);
         InputFormatValidator.validateId(postRequestDto.getUserId());
 
         Post post = postService.updatePost(Long.parseLong(postId), postRequestDto);
         View view = viewService.getView(post.getId());
+        int commentCount = commentService.getCommentCountForPost(post.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount()));
+        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount(), commentCount));
+    }
+
+    @ApiOperation(value = DELETE_POST, notes = DELETE_POST_DESCRIPTION)
+    @DeleteMapping("{postId}")
+    public ResponseEntity<PostResponseDto> deletePost
+            (@PathVariable @ApiParam(value = POST_ID, example = ID_EXAMPLE) String postId,
+             @RequestBody @ApiParam(value = USER_ID_VALUE) UserIdRequestDto userIdRequestDto) {
+        String userId = userIdRequestDto.getUserId();
+        InputFormatValidator.validateId(postId);
+        InputFormatValidator.validateId(userId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
+
+        postService.deletePost(Long.parseLong(postId), Long.parseLong(userId));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private ResponseEntity<PostResponseDto> buildResponse(PostResponseDto postResponseDto) {

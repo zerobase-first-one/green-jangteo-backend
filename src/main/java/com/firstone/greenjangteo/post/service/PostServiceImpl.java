@@ -7,6 +7,7 @@ import com.firstone.greenjangteo.post.repository.PostRepository;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -95,5 +96,17 @@ public class PostServiceImpl implements PostService {
         entityManager.refresh(updatedPost);
 
         return updatedPost;
+    }
+
+    @Override
+    @Transactional(isolation = READ_COMMITTED, timeout = 15)
+    @CacheEvict(key = DELETE_POST_KEY, condition = DELETE_KEY_CONDITION, value = KEY_VALUE)
+    public void deletePost(Long postId, Long userId) {
+        if (postRepository.existsByIdAndUserId(postId, userId)) {
+            postRepository.deleteById(postId);
+            return;
+        }
+
+        throw new EntityNotFoundException(POST_NOT_FOUND_EXCEPTION + postId + POSTED_USER_ID_NOT_FOUND_EXCEPTION + userId);
     }
 }

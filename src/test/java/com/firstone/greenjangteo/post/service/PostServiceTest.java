@@ -304,4 +304,36 @@ class PostServiceTest {
                         tuple(IMAGE_URL1, POSITION_IN_CONTENT + 3)
                 );
     }
+
+    @DisplayName("게시글 ID와 회원 ID를 전송해 게시글을 삭제할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "abc, 안녕하세요?, 안뇽하세요?",
+            "12345, abcde, 가나다라abc마바 123454321 aBc 가나다 ab 123",
+            "가나다, 가나다라 12345 aBc 가나다 ab 123, 안냥하세요?"
+    })
+    void deletePost(String subject, String content) {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post = PostTestObjectFactory.createPost(subject, content, user);
+        postRepository.save(post);
+
+        List<Image> images = ImageTestObjectFactory.createImages(post);
+        imageRepository.saveAll(images);
+
+        entityManager.refresh(post);
+
+        Long postId = post.getId();
+
+        // when
+        postService.deletePost(postId, user.getId());
+
+        // then
+        assertThat(postRepository.findById(postId)).isNotPresent();
+        assertThat(imageRepository.findAllByPostIdOrderByIdAsc(postId)).isEmpty();
+    }
 }
