@@ -56,12 +56,13 @@ public class Post extends BaseEntity {
                 .build();
     }
 
-    public Post updateFrom(PostRequestDto postRequestDto, User user) {
+    public Post updateFrom(PostRequestDto postRequestDto) {
         return Post.builder()
                 .id(id)
+                .subject(postRequestDto.getSubject())
                 .content(postRequestDto.getContent())
-                .images(images)
                 .user(user)
+                .images(images)
                 .build();
     }
 

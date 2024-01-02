@@ -37,9 +37,9 @@ public class PostController {
     private final PostService postService;
     private final ViewService viewService;
 
-    private static final String CREATE_POST = "게시물 등록";
-    private static final String CREATE_POST_DESCRIPTION = "회원 ID와 게시물 내용을 입력해 게시물을 등록할 수 있습니다.";
-    private static final String CREATE_POST_FORM = "게시물 등록 양식";
+    private static final String CREATE_POST = "게시글 등록";
+    private static final String CREATE_POST_DESCRIPTION = "회원 ID와 게시글 내용을 입력해 게시글을 등록할 수 있습니다.";
+    private static final String CREATE_POST_FORM = "게시글 등록 양식";
 
     private static final String GET_ALL_POSTS = "전체 게시글 목록 조회";
     private static final String GET_ALL_POSTS_DESCRIPTION = "전체 게시글 목록을 조회할 수 있습니다." +
@@ -49,10 +49,14 @@ public class PostController {
     private static final String GET_MY_POSTS_DESCRIPTION = "자신의 게시글 목록을 조회할 수 있습니다." +
             "\n페이징 옵션을 선택할 수 있습니다.";
 
-    private static final String GET_POST = "게시물 조회";
-    private static final String GET_POST_DESCRIPTION = "게시물 ID와 게시자 ID를 입력해 게시물을 조회할 수 있습니다.";
-    private static final String POST_ID = "게시물 ID";
+    private static final String GET_POST = "게시글 조회";
+    private static final String GET_POST_DESCRIPTION = "게시글 ID와 게시자 ID를 입력해 게시글을 조회할 수 있습니다.";
+    public static final String POST_ID = "게시글 ID";
     private static final String WRITER_ID = "게시자 ID";
+
+    private static final String UPDATE_POST = "게시글 수정";
+    private static final String UPDATE_POST_DESCRIPTION = "게시글 ID와 회원 ID를 입력해 게시글을 수정할 수 있습니다.";
+    private static final String UPDATE_POST_FORM = "게시글 수정 양식";
 
     @ApiOperation(value = CREATE_POST, notes = CREATE_POST_DESCRIPTION)
     @PostMapping
@@ -124,6 +128,22 @@ public class PostController {
 
         Post post = postService.getPost(Long.parseLong(postId), Long.parseLong(writerId));
         View view = viewService.addAndGetView(post.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount()));
+    }
+
+    @ApiOperation(value = UPDATE_POST, notes = UPDATE_POST_DESCRIPTION)
+    @PreAuthorize(PRINCIPAL_POINTCUT)
+    @PutMapping("{postId}")
+    public ResponseEntity<PostResponseDto> updatePost
+            (@PathVariable @ApiParam(value = POST_ID, example = ID_EXAMPLE) String postId,
+             @Valid @RequestBody @ApiParam(value = UPDATE_POST_FORM) PostRequestDto postRequestDto) {
+
+        InputFormatValidator.validateId(postId);
+        InputFormatValidator.validateId(postRequestDto.getUserId());
+
+        Post post = postService.updatePost(Long.parseLong(postId), postRequestDto);
+        View view = viewService.getView(post.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(PostResponseDto.from(post, view.getViewCount()));
     }
