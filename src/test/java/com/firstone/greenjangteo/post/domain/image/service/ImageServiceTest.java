@@ -2,7 +2,7 @@ package com.firstone.greenjangteo.post.domain.image.service;
 
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
-import com.firstone.greenjangteo.post.domain.image.model.repository.ImageRepository;
+import com.firstone.greenjangteo.post.domain.image.repository.ImageRepository;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
 import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.post.repository.PostRepository;

@@ -19,8 +19,7 @@ import javax.persistence.EntityNotFoundException;
 
 import static com.firstone.greenjangteo.post.exception.message.NotFoundExceptionMessage.POSTED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.post.exception.message.NotFoundExceptionMessage.POST_NOT_FOUND_EXCEPTION;
-import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
-import static org.springframework.transaction.annotation.Isolation.READ_UNCOMMITTED;
+import static org.springframework.transaction.annotation.Isolation.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +31,20 @@ public class PostServiceImpl implements PostService {
     private final EntityManager entityManager;
 
     private static final String CREATE_POST_KEY = "#result.id + '_' + #postRequestDto.userId";
-    private static final String CREATE_KEY_CONDITION = "#postRequestDto != null &&#postRequestDto.userId != null";
+    private static final String CREATE_KEY_CONDITION = "#postRequestDto != null && #postRequestDto.userId != null";
 
     private static final String GET_POST_KEY = "#postId + '_' + #writerId";
     private static final String GET_KEY_CONDITION = "#postId != null && #writerId != null";
 
     private static final String KEY_VALUE = "post";
     private static final String UNLESS_CONDITION = "#result == null";
+
+    private static final String UPDATE_POST_KEY = "#postId + '_' + #postRequestDto.userId";
+    private static final String UPDATE_KEY_CONDITION
+            = "#postId != null && #postRequestDto != null && #postRequestDto.userId != null";
+
+    private static final String DELETE_POST_KEY = "#postId + '_' + #userId";
+    private static final String DELETE_KEY_CONDITION = "#postId != null && #userId != null";
 
     @Override
     @Transactional(isolation = READ_UNCOMMITTED, timeout = 20)
@@ -75,5 +81,19 @@ public class PostServiceImpl implements PostService {
                         (POST_NOT_FOUND_EXCEPTION + postId + POSTED_USER_ID_NOT_FOUND_EXCEPTION + writerId));
 
         return post;
+    }
+
+    @Override
+    @Transactional(isolation = REPEATABLE_READ, timeout = 30)
+    @CachePut(key = UPDATE_POST_KEY, condition = UPDATE_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
+    public Post updatePost(Long postId, PostRequestDto postRequestDto) {
+        Post post = getPost(postId, Long.parseLong(postRequestDto.getUserId()));
+        Post updatedPost = postRepository.save(post.updateFrom(postRequestDto));
+
+        imageService.updateImages(updatedPost, postRequestDto.getImageRequestDtos());
+
+        entityManager.refresh(updatedPost);
+
+        return updatedPost;
     }
 }

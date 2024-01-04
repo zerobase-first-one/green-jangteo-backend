@@ -22,7 +22,7 @@ class ViewServiceTest {
     @Autowired
     private PostRepository postRepository;
 
-    @DisplayName("게시물 ID를 전송해 조회수를 추가하고 조회수 객체를 생성하거나 조회할 수 있다.")
+    @DisplayName("게시글 ID를 전송해 조회수를 추가하고 조회수 객체를 생성하거나 조회할 수 있다.")
     @Test
     void addAndGetView() {
         // given
@@ -40,7 +40,7 @@ class ViewServiceTest {
         assertThat(viewCount3).isEqualTo(3);
     }
 
-    @DisplayName("게시물 ID를 전송해 조회수 객체를 생성하거나 조회할 수 있다.")
+    @DisplayName("게시글 ID를 전송해 조회수 객체를 생성하거나 조회할 수 있다.")
     @Test
     void getView() {
         // given
