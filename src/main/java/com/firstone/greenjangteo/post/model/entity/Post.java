@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.post.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.firstone.greenjangteo.audit.BaseEntity;
+import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
 import com.firstone.greenjangteo.post.dto.PostRequestDto;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -38,6 +39,9 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Image> images;
+
+    @OneToMany(mappedBy = "post", cascade = REMOVE, fetch = FetchType.LAZY)
+    private List<Comment> comments;
 
     @Builder
     private Post(Long id, String subject, String content, User user, List<Image> images) {

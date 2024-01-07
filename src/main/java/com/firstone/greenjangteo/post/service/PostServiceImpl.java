@@ -77,11 +77,17 @@ public class PostServiceImpl implements PostService {
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
     @Cacheable(key = GET_POST_KEY, condition = GET_KEY_CONDITION, unless = UNLESS_CONDITION, value = KEY_VALUE)
     public Post getPost(Long postId, Long writerId) {
-        Post post = postRepository.findByIdAndUserId(postId, writerId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException
                         (POST_NOT_FOUND_EXCEPTION + postId + POSTED_USER_ID_NOT_FOUND_EXCEPTION + writerId));
 
         return post;
+    }
+
+    @Override
+    public Post getPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException(POST_NOT_FOUND_EXCEPTION + postId));
     }
 
     @Override
