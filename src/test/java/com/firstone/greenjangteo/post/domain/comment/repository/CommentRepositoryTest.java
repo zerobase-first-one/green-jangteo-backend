@@ -1,14 +1,11 @@
-package com.firstone.greenjangteo.post.domain.comment.service;
+package com.firstone.greenjangteo.post.domain.comment.repository;
 
-import com.firstone.greenjangteo.post.domain.comment.dto.CommentRequestDto;
 import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
-import com.firstone.greenjangteo.post.domain.comment.repository.CommentRepository;
-import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
+import com.firstone.greenjangteo.post.domain.comment.service.CommentTestObjectFactory;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
 import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.post.repository.PostRepository;
-import com.firstone.greenjangteo.post.service.PostService;
 import com.firstone.greenjangteo.post.utility.PostTestObjectFactory;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.repository.UserRepository;
@@ -36,60 +33,22 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class CommentServiceTest {
-    @Autowired
-    private CommentService commentService;
-
-    @Autowired
-    private PostService postService;
-
+class CommentRepositoryTest {
     @Autowired
     private CommentRepository commentRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private PostRepository postRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @DisplayName("게시글의 댓글을 등록할 수 있다.")
+    @DisplayName("게시글의 모든 댓글 목록을 페이징 처리해 생성 순서 내림차순으로 검색할 수 있다.")
     @Test
-    void createComment() {
-        // given
-        User user = UserTestObjectFactory.createUser(
-                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
-        );
-        userRepository.save(user);
-
-        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
-        postRepository.save(post);
-
-        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageRequestDtos();
-        CommentRequestDto commentRequestDto = CommentTestObjectFactory
-                .createCommentRequestDto(user.getId().toString(), post.getId().toString(), CONTENT2, imageRequestDtos);
-
-        // when
-        Comment comment = commentService.createComment(commentRequestDto);
-
-        // then
-        assertThat(comment.getContent()).isEqualTo(CONTENT2);
-        assertThat(comment.getPost()).isEqualTo(post);
-        assertThat(comment.getUser()).isEqualTo(user);
-        assertThat(comment.getImages()).hasSize(imageRequestDtos.size())
-                .extracting("url", "positionInContent")
-                .containsExactlyInAnyOrder(
-                        tuple(IMAGE_URL1, POSITION_IN_CONTENT),
-                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 1),
-                        tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2)
-                );
-    }
-
-    @DisplayName("게시글의 모든 댓글 목록을 페이징 처리해 댓글 생성 순서 내림차순으로 조회할 수 있다.")
-    @Test
-    void getComments() {
+    void findByPostIdWithPaging() {
         // given
         Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
         Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
@@ -113,7 +72,7 @@ class CommentServiceTest {
         Pageable pageable = PageRequest.of(0, 2, sort);
 
         // when
-        List<Comment> comments = commentService.getComments(pageable, post1.getId()).getContent();
+        List<Comment> comments = commentRepository.findByPostId(post1.getId(), pageable).getContent();
 
         // then
         assertThat(comments).hasSize(2)
