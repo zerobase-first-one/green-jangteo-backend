@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.post.domain.image.service;
 
+import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
 import com.firstone.greenjangteo.post.domain.image.repository.ImageRepository;
@@ -65,6 +66,14 @@ public class ImageService {
 
         imageRepository.deleteAllInList(imagesToDelete);
         imageRepository.saveAll(imagesToSave);
+    }
+
+    public void saveImages(Comment comment, List<ImageRequestDto> imageRequestDtos) {
+        List<Image> images = imageRequestDtos.stream()
+                .map(imageRequestDto -> Image.from(comment, imageRequestDto))
+                .collect(Collectors.toList());
+
+        imageRepository.saveAll(images);
     }
 
     private void deleteAllPostImages(Long postId) {

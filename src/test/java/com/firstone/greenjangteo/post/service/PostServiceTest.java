@@ -197,7 +197,7 @@ class PostServiceTest {
             "abcde, ㄱㄴㄷ",
             "문의 드립니다, 가나다라 12345 aBc 가나다 ab 123"
     })
-    void getPost(String subject, String content) {
+    void getPostFromPostAndUserId(String subject, String content) {
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
         );
@@ -233,7 +233,7 @@ class PostServiceTest {
 
     @DisplayName("잘못된 게시글 ID 또는 게시자 ID를 입력하면 EntityNotFoundException이 발생한다.")
     @Test
-    void getPostFromWrongId() {
+    void getPostFromWrongPostOrUserId() {
         // given
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
@@ -253,6 +253,65 @@ class PostServiceTest {
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(POST_NOT_FOUND_EXCEPTION + post.getId()
                         + POSTED_USER_ID_NOT_FOUND_EXCEPTION + (user.getId() + 1));
+    }
+
+    @DisplayName("게시글 ID를 전송해 게시글과 이미지들을 조회할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "안녕하세요?, 12345",
+            "abcde, ㄱㄴㄷ",
+            "문의 드립니다, 가나다라 12345 aBc 가나다 ab 123"
+    })
+    void getPostFromPostId(String subject, String content) {
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post createdPost = PostTestObjectFactory.createPost(subject, content, user);
+        postRepository.save(createdPost);
+
+        List<Image> images = ImageTestObjectFactory.createImages(createdPost);
+        imageRepository.saveAll(images);
+
+        entityManager.refresh(createdPost);
+
+        // when
+        Post foundPost = postService.getPost(createdPost.getId());
+
+        // then
+        assertThat(foundPost.getId()).isEqualTo(createdPost.getId());
+        assertThat(foundPost.getUser().getId()).isEqualTo(createdPost.getUser().getId());
+        assertThat(foundPost.getSubject()).isEqualTo(createdPost.getSubject());
+        assertThat(foundPost.getContent()).isEqualTo(createdPost.getContent());
+        assertThat(foundPost.getCreatedAt()).isEqualTo(createdPost.getCreatedAt());
+        assertThat(foundPost.getModifiedAt()).isEqualTo(createdPost.getModifiedAt());
+
+        assertThat(foundPost.getImages()).hasSize(3)
+                .extracting("url", "positionInContent")
+                .containsExactlyInAnyOrder(
+                        tuple(IMAGE_URL1, POSITION_IN_CONTENT),
+                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 1),
+                        tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2)
+                );
+    }
+
+    @DisplayName("잘못된 게시글 ID를 입력하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void getPostFromWrongPostId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1, user);
+        postRepository.save(post);
+
+        // when, then
+        assertThatThrownBy(() -> postService.getPost(post.getId() + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(POST_NOT_FOUND_EXCEPTION + (post.getId() + 1));
     }
 
     @DisplayName("게시글 ID와 회원 ID를 전송해 게시글을 수정할 수 있다.")
