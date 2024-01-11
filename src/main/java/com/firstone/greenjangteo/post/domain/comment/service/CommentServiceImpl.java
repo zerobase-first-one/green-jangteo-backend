@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENTED_USER_ID_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENT_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
 
@@ -50,6 +53,13 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(isolation = REPEATABLE_READ, readOnly = true, timeout = 15)
     public Page<Comment> getComments(Pageable pageable, Long postId) {
         return commentRepository.findByPostId(postId, pageable);
+    }
+
+    @Override
+    public Comment getComment(Long commentId, Long writerId) {
+        return commentRepository.findByIdAndUserId(commentId, writerId)
+                .orElseThrow(() -> new EntityNotFoundException
+                        (COMMENT_NOT_FOUND_EXCEPTION + commentId + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + writerId));
     }
 
     @Override

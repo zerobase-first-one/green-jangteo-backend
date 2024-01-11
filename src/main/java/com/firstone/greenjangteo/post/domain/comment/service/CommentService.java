@@ -10,5 +10,7 @@ public interface CommentService {
 
     Page<Comment> getComments(Pageable pageable, Long postId);
 
+    Comment getComment(Long commentId, Long writerId);
+
     int getCommentCountForPost(Long postId);
 }
