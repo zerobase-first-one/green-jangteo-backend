@@ -27,6 +27,7 @@ public class PostResponseDto {
     private String subject;
     private String content;
     private int viewCount;
+    private int commentCount;
     private List<ImageResponseDto> imageResponseDtos;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -57,7 +58,7 @@ public class PostResponseDto {
                 .build();
     }
 
-    public static PostResponseDto from(Post post, int viewCount) {
+    public static PostResponseDto from(Post post, int viewCount, int commentCount) {
         User user = post.getUser();
 
         return PostResponseDto.builder()
@@ -67,6 +68,7 @@ public class PostResponseDto {
                 .subject(post.getSubject())
                 .content(post.getContent())
                 .viewCount(viewCount)
+                .commentCount(commentCount)
                 .imageResponseDtos(
                         post.getImages() == null
                                 ? null

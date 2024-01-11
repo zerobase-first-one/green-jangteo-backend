@@ -51,4 +51,10 @@ public class CommentServiceImpl implements CommentService {
     public Page<Comment> getComments(Pageable pageable, Long postId) {
         return commentRepository.findByPostId(postId, pageable);
     }
+
+    @Override
+    @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 5)
+    public int getCommentCountForPost(Long postId) {
+        return commentRepository.countByPostId(postId).intValue();
+    }
 }
