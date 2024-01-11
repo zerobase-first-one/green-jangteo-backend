@@ -96,4 +96,26 @@ class CommentRepositoryTest {
                         tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2)
                 );
     }
+
+    @DisplayName("게시글 ID를 통해 게시글의 댓글 수를 검색할 수 있다.")
+    @Test
+    void countByPostId() {
+        // given
+        Post post1 = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        Post post2 = PostTestObjectFactory.createPost(SUBJECT2, CONTENT2);
+        postRepository.saveAll(List.of(post1, post2));
+
+        Comment comment1 = CommentTestObjectFactory.createComment(CONTENT1, post1);
+        Comment comment2 = CommentTestObjectFactory.createComment(CONTENT2, post2);
+        Comment comment3 = CommentTestObjectFactory.createComment(CONTENT3, post2);
+        commentRepository.saveAll(List.of(comment1, comment2, comment3));
+
+        // when
+        Long commentCount1 = commentRepository.countByPostId(post1.getId());
+        Long commentCount2 = commentRepository.countByPostId(post2.getId());
+
+        // then
+        assertThat(commentCount1).isEqualTo(1L);
+        assertThat(commentCount2).isEqualTo(2L);
+    }
 }

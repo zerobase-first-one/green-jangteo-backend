@@ -27,6 +27,13 @@ public class CommentTestObjectFactory {
                 .build();
     }
 
+    public static Comment createComment(String content, Post post) {
+        return Comment.builder()
+                .content(content)
+                .post(post)
+                .build();
+    }
+
     public static Comment createComment(String content, User user, Post post) {
         return Comment.builder()
                 .content(content)
