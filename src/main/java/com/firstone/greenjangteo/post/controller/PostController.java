@@ -191,7 +191,8 @@ public class PostController {
         List<PostsResponseDto> postsResponseDtos = new ArrayList<>();
         for (Post post : posts) {
             View view = viewService.getView(post.getId());
-            PostsResponseDto postsResponseDto = PostsResponseDto.from(post, view.getViewCount());
+            int commentCount = commentService.getCommentCountForPost(post.getId());
+            PostsResponseDto postsResponseDto = PostsResponseDto.from(post, view.getViewCount(), commentCount);
             postsResponseDtos.add(postsResponseDto);
         }
 
