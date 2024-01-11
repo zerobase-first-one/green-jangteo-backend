@@ -20,9 +20,23 @@ public class CommentTestObjectFactory {
                 .build();
     }
 
-    public static Comment createComment(String commentId, String content, User user, Post post, List<Image> images) {
+    public static Comment createComment(String commentId, String content) {
         return Comment.builder()
                 .id(Long.parseLong(commentId))
+                .content(content)
+                .build();
+    }
+
+    public static Comment createComment(String content, User user, Post post) {
+        return Comment.builder()
+                .content(content)
+                .user(user)
+                .post(post)
+                .build();
+    }
+
+    public static Comment createComment(String content, User user, Post post, List<Image> images) {
+        return Comment.builder()
                 .content(content)
                 .user(user)
                 .post(post)
@@ -30,10 +44,13 @@ public class CommentTestObjectFactory {
                 .build();
     }
 
-    public static Comment createComment(String commentId, String content) {
+    public static Comment createComment(String commentId, String content, User user, Post post, List<Image> images) {
         return Comment.builder()
                 .id(Long.parseLong(commentId))
                 .content(content)
+                .user(user)
+                .post(post)
+                .images(images)
                 .build();
     }
 }
