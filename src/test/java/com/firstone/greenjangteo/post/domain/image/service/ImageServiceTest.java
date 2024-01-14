@@ -22,7 +22,6 @@ import java.util.List;
 import static com.firstone.greenjangteo.post.domain.image.testutil.ImageTestConstant.*;
 import static com.firstone.greenjangteo.post.utility.PostTestConstant.CONTENT1;
 import static com.firstone.greenjangteo.post.utility.PostTestConstant.SUBJECT1;
-import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
@@ -66,11 +65,37 @@ class ImageServiceTest {
                 );
     }
 
+    @DisplayName("전송된 게시글 이미지의 목록을 수정할 수 있다.")
+    @Test
+    void updatePostImages() {
+        // given
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        postRepository.save(post);
+
+        List<Image> createdImages = ImageTestObjectFactory.createImages(post);
+        imageRepository.saveAll(createdImages);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageUpdateRequestDtos();
+
+        // when
+        imageService.updateImages(post, imageRequestDtos);
+        List<Image> updatedImages = imageRepository.findAll();
+
+        // then
+        assertThat(updatedImages).hasSize(3)
+                .extracting("url", "positionInContent", "post")
+                .containsExactlyInAnyOrder(
+                        tuple(IMAGE_URL3, POSITION_IN_CONTENT, post),
+                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 2, post),
+                        tuple(IMAGE_URL1, POSITION_IN_CONTENT + 3, post)
+                );
+    }
+
     @DisplayName("전송된 댓글 이미지의 목록을 저장할 수 있다.")
     @Test
     void saveCommentImages() {
         // given
-        Comment comment = CommentTestObjectFactory.createComment(ID_EXAMPLE, CONTENT1);
+        Comment comment = CommentTestObjectFactory.createComment(CONTENT1);
         commentRepository.save(comment);
 
         List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageRequestDtos();
@@ -87,6 +112,32 @@ class ImageServiceTest {
                         tuple(IMAGE_URL1, POSITION_IN_CONTENT, comment),
                         tuple(IMAGE_URL2, POSITION_IN_CONTENT + 1, comment),
                         tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2, comment)
+                );
+    }
+
+    @DisplayName("전송된 댓글 이미지의 목록을 수정할 수 있다.")
+    @Test
+    void updateCommentImages() {
+        // given
+        Comment comment = CommentTestObjectFactory.createComment(CONTENT1);
+        commentRepository.save(comment);
+
+        List<Image> createdImages = ImageTestObjectFactory.createImages(comment);
+        imageRepository.saveAll(createdImages);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageUpdateRequestDtos();
+
+        // when
+        imageService.updateImages(comment, imageRequestDtos);
+        List<Image> updatedImages = imageRepository.findAll();
+
+        // then
+        assertThat(updatedImages).hasSize(3)
+                .extracting("url", "positionInContent", "comment")
+                .containsExactlyInAnyOrder(
+                        tuple(IMAGE_URL3, POSITION_IN_CONTENT, comment),
+                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 2, comment),
+                        tuple(IMAGE_URL1, POSITION_IN_CONTENT + 3, comment)
                 );
     }
 }
