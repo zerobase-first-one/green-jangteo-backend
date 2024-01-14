@@ -5,6 +5,7 @@ import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
 import com.firstone.greenjangteo.post.domain.comment.repository.CommentRepository;
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
+import com.firstone.greenjangteo.post.domain.image.repository.ImageRepository;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
 import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.post.repository.PostRepository;
@@ -24,13 +25,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENTED_USER_ID_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENT_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.post.domain.image.testutil.ImageTestConstant.*;
 import static com.firstone.greenjangteo.post.utility.PostTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @ActiveProfiles("test")
@@ -51,6 +56,9 @@ class CommentServiceTest {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -101,6 +109,7 @@ class CommentServiceTest {
         userRepository.save(user);
 
         List<Image> images = ImageTestObjectFactory.createImages();
+        imageRepository.saveAll(images);
 
         Comment comment1 = CommentTestObjectFactory.createComment(CONTENT1, user, post1, images);
         Comment comment2 = CommentTestObjectFactory.createComment(CONTENT1, user, post2, images);
@@ -136,6 +145,67 @@ class CommentServiceTest {
                         tuple(IMAGE_URL2, POSITION_IN_CONTENT + 1),
                         tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2)
                 );
+    }
+
+    @DisplayName("댓글 ID와 작성자 ID를 통해 댓글을 조회할 수 있다.")
+    @Test
+    void getComment() {
+        // given
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        postRepository.save(post);
+
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        List<Image> images = ImageTestObjectFactory.createImages();
+        imageRepository.saveAll(images);
+
+        Comment createdComment = CommentTestObjectFactory.createComment(CONTENT1, user, post, images);
+        commentRepository.save(createdComment);
+
+        // when
+        Comment foundComment = commentService.getComment(createdComment.getId(), user.getId());
+
+        // then
+        assertThat(foundComment).isEqualTo(createdComment);
+        assertThat(foundComment.getPost()).isEqualTo(post);
+        assertThat(foundComment.getUser()).isEqualTo(user);
+        assertThat(foundComment.getImages()).hasSize(images.size())
+                .extracting("url", "positionInContent")
+                .containsExactlyInAnyOrder(
+                        tuple(IMAGE_URL1, POSITION_IN_CONTENT),
+                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 1),
+                        tuple(IMAGE_URL3, POSITION_IN_CONTENT + 2)
+                );
+    }
+
+    @DisplayName("일치하지 않는 댓글 ID 또는 작성자 ID를 통해 댓글을 조회하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void getCommentWithWrongCommentOrWriterId() {
+        // given
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        postRepository.save(post);
+
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Comment createdComment = CommentTestObjectFactory.createComment(CONTENT1, user, post);
+        commentRepository.save(createdComment);
+
+        // when, then
+        assertThatThrownBy(() -> commentService.getComment(createdComment.getId() + 1, user.getId()))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(COMMENT_NOT_FOUND_EXCEPTION + (createdComment.getId() + 1)
+                        + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + user.getId());
+
+        assertThatThrownBy(() -> commentService.getComment(createdComment.getId(), user.getId() + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(COMMENT_NOT_FOUND_EXCEPTION + createdComment.getId()
+                        + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + (user.getId() + 1));
     }
 
     @DisplayName("게시글 ID를 통해 게시글의 댓글 수를 조회할 수 있다.")
