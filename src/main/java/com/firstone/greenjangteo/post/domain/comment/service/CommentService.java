@@ -12,5 +12,7 @@ public interface CommentService {
 
     Comment getComment(Long commentId, Long writerId);
 
+    Comment updateComment(Long commentId, CommentRequestDto commentRequestDto);
+
     int getCommentCountForPost(Long postId);
 }

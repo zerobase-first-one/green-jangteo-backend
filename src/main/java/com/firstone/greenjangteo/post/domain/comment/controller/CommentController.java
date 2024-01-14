@@ -41,6 +41,11 @@ public class CommentController {
     private static final String GET_ALL_COMMENTS_DESCRIPTION = "게시글 전체 댓글 목록을 조회할 수 있습니다." +
             "\n페이징 옵션을 선택할 수 있습니다.";
 
+    private static final String UPDATE_COMMENT = "댓글 수정";
+    private static final String UPDATE_COMMENT_DESCRIPTION = "댓글 ID와 회원 ID를 입력해 댓글을 수정할 수 있습니다.";
+    private static final String UPDATE_COMMENT_FORM = "댓글 수정 양식";
+    public static final String COMMENT_ID = "댓글 ID";
+    
     @ApiOperation(value = CREATE_COMMENT, notes = CREATE_COMMENT_DESCRIPTION)
     @PostMapping()
     public ResponseEntity<CommentResponseDto> createComment
@@ -76,6 +81,23 @@ public class CommentController {
                 = comments.stream().map(CommentResponseDto::from).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(commentResponseDtos);
+    }
+
+    @ApiOperation(value = UPDATE_COMMENT, notes = UPDATE_COMMENT_DESCRIPTION)
+    @PutMapping("{commentId}")
+    public ResponseEntity<CommentResponseDto> updateComment
+            (@PathVariable @ApiParam(value = COMMENT_ID, example = ID_EXAMPLE) String commentId,
+             @Valid @RequestBody @ApiParam(value = UPDATE_COMMENT_FORM) CommentRequestDto commentRequestDto) {
+        String userId = commentRequestDto.getUserId();
+
+        InputFormatValidator.validateId(commentId);
+        InputFormatValidator.validateId(userId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
+
+        Comment comment = commentService.updateComment(Long.parseLong(commentId), commentRequestDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommentResponseDto.from(comment));
     }
 
     private ResponseEntity<CommentResponseDto> buildResponse(CommentResponseDto commentResponseDto) {
