@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.post.domain.comment.model.entity;
 
 import com.firstone.greenjangteo.audit.BaseEntity;
+import com.firstone.greenjangteo.post.domain.comment.dto.CommentRequestDto;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
 import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -51,6 +52,16 @@ public class Comment extends BaseEntity {
                 .content(content)
                 .user(user)
                 .post(post)
+                .build();
+    }
+
+    public Comment updateFrom(CommentRequestDto commentRequestDto) {
+        return Comment.builder()
+                .id(id)
+                .content(commentRequestDto.getContent())
+                .user(user)
+                .post(post)
+                .images(images)
                 .build();
     }
 }

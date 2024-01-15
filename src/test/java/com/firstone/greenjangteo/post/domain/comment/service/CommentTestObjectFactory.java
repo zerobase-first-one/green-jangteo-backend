@@ -20,9 +20,8 @@ public class CommentTestObjectFactory {
                 .build();
     }
 
-    public static Comment createComment(String commentId, String content) {
+    public static Comment createComment(String content) {
         return Comment.builder()
-                .id(Long.parseLong(commentId))
                 .content(content)
                 .build();
     }
@@ -48,6 +47,15 @@ public class CommentTestObjectFactory {
                 .user(user)
                 .post(post)
                 .images(images)
+                .build();
+    }
+
+    public static Comment createComment(String commentId, String content, User user, Post post) {
+        return Comment.builder()
+                .id(Long.parseLong(commentId))
+                .content(content)
+                .user(user)
+                .post(post)
                 .build();
     }
 
