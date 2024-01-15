@@ -35,11 +35,11 @@ import static com.firstone.greenjangteo.user.testutil.UserTestConstant.USERNAME1
 import static com.firstone.greenjangteo.utility.PagingConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -113,6 +113,31 @@ class CommentControllerTest {
                         .param("page", ZERO)
                         .param("size", FIVE)
                         .param("sort", ORDER_BY_CREATED_AT_DESCENDING))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("댓글 ID를 전송해 댓글을 수정할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void updateComment() throws Exception {
+        // given
+        User user = mock(User.class);
+        Post post = mock(Post.class);
+        Comment comment = CommentTestObjectFactory.createComment(ID_EXAMPLE, CONTENT1, user, post);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageRequestDtos();
+        CommentRequestDto commentRequestDto
+                = CommentTestObjectFactory.createCommentRequestDto(BUYER_ID, ID_EXAMPLE, CONTENT2, imageRequestDtos);
+
+        when(commentService.updateComment(anyLong(), any(CommentRequestDto.class))).thenReturn(comment);
+        when(user.getUsername()).thenReturn(Username.of(USERNAME1));
+
+        // when, then
+        mockMvc.perform(put("/comments/{commentId}", comment.getId())
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(commentRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

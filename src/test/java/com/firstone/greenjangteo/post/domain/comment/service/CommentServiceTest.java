@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.post.domain.comment.service;
 
 import com.firstone.greenjangteo.post.domain.comment.dto.CommentRequestDto;
+import com.firstone.greenjangteo.post.domain.comment.exception.serious.InconsistentCommentException;
 import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
 import com.firstone.greenjangteo.post.domain.comment.repository.CommentRepository;
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.InconsistentExceptionMessage.INCONSISTENT_COMMENT_EXCEPTION_COMMENT_ID;
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.InconsistentExceptionMessage.INCONSISTENT_COMMENT_EXCEPTION_POST_ID;
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENTED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENT_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.post.domain.image.testutil.ImageTestConstant.*;
@@ -228,5 +231,127 @@ class CommentServiceTest {
         // then
         assertThat(commentCount1).isEqualTo(1);
         assertThat(commentCount2).isEqualTo(2);
+    }
+
+    @DisplayName("댓글 ID를 전송해 댓글 내용을 수정할 수 있다.")
+    @Test
+    void updateComment() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        postRepository.save(post);
+
+        Comment createdComment = CommentTestObjectFactory.createComment(CONTENT1, user, post);
+        commentRepository.save(createdComment);
+
+        List<Image> images = ImageTestObjectFactory.createImages(createdComment);
+        imageRepository.saveAll(images);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageUpdateRequestDtos();
+
+        CommentRequestDto commentRequestDto = CommentTestObjectFactory.createCommentRequestDto(
+                user.getId().toString(), post.getId().toString(), CONTENT2, imageRequestDtos
+        );
+
+        // when
+        Comment savedComment = commentService.updateComment(createdComment.getId(), commentRequestDto);
+        Comment foundComment = commentRepository.findById(savedComment.getId()).get();
+
+        // then
+        assertThat(savedComment).isEqualTo(foundComment);
+        assertThat(savedComment.getContent()).isEqualTo(CONTENT2);
+        assertThat(savedComment.getPost()).isEqualTo(post);
+        assertThat(savedComment.getUser()).isEqualTo(user);
+        assertThat(savedComment.getModifiedAt()).isNotEqualTo(savedComment.getCreatedAt());
+        assertThat(savedComment.getImages()).hasSize(images.size())
+                .extracting("url", "positionInContent")
+                .containsExactlyInAnyOrder(
+                        tuple(IMAGE_URL3, POSITION_IN_CONTENT),
+                        tuple(IMAGE_URL2, POSITION_IN_CONTENT + 2),
+                        tuple(IMAGE_URL1, POSITION_IN_CONTENT + 3)
+                );
+    }
+
+    @DisplayName("존재하지 않는 댓글 ID 또는 작성자 ID를 전송해 댓글을 수정하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void updateCommentWithWrongCommentOrWriterId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        postRepository.save(post);
+
+        Comment createdComment = CommentTestObjectFactory.createComment(CONTENT1, user, post);
+        commentRepository.save(createdComment);
+
+        List<Image> images = ImageTestObjectFactory.createImages(createdComment);
+        imageRepository.saveAll(images);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageUpdateRequestDtos();
+
+        CommentRequestDto commentRequestDto1 = CommentTestObjectFactory.createCommentRequestDto(
+                user.getId().toString(), post.getId().toString(), CONTENT2, imageRequestDtos
+        );
+
+        Long requestedWriterId = user.getId() + 1;
+        CommentRequestDto commentRequestDto2 = CommentTestObjectFactory.createCommentRequestDto(
+                requestedWriterId.toString(), post.getId().toString(), CONTENT2, imageRequestDtos
+        );
+
+        // when
+        assertThatThrownBy(() -> commentService.updateComment(createdComment.getId() + 1, commentRequestDto1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(
+                        COMMENT_NOT_FOUND_EXCEPTION + (createdComment.getId() + 1)
+                                + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + user.getId()
+                );
+
+        assertThatThrownBy(() -> commentService.updateComment(createdComment.getId(), commentRequestDto2))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(
+                        COMMENT_NOT_FOUND_EXCEPTION + (createdComment.getId())
+                                + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + requestedWriterId
+                );
+    }
+
+    @DisplayName("일치하지 않는 게시글 ID를 전송해 댓글을 수정하려 하면 InconsistentCommentException이 발생한다.")
+    @Test
+    void updateCommentWithInconsistentPostId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1);
+        postRepository.save(post);
+
+        Comment createdComment = CommentTestObjectFactory.createComment(CONTENT1, user, post);
+        commentRepository.save(createdComment);
+
+        List<Image> images = ImageTestObjectFactory.createImages(createdComment);
+        imageRepository.saveAll(images);
+
+        List<ImageRequestDto> imageRequestDtos = ImageTestObjectFactory.createImageUpdateRequestDtos();
+
+        Long requestedPostId = post.getId() + 1;
+        CommentRequestDto commentRequestDto = CommentTestObjectFactory.createCommentRequestDto(
+                user.getId().toString(), requestedPostId.toString(), CONTENT2, imageRequestDtos
+        );
+
+        // when
+        assertThatThrownBy(() -> commentService.updateComment(createdComment.getId(), commentRequestDto))
+                .isInstanceOf(InconsistentCommentException.class)
+                .hasMessage(
+                        INCONSISTENT_COMMENT_EXCEPTION_POST_ID + requestedPostId
+                                + INCONSISTENT_COMMENT_EXCEPTION_COMMENT_ID + createdComment.getId()
+                );
     }
 }

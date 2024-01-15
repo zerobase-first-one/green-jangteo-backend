@@ -76,8 +76,49 @@ public class ImageService {
         imageRepository.saveAll(images);
     }
 
+    public void updateImages(Comment comment, List<ImageRequestDto> imageRequestDtos) {
+        Long commentId = comment.getId();
+
+        if (imageRequestDtos == null || imageRequestDtos.isEmpty()) {
+            deleteAllCommentImages(commentId);
+            return;
+        }
+
+        List<Image> images = imageRepository.findAllByCommentIdOrderByIdAsc(commentId);
+
+        List<Image> imagesToDelete = new ArrayList<>();
+        List<Image> imagesToSave = new ArrayList<>();
+
+        int startingIdx = 0;
+
+        for (ImageRequestDto imageRequestDto : imageRequestDtos) {
+            boolean isSameImage = false;
+
+            for (int i = startingIdx; i < images.size(); i++) {
+                if (checkSameUrlAndPosition(images, imageRequestDto, i)) {
+                    isSameImage = true;
+                    startingIdx = i + 1;
+                    break;
+                } else {
+                    imagesToDelete.add(images.get(i));
+                }
+            }
+
+            if (!isSameImage) {
+                imagesToSave.add(Image.from(comment, imageRequestDto));
+            }
+        }
+
+        imageRepository.deleteAllInList(imagesToDelete);
+        imageRepository.saveAll(imagesToSave);
+    }
+
     private void deleteAllPostImages(Long postId) {
         imageRepository.deleteByPostId(postId);
+    }
+
+    private void deleteAllCommentImages(Long commentId) {
+        imageRepository.deleteByCommentId(commentId);
     }
 
     private boolean checkSameUrlAndPosition(List<Image> images, ImageRequestDto imageRequestDto, int idx) {

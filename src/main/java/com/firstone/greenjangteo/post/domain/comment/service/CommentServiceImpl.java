@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.post.domain.comment.service;
 
 import com.firstone.greenjangteo.post.domain.comment.dto.CommentRequestDto;
+import com.firstone.greenjangteo.post.domain.comment.exception.serious.InconsistentCommentException;
 import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
 import com.firstone.greenjangteo.post.domain.comment.repository.CommentRepository;
 import com.firstone.greenjangteo.post.domain.image.service.ImageService;
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.InconsistentExceptionMessage.INCONSISTENT_COMMENT_EXCEPTION_COMMENT_ID;
+import static com.firstone.greenjangteo.post.domain.comment.exception.message.InconsistentExceptionMessage.INCONSISTENT_COMMENT_EXCEPTION_POST_ID;
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENTED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENT_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
@@ -63,8 +66,34 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(isolation = READ_COMMITTED, timeout = 15)
+    public Comment updateComment(Long commentId, CommentRequestDto commentRequestDto) {
+        Comment comment = getComment(commentId, Long.parseLong(commentRequestDto.getUserId()));
+        validatePostId(comment, Long.parseLong(commentRequestDto.getPostId()));
+
+        Comment updatedComment = commentRepository.save(comment.updateFrom(commentRequestDto));
+
+        imageService.updateImages(updatedComment, commentRequestDto.getImageRequestDtos());
+
+        entityManager.flush();
+        entityManager.refresh(updatedComment);
+
+        return updatedComment;
+    }
+
+    @Override
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 5)
     public int getCommentCountForPost(Long postId) {
         return commentRepository.countByPostId(postId).intValue();
+    }
+
+    private void validatePostId(Comment comment, Long requestedPostId) {
+        if (comment.getPost().getId().equals(requestedPostId)) {
+            return;
+        }
+
+        throw new InconsistentCommentException(INCONSISTENT_COMMENT_EXCEPTION_POST_ID + requestedPostId
+                + INCONSISTENT_COMMENT_EXCEPTION_COMMENT_ID + comment.getId()
+        );
     }
 }
