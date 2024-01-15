@@ -9,4 +9,6 @@ public interface CommentService {
     Comment createComment(CommentRequestDto commentRequestDto);
 
     Page<Comment> getComments(Pageable pageable, Long postId);
+
+    int getCommentCountForPost(Long postId);
 }

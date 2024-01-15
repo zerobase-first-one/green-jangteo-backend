@@ -21,6 +21,7 @@ public class PostsResponseDto {
     private String username;
     private String subject;
     private int viewCount;
+    private int commentCount;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -30,12 +31,13 @@ public class PostsResponseDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedAt;
 
-    public static PostsResponseDto from(Post post, int viewCount) {
+    public static PostsResponseDto from(Post post, int viewCount, int commentCount) {
         return PostsResponseDto.builder()
                 .postId(post.getId())
                 .username(post.getUser().getUsername().getValue())
                 .subject(post.getSubject())
                 .viewCount(viewCount)
+                .commentCount(commentCount)
                 .createdAt(post.getCreatedAt())
                 .modifiedAt(post.getModifiedAt())
                 .build();
