@@ -4,6 +4,8 @@ import com.firstone.greenjangteo.post.domain.comment.dto.CommentRequestDto;
 import com.firstone.greenjangteo.post.domain.comment.dto.CommentResponseDto;
 import com.firstone.greenjangteo.post.domain.comment.model.entity.Comment;
 import com.firstone.greenjangteo.post.domain.comment.service.CommentService;
+import com.firstone.greenjangteo.post.dto.PostResponseDto;
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.utility.FormatConverter;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
 import com.firstone.greenjangteo.utility.RoleValidator;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 import static com.firstone.greenjangteo.post.controller.PostController.POST_ID;
 import static com.firstone.greenjangteo.utility.PagingConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
+import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_VALUE;
 
 @RestController
 @RequestMapping("/comments")
@@ -45,7 +48,10 @@ public class CommentController {
     private static final String UPDATE_COMMENT_DESCRIPTION = "댓글 ID와 회원 ID를 입력해 댓글을 수정할 수 있습니다.";
     private static final String UPDATE_COMMENT_FORM = "댓글 수정 양식";
     public static final String COMMENT_ID = "댓글 ID";
-    
+
+    private static final String DELETE_COMMENT = "댓글 삭제";
+    private static final String DELETE_COMMENT_DESCRIPTION = "댓글 ID와 회원 ID를 입력해 댓글을 삭제할 수 있습니다.";
+
     @ApiOperation(value = CREATE_COMMENT, notes = CREATE_COMMENT_DESCRIPTION)
     @PostMapping()
     public ResponseEntity<CommentResponseDto> createComment
@@ -98,6 +104,22 @@ public class CommentController {
         Comment comment = commentService.updateComment(Long.parseLong(commentId), commentRequestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(CommentResponseDto.from(comment));
+    }
+
+    @ApiOperation(value = DELETE_COMMENT, notes = DELETE_COMMENT_DESCRIPTION)
+    @DeleteMapping("{commentId}")
+    public ResponseEntity<PostResponseDto> deleteComment
+            (@PathVariable @ApiParam(value = COMMENT_ID, example = ID_EXAMPLE) String commentId,
+             @RequestBody @ApiParam(value = USER_ID_VALUE) UserIdRequestDto userIdRequestDto) {
+        String userId = userIdRequestDto.getUserId();
+        InputFormatValidator.validateId(commentId);
+        InputFormatValidator.validateId(userId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
+
+        commentService.deleteComment(Long.parseLong(commentId), Long.parseLong(userId));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private ResponseEntity<CommentResponseDto> buildResponse(CommentResponseDto commentResponseDto) {
