@@ -9,6 +9,7 @@ import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.model.entity.Image;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
 import com.firstone.greenjangteo.post.model.entity.Post;
+import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
@@ -36,8 +37,7 @@ import static com.firstone.greenjangteo.utility.PagingConstant.*;
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -140,5 +140,22 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("댓글 ID와 회원 ID를 전송해 댓글을 삭제할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void deleteComment() throws Exception {
+        // given
+        doNothing().when(commentService).deleteComment(anyLong(), anyLong());
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto(BUYER_ID);
+
+        // when, then
+        mockMvc.perform(delete("/comments/{commentId}", BUYER_ID)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(userIdRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 }

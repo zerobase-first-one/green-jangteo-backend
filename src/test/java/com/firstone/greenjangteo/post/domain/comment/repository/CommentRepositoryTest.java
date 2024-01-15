@@ -156,4 +156,32 @@ class CommentRepositoryTest {
         assertThat(commentCount1).isEqualTo(1L);
         assertThat(commentCount2).isEqualTo(2L);
     }
+
+    @DisplayName("댓글 ID와 회원 ID를 통해 댓글의 존재 여부를 확인할 수 있다.")
+    @Test
+    void existsByIdAndUserId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Comment comment1 = CommentTestObjectFactory.createComment(CONTENT1, user);
+        Comment comment2 = CommentTestObjectFactory.createComment(CONTENT2);
+        Comment comment3 = CommentTestObjectFactory.createComment(CONTENT3, user);
+
+        commentRepository.saveAll(List.of(comment1, comment2, comment3));
+        commentRepository.delete(comment1);
+
+        // when
+        boolean result1 = commentRepository.existsByIdAndUserId(comment1.getId(), user.getId());
+        boolean result2 = commentRepository.existsByIdAndUserId(comment2.getId(), user.getId());
+        boolean result3 = commentRepository.existsByIdAndUserId(comment3.getId(), user.getId());
+
+
+        // then
+        assertThat(result1).isFalse();
+        assertThat(result2).isFalse();
+        assertThat(result3).isTrue();
+    }
 }

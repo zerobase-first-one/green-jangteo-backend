@@ -17,6 +17,8 @@ import com.firstone.greenjangteo.user.repository.UserRepository;
 import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
@@ -65,6 +68,9 @@ class CommentServiceTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("게시글의 댓글을 등록할 수 있다.")
     @Test
@@ -305,7 +311,7 @@ class CommentServiceTest {
                 requestedWriterId.toString(), post.getId().toString(), CONTENT2, imageRequestDtos
         );
 
-        // when
+        // when, then
         assertThatThrownBy(() -> commentService.updateComment(createdComment.getId() + 1, commentRequestDto1))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(
@@ -346,12 +352,78 @@ class CommentServiceTest {
                 user.getId().toString(), requestedPostId.toString(), CONTENT2, imageRequestDtos
         );
 
-        // when
+        // when, then
         assertThatThrownBy(() -> commentService.updateComment(createdComment.getId(), commentRequestDto))
                 .isInstanceOf(InconsistentCommentException.class)
                 .hasMessage(
                         INCONSISTENT_COMMENT_EXCEPTION_POST_ID + requestedPostId
                                 + INCONSISTENT_COMMENT_EXCEPTION_COMMENT_ID + createdComment.getId()
+                );
+    }
+
+    @DisplayName("댓글 ID와 회원 ID를 전송해 댓글을 삭제할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "안녕하세요?",
+            "가나다라abc마바 123454321 aBc 가나다 ab 123",
+            "12345"
+    })
+    void deleteComment(String content) {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Comment comment = CommentTestObjectFactory.createComment(content, user);
+        commentRepository.save(comment);
+
+        List<Image> images = ImageTestObjectFactory.createImages(comment);
+        imageRepository.saveAll(images);
+
+        entityManager.refresh(comment);
+
+        Long commentId = comment.getId();
+
+        // when
+        commentService.deleteComment(commentId, user.getId());
+
+        // then
+        assertThat(postRepository.findById(commentId)).isNotPresent();
+        assertThat(imageRepository.findAllByCommentIdOrderByIdAsc(commentId)).isEmpty();
+    }
+
+    @DisplayName("일치하지 않는 댓글 ID 또는 회원 ID를 전송해 댓글을 삭제하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void deletePostWithWrongCommentOrUserId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Comment comment = CommentTestObjectFactory.createComment(CONTENT1, user);
+        commentRepository.save(comment);
+
+        Long commentId = comment.getId();
+        Long userId = user.getId();
+
+        // when, then
+        assertThatThrownBy(() -> commentService.deleteComment(commentId + 1, userId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(
+                        COMMENT_NOT_FOUND_EXCEPTION + (commentId + 1) + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + userId
+                );
+        assertThatThrownBy(() -> commentService.deleteComment(commentId, userId + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(
+                        COMMENT_NOT_FOUND_EXCEPTION + commentId + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + (userId + 1)
+                );
+        assertThatThrownBy(() -> commentService.deleteComment(commentId + 1, userId + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(
+                        COMMENT_NOT_FOUND_EXCEPTION + (commentId + 1)
+                                + COMMENTED_USER_ID_NOT_FOUND_EXCEPTION + (userId + 1)
                 );
     }
 }
