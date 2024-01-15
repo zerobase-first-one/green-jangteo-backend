@@ -14,5 +14,7 @@ public interface CommentService {
 
     Comment updateComment(Long commentId, CommentRequestDto commentRequestDto);
 
+    void deleteComment(Long commentId, Long userId);
+
     int getCommentCountForPost(Long postId);
 }
