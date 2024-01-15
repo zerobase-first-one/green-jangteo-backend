@@ -10,12 +10,15 @@ import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
+import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +44,11 @@ public class CommentServiceImpl implements CommentService {
         }
 
         return comment;
+    }
+
+    @Override
+    @Transactional(isolation = REPEATABLE_READ, readOnly = true, timeout = 15)
+    public Page<Comment> getComments(Pageable pageable, Long postId) {
+        return commentRepository.findByPostId(postId, pageable);
     }
 }

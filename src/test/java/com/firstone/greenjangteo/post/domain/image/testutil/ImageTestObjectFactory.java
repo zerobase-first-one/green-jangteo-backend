@@ -42,8 +42,8 @@ public class ImageTestObjectFactory {
     public static List<Image> createImages() {
         int position = POSITION_IN_CONTENT;
 
-        Image image1 = createImage(IMAGE_URL1, position);
-        Image image2 = createImage(IMAGE_URL2, position);
+        Image image1 = createImage(IMAGE_URL1, position++);
+        Image image2 = createImage(IMAGE_URL2, position++);
         Image image3 = createImage(IMAGE_URL3, position);
 
         return List.of(image1, image2, image3);
