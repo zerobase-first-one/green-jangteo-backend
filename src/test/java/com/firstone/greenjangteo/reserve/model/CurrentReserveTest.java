@@ -1,9 +1,11 @@
 package com.firstone.greenjangteo.reserve.model;
 
+import com.firstone.greenjangteo.reserve.exception.serious.InsufficientReserveException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
+import static com.firstone.greenjangteo.reserve.exception.message.InsufficientExceptionMessage.*;
 import static com.firstone.greenjangteo.reserve.exception.message.InvalidExceptionMessage.INVALID_UPDATING_RESERVE_EXCEPTION;
 import static com.firstone.greenjangteo.reserve.testutil.ReserveTestConstant.RESERVE1;
 import static com.firstone.greenjangteo.reserve.testutil.ReserveTestConstant.RESERVE2;
@@ -60,5 +62,57 @@ class CurrentReserveTest {
         assertThatThrownBy(() -> CurrentReserve.addReserve(currentReserve, addedReserve))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(INVALID_UPDATING_RESERVE_EXCEPTION + addedReserve);
+    }
+
+    @DisplayName("현재 적립금과 차감할 적립금을 전송해 적립금을 차감할 수 있다.")
+    @Test
+    void useReserve() {
+        // given
+        CurrentReserve currentReserve = new CurrentReserve(RESERVE2);
+
+        // when
+        CurrentReserve reducedCurrentReserve = CurrentReserve.useReserve(currentReserve, RESERVE1);
+
+        // then
+        assertThat(reducedCurrentReserve.getValue()).isEqualTo(RESERVE2 - RESERVE1);
+    }
+
+    @DisplayName("전송된 현재 적립금이 음수이면 InsufficientReserveException이 발생한다.")
+    @Test
+    void useReserveFromMinusCurrentReserve() {
+        // given
+        int currentReserveValue = -RESERVE2;
+        CurrentReserve currentReserve = new CurrentReserve(currentReserveValue);
+
+        // when, then
+        assertThatThrownBy(() -> CurrentReserve.useReserve(currentReserve, RESERVE1))
+                .isInstanceOf(InsufficientReserveException.class)
+                .hasMessage(INSUFFICIENT_CURRENT_RESERVE_EXCEPTION + currentReserveValue);
+    }
+
+    @DisplayName("전송된 차감할 적립금이 음수이면 IllegalArgumentException이 발생한다.")
+    @Test
+    void useReserveFromMinusValue() {
+        // given
+        CurrentReserve currentReserve = new CurrentReserve(RESERVE1);
+        int usedReserve = -RESERVE2;
+
+        // when, then
+        assertThatThrownBy(() -> CurrentReserve.useReserve(currentReserve, usedReserve))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_UPDATING_RESERVE_EXCEPTION + usedReserve);
+    }
+
+    @DisplayName("차감할 적립금이 부족하면 InsufficientReserveException이 발생한다.")
+    @Test
+    void useReserveFromInsufficientCurrentReserve() {
+        // given
+        CurrentReserve currentReserve = new CurrentReserve(RESERVE1);
+
+        // when, then
+        assertThatThrownBy(() -> CurrentReserve.useReserve(currentReserve, RESERVE2))
+                .isInstanceOf(InsufficientReserveException.class)
+                .hasMessage(INSUFFICIENT_NEW_RESERVE_EXCEPTION1 + RESERVE1
+                        + INSUFFICIENT_NEW_RESERVE_EXCEPTION2 + RESERVE2);
     }
 }
