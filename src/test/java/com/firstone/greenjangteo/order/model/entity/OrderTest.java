@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
 import com.firstone.greenjangteo.order.repository.OrderRepository;
 import com.firstone.greenjangteo.order.service.OrderService;
+import com.firstone.greenjangteo.order.testutil.OrderTestConstant;
 import com.firstone.greenjangteo.order.testutil.OrderTestObjectFactory;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
@@ -23,13 +24,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY1;
-import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY2;
+import static com.firstone.greenjangteo.order.excpeption.message.InvalidExceptionMessage.INVALID_ORDER_PRICE_EXCEPTION;
+import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.PRICE1;
+import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.PRICE2;
+import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.*;
 import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -138,5 +143,32 @@ class OrderTest {
         // then
         assertThat(order1).isNotEqualTo(order2);
         assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
+    }
+
+    @DisplayName("주문에 여러 쿠폰을 적용할 수 있다.")
+    @Test
+    void updateCouponAmount() {
+        // given
+        Order order = OrderTestObjectFactory.createOrder(mock(Store.class), mock(User.class), PRICE3);
+
+        order.updateCouponAmount(OrderTestConstant.PRICE1);
+
+        // when
+        order.updateCouponAmount(PRICE2);
+
+        // then
+        assertThat(order.getUsedCouponAmount()).isEqualTo(PRICE1 + PRICE2);
+    }
+
+    @DisplayName("적용된 쿠폰 가격이 총 주문 금액을 초과하면 IllegalArgumentException이 발생한다.")
+    @Test
+    void updateExceedingCouponAmount() {
+        // given
+        Order order = OrderTestObjectFactory.createOrder(mock(Store.class), mock(User.class), PRICE1);
+
+        // when, then
+        assertThatThrownBy(() -> order.updateCouponAmount(PRICE2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_ORDER_PRICE_EXCEPTION + (PRICE1 - PRICE2));
     }
 }

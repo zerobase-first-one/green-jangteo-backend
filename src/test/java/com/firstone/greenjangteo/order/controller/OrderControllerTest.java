@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
+import com.firstone.greenjangteo.order.dto.request.UseCouponRequestDto;
 import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.service.OrderService;
 import com.firstone.greenjangteo.order.testutil.OrderTestObjectFactory;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.PRICE1;
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.*;
 import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.PRICE2;
 import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
@@ -232,6 +234,23 @@ class OrderControllerTest {
         mockMvc.perform(get("/orders/{orderId}", order.getId())
                         .with(csrf())
                         .queryParam("userId", BUYER_ID))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("주문에 쿠폰을 적용할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void useCoupon() throws Exception {
+        // given
+        UseCouponRequestDto useCouponRequestDto = new UseCouponRequestDto(BUYER_ID, ORDER_ID);
+        when(orderService.useCoupon(anyLong(), anyLong())).thenReturn(PRICE1);
+
+        // when, then
+        mockMvc.perform(patch("/orders/{orderId}/coupon-usage", ORDER_ID)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(useCouponRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
