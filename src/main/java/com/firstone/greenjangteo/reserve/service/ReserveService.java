@@ -11,6 +11,7 @@ public interface ReserveService {
 
     void reduceReserve(UseReserveRequestDto useReserveRequestDto);
 
-
     List<ReserveHistory> getReserveHistories(Long userId);
+
+    ReserveHistory getCurrentReserve(Long userId);
 }

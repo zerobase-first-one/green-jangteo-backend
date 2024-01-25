@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-
 import java.util.List;
 
 import static com.firstone.greenjangteo.reserve.exception.message.NotFoundExceptionMessage.RESERVE_NOT_FOUND_EXCEPTION;
@@ -50,7 +49,7 @@ public class ReserveServiceImpl implements ReserveService {
         return reserveHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
-    private ReserveHistory getCurrentReserve(Long userId) {
+    public ReserveHistory getCurrentReserve(Long userId) {
         return reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(userId)
                 .orElseThrow(() -> new EntityNotFoundException(RESERVE_NOT_FOUND_EXCEPTION + userId));
     }

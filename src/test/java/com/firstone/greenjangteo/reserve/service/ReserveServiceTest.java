@@ -18,14 +18,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
+import static com.firstone.greenjangteo.reserve.exception.message.NotFoundExceptionMessage.RESERVE_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.reserve.testutil.ReserveTestConstant.RESERVE1;
 import static com.firstone.greenjangteo.reserve.testutil.ReserveTestConstant.RESERVE2;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -143,5 +144,49 @@ class ReserveServiceTest {
                         tuple(RESERVE1, new CurrentReserve(2 * RESERVE1 + RESERVE2)),
                         tuple(RESERVE1, new CurrentReserve(RESERVE1 + RESERVE2))
                 );
+    }
+
+    @DisplayName("회원 ID를 통해 가장 최신의 적립금 내역을 조회할 수 있다.")
+    @Test
+    void getCurrentReserve() {
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        ReserveHistory reserveHistory1
+                = ReserveTestObjectFactory.createReserveHistory(user.getId(), RESERVE1, new CurrentReserve(RESERVE2));
+        ReserveHistory reserveHistory2 = ReserveTestObjectFactory
+                .createReserveHistory(user.getId(), RESERVE1, new CurrentReserve(RESERVE1 + RESERVE2));
+        reserveHistoryRepository.saveAll(List.of(reserveHistory1, reserveHistory2));
+
+        // when
+        ReserveHistory foundReserveHistory
+                = reserveService.getCurrentReserve(user.getId());
+
+        // then
+        assertThat(foundReserveHistory.getAddedReserve()).isEqualTo(reserveHistory2.getAddedReserve());
+        assertThat(foundReserveHistory.getCurrentReserve()).isEqualTo(reserveHistory2.getCurrentReserve());
+        assertThat(foundReserveHistory.getCurrentReserve().getValue()).isEqualTo(2 * RESERVE1 + RESERVE2);
+    }
+
+    @DisplayName("잘못된 회원 ID를 통해 가장 최신의 적립금 내역을 조회하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void getCurrentReserveFromWrongUserId() {
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        ReserveHistory reserveHistory
+                = ReserveTestObjectFactory.createReserveHistory(user.getId(), RESERVE1, new CurrentReserve(RESERVE2));
+        reserveHistoryRepository.save(reserveHistory);
+
+        Long requestedUserId = user.getId() + 1;
+
+        // when, then
+        assertThatThrownBy(() -> reserveService.getCurrentReserve(requestedUserId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(RESERVE_NOT_FOUND_EXCEPTION + requestedUserId);
     }
 }
