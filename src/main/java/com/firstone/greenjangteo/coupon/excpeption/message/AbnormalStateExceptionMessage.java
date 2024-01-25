@@ -7,5 +7,6 @@ public class AbnormalStateExceptionMessage {
     public static final String INSUFFICIENT_REMAINING_QUANTITY_EXCEPTION
             = "쿠폰 그룹의 잔여 쿠폰 수량이 지급 예정 쿠폰 수량보다 부족합니다. 잔여 쿠폰 수량: ";
     public static final String INSUFFICIENT_REMAINING_QUANTITY_EXCEPTION_QUANTITY_TO_PROVIDE = ", 지급 예정 쿠폰 수량: ";
-    public static final String ALREADY_GIVEN_COUPON_EXCEPTION = "이미 다른 사용자에게 지급된 쿠폰입니다.";
+    public static final String ALREADY_GIVEN_COUPON_EXCEPTION = "이미 다른 사용자에게 지급된 쿠폰입니다. 회원 ID: ";
+    public static final String ALREADY_USED_COUPON_EXCEPTION = "이미 사용된 쿠폰입니다. 사용된 주문 ID: ";
 }

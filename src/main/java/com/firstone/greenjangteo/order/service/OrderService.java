@@ -16,5 +16,7 @@ public interface OrderService {
 
     Order getOrder(Long orderId);
 
+    int useCoupon(Long orderId, Long couponId);
+
     void deleteOrder(Long orderId, UserIdRequestDto userIdRequestDto);
 }

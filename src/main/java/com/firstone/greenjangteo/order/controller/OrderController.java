@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.order.controller;
 
 import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
+import com.firstone.greenjangteo.order.dto.request.UseCouponRequestDto;
 import com.firstone.greenjangteo.order.dto.response.OrderResponseDto;
 import com.firstone.greenjangteo.order.dto.response.OrdersResponseDto;
 import com.firstone.greenjangteo.order.model.entity.Order;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
-import static com.firstone.greenjangteo.web.ApiConstant.USER_ID_VALUE;
 
 @RestController
 @RequestMapping("/orders")
@@ -46,6 +46,12 @@ public class OrderController {
     private static final String ORDER_ID = "주문 ID";
     private static final String GET_ORDER = "주문 조회";
     private static final String GET_ORDER_DESCRIPTION = "주문 ID와 판매자 또는 구매자 ID를 입력해 주문을 조회할 수 있습니다.";
+
+    private static final String BUYER_ID = "구매자 ID";
+
+    private static final String COUPON_USAGE = "쿠폰 적용";
+    private static final String COUPON_USAGE_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문에 쿠폰을 적용할 수 있습니다.";
+    private static final String COUPON_USAGE_FORM = "쿠폰 적용 요청 양식";
 
     private static final String DELETE_ORDER = "주문 삭제";
     private static final String DELETE_ORDER_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문을 삭제할 수 있습니다.";
@@ -81,7 +87,7 @@ public class OrderController {
     @ApiOperation(value = GET_ORDERS, notes = GET_ORDERS_DESCRIPTION)
     @GetMapping()
     public ResponseEntity<List<OrdersResponseDto>> getOrders
-            (@RequestParam(name = "userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
+            (@RequestParam(name = "userId") @ApiParam(value = SELLER_OR_BUYER_ID, example = ID_EXAMPLE) String userId) {
         InputFormatValidator.validateId(userId);
         RoleValidator.checkAdminOrPrincipalAuthentication(userId);
 
@@ -94,7 +100,7 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder
             (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
-             @RequestParam(name = "userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
+             @RequestParam(name = "userId") @ApiParam(value = SELLER_OR_BUYER_ID, example = ID_EXAMPLE) String userId) {
         InputFormatValidator.validateId(orderId);
         InputFormatValidator.validateId(userId);
 
@@ -105,11 +111,29 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(OrderResponseDto.from(order));
     }
 
+    @ApiOperation(value = COUPON_USAGE, notes = COUPON_USAGE_DESCRIPTION)
+    @PatchMapping("/{orderId}/coupon-usage")
+    public ResponseEntity<Integer> useCoupon
+            (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
+             @RequestBody @ApiParam(value = COUPON_USAGE_FORM) UseCouponRequestDto useCouponRequestDto) {
+        String couponId = useCouponRequestDto.getCouponId();
+
+        InputFormatValidator.validateId(orderId);
+        InputFormatValidator.validateId(useCouponRequestDto.getUserId());
+        InputFormatValidator.validateId(couponId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(useCouponRequestDto.getUserId());
+
+        int totalOrderPriceAfterCouponUsed = orderService.useCoupon(Long.parseLong(orderId), Long.parseLong(couponId));
+
+        return ResponseEntity.status(HttpStatus.OK).body(totalOrderPriceAfterCouponUsed);
+    }
+
     @ApiOperation(value = DELETE_ORDER, notes = DELETE_ORDER_DESCRIPTION)
     @DeleteMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> deleteOrder
             (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
-             @RequestBody @ApiParam(value = USER_ID_VALUE) UserIdRequestDto userIdRequestDto) {
+             @RequestBody @ApiParam(value = BUYER_ID) UserIdRequestDto userIdRequestDto) {
         InputFormatValidator.validateId(orderId);
         InputFormatValidator.validateId(userIdRequestDto.getUserId());
 
