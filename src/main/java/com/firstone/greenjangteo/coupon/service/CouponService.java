@@ -20,7 +20,10 @@ public interface CouponService {
 
     void provideCouponsToUser(ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto);
 
-    List<Coupon> getCoupons(long userId);
+    List<Coupon> getCoupons(Long userId);
+
+    int updateUsedCoupon(Long orderId, Long couponId);
 
     void deleteCoupon(long couponId);
 }
+

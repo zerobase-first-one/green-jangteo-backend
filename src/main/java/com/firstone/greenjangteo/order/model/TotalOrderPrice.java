@@ -4,6 +4,8 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Objects;
 
+import static com.firstone.greenjangteo.order.excpeption.message.InvalidExceptionMessage.INVALID_ORDER_PRICE_EXCEPTION;
+
 public class TotalOrderPrice {
     private final int totalOrderPrice;
 
@@ -32,6 +34,19 @@ public class TotalOrderPrice {
 
     public int getValue() {
         return totalOrderPrice;
+    }
+
+    public int computeOrderPriceAfterUpdate(int usedCouponAmount, int usedReserveAmount) {
+        int orderPriceAfterCouponUsed = totalOrderPrice - (usedCouponAmount + usedReserveAmount);
+        validateOrderPriceAfterUpdate(orderPriceAfterCouponUsed);
+
+        return orderPriceAfterCouponUsed;
+    }
+
+    private static void validateOrderPriceAfterUpdate(int totalOrderPriceAfterUpdate) {
+        if (totalOrderPriceAfterUpdate < 0) {
+            throw new IllegalArgumentException(INVALID_ORDER_PRICE_EXCEPTION + totalOrderPriceAfterUpdate);
+        }
     }
 
     @Converter

@@ -4,6 +4,11 @@ import com.firstone.greenjangteo.cart.domain.model.Cart;
 import com.firstone.greenjangteo.cart.domain.model.CartProduct;
 import com.firstone.greenjangteo.cart.repository.CartProductRepository;
 import com.firstone.greenjangteo.cart.repository.CartRepository;
+import com.firstone.greenjangteo.coupon.model.entity.Coupon;
+import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
+import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
+import com.firstone.greenjangteo.coupon.repository.CouponRepository;
+import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
 import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
@@ -17,6 +22,7 @@ import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
 import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
+import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
 import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
 import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.user.model.embedment.Address;
@@ -32,9 +38,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDERED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExceptionMessage.ORDER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.order.model.OrderStatus.BEFORE_PAYMENT;
@@ -65,6 +73,9 @@ class OrderServiceTest {
     private UserRepository userRepository;
 
     @Autowired
+    private StoreRepository storeRepository;
+
+    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -72,6 +83,12 @@ class OrderServiceTest {
 
     @Autowired
     private CartProductRepository cartProductRepository;
+
+    @Autowired
+    private CouponGroupRepository couponGroupRepository;
+
+    @Autowired
+    private CouponRepository couponRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -391,6 +408,44 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.getOrder(createdOrder.getId() + 1))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage(ORDER_ID_NOT_FOUND_EXCEPTION + (createdOrder.getId() + 1));
+    }
+
+    @DisplayName("주문 시 쿠폰을 적용할 수 있다.")
+    @Test
+    void useCoupon() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        storeRepository.save(store);
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        Coupon couponToUse = coupons.get(0);
+
+        Order order = OrderTestObjectFactory.createOrder(store, buyer, PRICE1);
+        orderRepository.save(order);
+
+        // when
+        orderService.useCoupon(order.getId(), couponToUse.getId());
+
+        // then
+        assertThat(order.getUsedCouponAmount()).isEqualTo(couponGroup.getAmount().getValue());
+        assertThat(couponToUse.getUsedOrderId()).isEqualTo(order.getId());
     }
 
     @DisplayName("주문 ID와 구매자 ID를 전송해 주문을 삭제한다.")

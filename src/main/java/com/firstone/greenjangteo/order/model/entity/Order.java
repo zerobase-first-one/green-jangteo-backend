@@ -47,6 +47,9 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private TotalOrderPrice totalOrderPrice;
 
+    private int usedCouponAmount;
+    private int usedReserveAmount;
+
     @Embedded
     private Address shippingAddress;
 
@@ -95,5 +98,11 @@ public class Order extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, store, buyer, orderStatus, totalOrderPrice, shippingAddress);
+    }
+
+    public int updateCouponAmount(int couponAmount) {
+        usedCouponAmount += couponAmount;
+
+        return totalOrderPrice.computeOrderPriceAfterUpdate(usedCouponAmount, usedReserveAmount);
     }
 }
