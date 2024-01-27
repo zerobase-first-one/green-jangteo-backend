@@ -18,5 +18,7 @@ public interface OrderService {
 
     int useCoupon(Long orderId, Long couponId);
 
+    int cancelCoupon(Long orderId, Long couponId);
+
     void deleteOrder(Long orderId, UserIdRequestDto userIdRequestDto);
 }

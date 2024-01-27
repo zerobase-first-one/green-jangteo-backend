@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.firstone.greenjangteo.coupon.exception.serious.AlreadyProvidedCouponException;
 import com.firstone.greenjangteo.coupon.exception.serious.AlreadyUsedCouponException;
+import com.firstone.greenjangteo.coupon.exception.serious.NotUsedCouponException;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.AccessLevel;
@@ -113,5 +114,13 @@ public class Coupon {
         }
 
         throw new AlreadyUsedCouponException(ALREADY_USED_COUPON_EXCEPTION + usedOrderId);
+    }
+
+    public void removeOrderId(Long orderId) {
+        if (usedOrderId == null) {
+            throw new NotUsedCouponException(NOT_USED_COUPON_EXCEPTION);
+        }
+
+        usedOrderId = null;
     }
 }

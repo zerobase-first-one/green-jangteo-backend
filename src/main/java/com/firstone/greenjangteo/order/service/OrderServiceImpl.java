@@ -105,6 +105,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public int cancelCoupon(Long orderId, Long couponId) {
+        int couponAmount = couponService.rollBackUsedCoupon(orderId, couponId);
+        Order order = getOrder(orderId);
+
+        int totalOrderPriceAfterCouponUsed = order.updateCouponAmount(-couponAmount);
+        orderRepository.save(order);
+
+        return totalOrderPriceAfterCouponUsed;
+    }
+
+    @Override
     public void deleteOrder(Long orderId, UserIdRequestDto userIdRequestDto) {
         Long buyerId = Long.parseLong(userIdRequestDto.getUserId());
 

@@ -24,6 +24,8 @@ public interface CouponService {
 
     int updateUsedCoupon(Long orderId, Long couponId);
 
+    int rollBackUsedCoupon(Long orderId, Long couponId);
+
     void deleteCoupon(long couponId);
 }
 
