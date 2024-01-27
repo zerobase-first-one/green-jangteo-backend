@@ -255,6 +255,23 @@ class OrderControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("주문에 적용한 쿠폰을 취소할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void cancelCoupon() throws Exception {
+        // given
+        UseCouponRequestDto useCouponRequestDto = new UseCouponRequestDto(BUYER_ID, ORDER_ID);
+        when(orderService.cancelCoupon(anyLong(), anyLong())).thenReturn(PRICE1);
+
+        // when, then
+        mockMvc.perform(patch("/orders/{orderId}/coupon-cancel", ORDER_ID)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(useCouponRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("주문 ID와 구매자 ID를 입력해 주문을 삭제할 수 있다.")
     @Test
     @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
