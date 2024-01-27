@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 
 @Service

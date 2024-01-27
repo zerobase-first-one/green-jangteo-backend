@@ -7,8 +7,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.BlankExceptionMessage.COUPON_AMOUNT_NO_VALUE_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExceptionMessage.INVALID_COUPON_AMOUNT_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.BlankExceptionMessage.COUPON_AMOUNT_NO_VALUE_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.InvalidExceptionMessage.INVALID_COUPON_AMOUNT_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.AMOUNT1;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.AMOUNT2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
