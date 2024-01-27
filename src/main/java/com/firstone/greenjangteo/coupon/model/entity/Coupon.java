@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.firstone.greenjangteo.coupon.excpeption.serious.AlreadyProvidedCouponException;
-import com.firstone.greenjangteo.coupon.excpeption.serious.AlreadyUsedCouponException;
+import com.firstone.greenjangteo.coupon.exception.serious.AlreadyProvidedCouponException;
+import com.firstone.greenjangteo.coupon.exception.serious.AlreadyUsedCouponException;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.user.model.entity.User;
 import lombok.AccessLevel;
@@ -18,8 +18,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.ALREADY_GIVEN_COUPON_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.ALREADY_USED_COUPON_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.*;
 
 @Entity(name = "coupon")
 @Table(name = "coupon")
