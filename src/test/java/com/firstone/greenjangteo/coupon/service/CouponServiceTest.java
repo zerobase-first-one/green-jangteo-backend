@@ -3,6 +3,7 @@ package com.firstone.greenjangteo.coupon.service;
 import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
+import com.firstone.greenjangteo.coupon.exception.serious.AlreadyUsedCouponException;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
@@ -31,10 +32,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.ALREADY_USED_COUPON_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -65,8 +68,8 @@ class CouponServiceTest {
 
     @AfterEach
     void tearDown() {
-        couponGroupRepository.deleteAll();
         couponRepository.deleteAll();
+        couponGroupRepository.deleteAll();
     }
 
     @DisplayName("올바른 쿠폰 발행 양식을 전송하면 대량의 쿠폰을 등록할 수 있다.")
@@ -275,6 +278,58 @@ class CouponServiceTest {
         assertThat(foundCoupons).hasSize(coupons2.size())
                 .extracting("couponGroup")
                 .containsOnly(couponGroup2);
+    }
+
+    @DisplayName("쿠폰을 주문에 사용할 수 있다.")
+    @Test
+    @Transactional
+    void updateUsedCoupon() {
+        // given
+        Long orderId = 1L;
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        Coupon coupon1 = coupons.get(0);
+        Coupon coupon2 = coupons.get(1);
+
+        // when
+        couponService.updateUsedCoupon(orderId, coupon1.getId());
+
+        // then
+        assertThat(coupon1.getUsedOrderId()).isEqualTo(orderId);
+        assertThat(coupon2.getUsedOrderId()).isNull();
+    }
+
+    @DisplayName("이미 사용된 쿠폰을 사용하려 하면 AlreadyUsedCouponException이 발생한다.")
+    @Test
+    @Transactional
+    void updateAlreadyUsedCoupon() {
+        // given
+        Long orderId1 = 1L;
+        Long orderId2 = 2L;
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        Coupon coupon = coupons.get(0);
+
+        couponService.updateUsedCoupon(orderId1, coupon.getId());
+
+        // when, then
+        assertThatThrownBy(() -> couponService.updateUsedCoupon(orderId2, coupon.getId()))
+                .isInstanceOf(AlreadyUsedCouponException.class)
+                .hasMessage(ALREADY_USED_COUPON_EXCEPTION + orderId1);
     }
 
     @DisplayName("쿠폰 ID를 통해 쿠폰을 삭제할 수 있다.")

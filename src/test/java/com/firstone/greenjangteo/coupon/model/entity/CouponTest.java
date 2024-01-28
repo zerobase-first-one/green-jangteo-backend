@@ -1,6 +1,6 @@
 package com.firstone.greenjangteo.coupon.model.entity;
 
-import com.firstone.greenjangteo.coupon.excpeption.serious.AlreadyProvidedCouponException;
+import com.firstone.greenjangteo.coupon.exception.serious.AlreadyProvidedCouponException;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
 import com.firstone.greenjangteo.user.model.entity.User;
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.ALREADY_GIVEN_COUPON_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.ALREADY_GIVEN_COUPON_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

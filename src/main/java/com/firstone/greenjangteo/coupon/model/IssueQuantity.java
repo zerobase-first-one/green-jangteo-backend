@@ -4,8 +4,8 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Objects;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.BlankExceptionMessage.ISSUE_QUANTITY_NO_VALUE_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExceptionMessage.INVALID_ISSUE_QUANTITY_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.BlankExceptionMessage.ISSUE_QUANTITY_NO_VALUE_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.InvalidExceptionMessage.INVALID_ISSUE_QUANTITY_EXCEPTION;
 import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_OR_MINUS_ONE_PATTERN;
 
 public class IssueQuantity {

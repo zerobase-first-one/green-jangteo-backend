@@ -12,4 +12,5 @@ public class OrderTestConstant {
     public static final String CART_ID = "1";
     public static final int PRICE1 = 30_000;
     public static final int PRICE2 = 50_000;
+    public static final int PRICE3 = 100_000;
 }

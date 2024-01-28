@@ -2,6 +2,7 @@ package com.firstone.greenjangteo.order.service;
 
 import com.firstone.greenjangteo.cart.domain.dto.response.CartProductListResponseDto;
 import com.firstone.greenjangteo.cart.service.CartService;
+import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.order.dto.request.CartOrderRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderProductRequestDto;
 import com.firstone.greenjangteo.order.dto.request.OrderRequestDto;
@@ -9,6 +10,7 @@ import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.repository.OrderRepository;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.service.ProductService;
+import com.firstone.greenjangteo.reserve.service.ReserveService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
@@ -35,6 +37,8 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final ProductService productService;
     private final CartService cartService;
+    private final CouponService couponService;
+    private final ReserveService reserveService;
     private final OrderRepository orderRepository;
 
     @Override
@@ -87,6 +91,17 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrder(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException(ORDER_ID_NOT_FOUND_EXCEPTION + orderId));
+    }
+
+    @Override
+    public int useCoupon(Long orderId, Long couponId) {
+        int couponAmount = couponService.updateUsedCoupon(orderId, couponId);
+        Order order = getOrder(orderId);
+
+        int totalOrderPriceAfterCouponUsed = order.updateCouponAmount(couponAmount);
+        orderRepository.save(order);
+
+        return totalOrderPriceAfterCouponUsed;
     }
 
     @Override

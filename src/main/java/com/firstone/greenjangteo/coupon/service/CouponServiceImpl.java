@@ -123,8 +123,17 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 15)
-    public List<Coupon> getCoupons(long userId) {
+    public List<Coupon> getCoupons(Long userId) {
         return couponRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public int updateUsedCoupon(Long orderId, Long couponId) {
+        Coupon coupon = getCoupon(couponId);
+        coupon.addOrderId(orderId);
+        couponRepository.save(coupon);
+
+        return coupon.getCouponGroup().getAmount().getValue();
     }
 
     @Override
@@ -151,5 +160,10 @@ public class CouponServiceImpl implements CouponService {
         couponGroup.issueAndAddUserToCoupons(user, coupons, requiredQuantity);
 
         couponRepository.saveAll(coupons);
+    }
+
+    private Coupon getCoupon(long couponId) {
+        return couponRepository.findById(couponId)
+                .orElseThrow(() -> new EntityNotFoundException(COUPON_ID_NOT_FOUND_EXCEPTION + couponId));
     }
 }
