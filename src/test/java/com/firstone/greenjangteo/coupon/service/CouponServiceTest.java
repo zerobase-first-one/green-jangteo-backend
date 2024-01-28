@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
 import com.firstone.greenjangteo.coupon.exception.serious.AlreadyUsedCouponException;
+import com.firstone.greenjangteo.coupon.exception.serious.NotUsedCouponException;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
@@ -33,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.ALREADY_USED_COUPON_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.NOT_USED_COUPON_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
@@ -330,6 +332,57 @@ class CouponServiceTest {
         assertThatThrownBy(() -> couponService.updateUsedCoupon(orderId2, coupon.getId()))
                 .isInstanceOf(AlreadyUsedCouponException.class)
                 .hasMessage(ALREADY_USED_COUPON_EXCEPTION + orderId1);
+    }
+
+    @DisplayName("주문에 사용된 쿠폰을 취소할 수 있다.")
+    @Test
+    @Transactional
+    void rollbackUsedCoupon() {
+        // given
+        Long orderId = 1L;
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        Coupon coupon = coupons.get(0);
+
+        Long couponId = coupon.getId();
+
+        couponService.updateUsedCoupon(orderId, couponId);
+
+        // when
+        couponService.rollBackUsedCoupon(orderId, couponId);
+
+        // then
+        assertThat(coupon.getUsedOrderId()).isNull();
+    }
+
+    @DisplayName("사용되지 않은 쿠폰을 취소하려 하면 NotUsedCouponException이 발생한다.")
+    @Test
+    @Transactional
+    void rollbackNotUsedCoupon() {
+        // given
+        Long orderId = 1L;
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        Coupon coupon = coupons.get(0);
+
+        // when, then
+        assertThatThrownBy(() -> couponService.rollBackUsedCoupon(orderId, coupon.getId()))
+                .isInstanceOf(NotUsedCouponException.class)
+                .hasMessage(NOT_USED_COUPON_EXCEPTION);
     }
 
     @DisplayName("쿠폰 ID를 통해 쿠폰을 삭제할 수 있다.")

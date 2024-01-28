@@ -53,6 +53,10 @@ public class OrderController {
     private static final String COUPON_USAGE_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문에 쿠폰을 적용할 수 있습니다.";
     private static final String COUPON_USAGE_FORM = "쿠폰 적용 요청 양식";
 
+    private static final String COUPON_USAGE_CANCEL = "쿠폰 적용 취소";
+    private static final String COUPON_USAGE_CANCEL_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문에 쿠폰 적용을 취소할 수 있습니다.";
+    private static final String COUPON_USAGE_CANCEL_FORM = "쿠폰 적용 취소 요청 양식";
+
     private static final String DELETE_ORDER = "주문 삭제";
     private static final String DELETE_ORDER_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문을 삭제할 수 있습니다.";
 
@@ -125,6 +129,25 @@ public class OrderController {
         RoleValidator.checkAdminOrPrincipalAuthentication(useCouponRequestDto.getUserId());
 
         int totalOrderPriceAfterCouponUsed = orderService.useCoupon(Long.parseLong(orderId), Long.parseLong(couponId));
+
+        return ResponseEntity.status(HttpStatus.OK).body(totalOrderPriceAfterCouponUsed);
+    }
+
+    @ApiOperation(value = COUPON_USAGE_CANCEL, notes = COUPON_USAGE_CANCEL_DESCRIPTION)
+    @PatchMapping("/{orderId}/coupon-cancel")
+    public ResponseEntity<Integer> cancelCoupon
+            (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
+             @RequestBody @ApiParam(value = COUPON_USAGE_CANCEL_FORM) UseCouponRequestDto useCouponRequestDto) {
+        String couponId = useCouponRequestDto.getCouponId();
+
+        InputFormatValidator.validateId(orderId);
+        InputFormatValidator.validateId(useCouponRequestDto.getUserId());
+        InputFormatValidator.validateId(couponId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(useCouponRequestDto.getUserId());
+
+        int totalOrderPriceAfterCouponUsed
+                = orderService.cancelCoupon(Long.parseLong(orderId), Long.parseLong(couponId));
 
         return ResponseEntity.status(HttpStatus.OK).body(totalOrderPriceAfterCouponUsed);
     }

@@ -448,6 +448,48 @@ class OrderServiceTest {
         assertThat(couponToUse.getUsedOrderId()).isEqualTo(order.getId());
     }
 
+    @DisplayName("주문에 적용된 쿠폰을 제거할 수 있다.")
+    @Test
+    void cancelCoupon() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        storeRepository.save(store);
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                COUPON_NAME1, AMOUNT, DESCRIPTION, ISSUE_QUANTITY1, tomorrow, EXPIRATION_PERIOD1
+        );
+        couponGroupRepository.save(couponGroup);
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        Coupon couponToUse = coupons.get(0);
+
+        Order order = OrderTestObjectFactory.createOrder(store, buyer, PRICE1);
+        orderRepository.save(order);
+
+        Long orderId = order.getId();
+        Long couponId = couponToUse.getId();
+        orderService.useCoupon(orderId, couponId);
+
+        // when
+        orderService.cancelCoupon(orderId, couponId);
+
+        // then
+        assertThat(order.getUsedCouponAmount()).isZero();
+        assertThat(couponToUse.getUsedOrderId()).isNull();
+    }
+
     @DisplayName("주문 ID와 구매자 ID를 전송해 주문을 삭제한다.")
     @Test
     void deleteOrder() {

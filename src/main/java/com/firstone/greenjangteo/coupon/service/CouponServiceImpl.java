@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_ID_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.NotFoundExceptionMessage.COUPON_ID_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 
 @Service
@@ -131,6 +131,15 @@ public class CouponServiceImpl implements CouponService {
     public int updateUsedCoupon(Long orderId, Long couponId) {
         Coupon coupon = getCoupon(couponId);
         coupon.addOrderId(orderId);
+        couponRepository.save(coupon);
+
+        return coupon.getCouponGroup().getAmount().getValue();
+    }
+
+    @Override
+    public int rollBackUsedCoupon(Long orderId, Long couponId) {
+        Coupon coupon = getCoupon(couponId);
+        coupon.removeOrderId(orderId);
         couponRepository.save(coupon);
 
         return coupon.getCouponGroup().getAmount().getValue();
