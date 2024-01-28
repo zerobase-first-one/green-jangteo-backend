@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 
+import java.util.List;
+
 import static com.firstone.greenjangteo.reserve.exception.message.NotFoundExceptionMessage.RESERVE_NOT_FOUND_EXCEPTION;
 
 @Service
@@ -41,6 +43,11 @@ public class ReserveServiceImpl implements ReserveService {
                 = ReserveHistory.from(useReserveRequestDto, reserveHistory.getCurrentReserve());
 
         reserveHistoryRepository.save(newReserveHistory);
+    }
+
+    @Override
+    public List<ReserveHistory> getReserveHistories(Long userId) {
+        return reserveHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     private ReserveHistory getCurrentReserve(Long userId) {
