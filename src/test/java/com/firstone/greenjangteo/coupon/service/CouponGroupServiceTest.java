@@ -17,8 +17,8 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.NotFoundExceptionMessage.COUPON_GROUP_ID_NOT_FOUND_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.NotFoundExceptionMessage.COUPON_NAME_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

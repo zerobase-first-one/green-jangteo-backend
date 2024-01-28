@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.coupon.excpeption.message;
+package com.firstone.greenjangteo.coupon.exception.message;
 
 public class BlankExceptionMessage {
     public static final String COUPON_AMOUNT_NO_VALUE_EXCEPTION = "쿠폰 금액은 필수값입니다.";

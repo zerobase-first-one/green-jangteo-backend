@@ -3,7 +3,7 @@ package com.firstone.greenjangteo.coupon.service;
 import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
 import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUsersRequestDto;
-import com.firstone.greenjangteo.coupon.excpeption.serious.AlreadyUsedCouponException;
+import com.firstone.greenjangteo.coupon.exception.serious.AlreadyUsedCouponException;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
@@ -32,7 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.ALREADY_USED_COUPON_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.ALREADY_USED_COUPON_EXCEPTION;
 import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;

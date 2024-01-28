@@ -1,4 +1,4 @@
-package com.firstone.greenjangteo.coupon.excpeption.message;
+package com.firstone.greenjangteo.coupon.exception.message;
 
 public class InvalidExceptionMessage {
     public static final String INVALID_COUPON_AMOUNT_EXCEPTION

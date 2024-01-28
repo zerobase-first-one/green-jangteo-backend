@@ -5,8 +5,8 @@ import javax.persistence.Converter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.BlankExceptionMessage.EXPIRATION_PERIOD_NO_VALUE_EXCEPTION;
-import static com.firstone.greenjangteo.coupon.excpeption.message.InvalidExceptionMessage.INVALID_EXPIRATION_PERIOD_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.BlankExceptionMessage.EXPIRATION_PERIOD_NO_VALUE_EXCEPTION;
+import static com.firstone.greenjangteo.coupon.exception.message.InvalidExceptionMessage.INVALID_EXPIRATION_PERIOD_EXCEPTION;
 import static com.firstone.greenjangteo.utility.RegularExpressionConstant.POSITIVE_INTEGER_PATTERN;
 
 public class ExpirationPeriod {

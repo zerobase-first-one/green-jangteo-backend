@@ -3,8 +3,8 @@ package com.firstone.greenjangteo.coupon.model.entity;
 import com.firstone.greenjangteo.application.model.CouponGroupModel;
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.coupon.dto.request.IssueCouponsRequestDto;
-import com.firstone.greenjangteo.coupon.excpeption.serious.InconsistentCouponSizeException;
-import com.firstone.greenjangteo.coupon.excpeption.serious.InsufficientRemainingQuantityException;
+import com.firstone.greenjangteo.coupon.exception.serious.InconsistentCouponSizeException;
+import com.firstone.greenjangteo.coupon.exception.serious.InsufficientRemainingQuantityException;
 import com.firstone.greenjangteo.coupon.model.Amount;
 import com.firstone.greenjangteo.coupon.model.ExpirationPeriod;
 import com.firstone.greenjangteo.coupon.model.IssueQuantity;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.firstone.greenjangteo.coupon.excpeption.message.AbnormalStateExceptionMessage.*;
+import static com.firstone.greenjangteo.coupon.exception.message.AbnormalStateExceptionMessage.*;
 import static javax.persistence.CascadeType.*;
 
 @Entity(name = "coupon_group")
@@ -96,7 +96,6 @@ public class CouponGroup extends BaseEntity {
                 .expirationPeriod(ExpirationPeriod.of(couponGroupModel.getExpirationPeriod()))
                 .build();
     }
-
 
     @Override
     public boolean equals(Object o) {
