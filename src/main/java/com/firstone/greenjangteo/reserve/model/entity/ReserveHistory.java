@@ -2,7 +2,6 @@ package com.firstone.greenjangteo.reserve.model.entity;
 
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.reserve.dto.request.AddReserveRequestDto;
-import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.reserve.model.CurrentReserve;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,18 +45,6 @@ public class ReserveHistory extends BaseEntity {
                 .userId(userId)
                 .addedReserve(addedReserve)
                 .currentReserve(CurrentReserve.addReserve(currentReserve, addedReserve))
-                .build();
-    }
-
-    public static ReserveHistory from
-            (UseReserveRequestDto useReserveRequestDto, CurrentReserve currentReserve) {
-        Long userId = Long.parseLong(useReserveRequestDto.getUserId());
-        int usedReserve = useReserveRequestDto.getUsedReserve();
-
-        return ReserveHistory.builder()
-                .userId(userId)
-                .usedReserve(usedReserve)
-                .currentReserve(CurrentReserve.useReserve(currentReserve, usedReserve))
                 .build();
     }
 

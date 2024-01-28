@@ -2,7 +2,6 @@ package com.firstone.greenjangteo.reserve.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstone.greenjangteo.reserve.dto.request.AddReserveRequestDto;
-import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.reserve.service.ReserveService;
 import com.firstone.greenjangteo.reserve.testutil.ReserveTestObjectFactory;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
@@ -56,24 +55,6 @@ class ReserveControllerTest {
         mockMvc.perform(post("/reserves/add")
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(addReserveRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-    }
-
-    @DisplayName("회원 ID와 차감할 적립금을 전송해 적립금을 차감할 수 있다.")
-    @Test
-    @WithMockUser(username = ID_EXAMPLE, roles = {"ADMIN"})
-    void reduceReserve() throws Exception {
-        // given
-        UseReserveRequestDto useReserveRequestDto
-                = ReserveTestObjectFactory.createUseReserveRequestDto(ID_EXAMPLE, RESERVE1);
-
-        doNothing().when(reserveService).reduceReserve(useReserveRequestDto);
-
-        // when, then
-        mockMvc.perform(post("/reserves/reduce")
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(useReserveRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }

@@ -1,7 +1,6 @@
 package com.firstone.greenjangteo.reserve.service;
 
 import com.firstone.greenjangteo.reserve.dto.request.AddReserveRequestDto;
-import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.reserve.model.CurrentReserve;
 import com.firstone.greenjangteo.reserve.model.entity.ReserveHistory;
 import com.firstone.greenjangteo.reserve.repository.ReserveHistoryRepository;
@@ -86,31 +85,5 @@ class ReserveServiceTest {
                 = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).get();
 
         assertThat(currentReserveHistory.getCurrentReserve()).isEqualTo(new CurrentReserve(RESERVE1 + RESERVE2));
-    }
-
-    @DisplayName("회원의 적립금을 차감할 수 있다.")
-    @Test
-    void useReserve() {
-        // given
-        User user = UserTestObjectFactory.createUser(
-                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
-        );
-        userRepository.save(user);
-
-        ReserveHistory firstReserveHistory
-                = ReserveTestObjectFactory.createReserveHistory(user.getId(), RESERVE1, new CurrentReserve(RESERVE2));
-        reserveHistoryRepository.save(firstReserveHistory);
-
-        UseReserveRequestDto useReserveRequestDto
-                = ReserveTestObjectFactory.createUseReserveRequestDto(user.getId().toString(), RESERVE1);
-
-        // when
-        reserveService.reduceReserve(useReserveRequestDto);
-
-        // then
-        ReserveHistory currentReserveHistory
-                = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).get();
-
-        assertThat(currentReserveHistory.getCurrentReserve()).isEqualTo(new CurrentReserve(RESERVE2));
     }
 }

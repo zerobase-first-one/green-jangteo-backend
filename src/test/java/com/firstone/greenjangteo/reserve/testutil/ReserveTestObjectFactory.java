@@ -1,17 +1,12 @@
 package com.firstone.greenjangteo.reserve.testutil;
 
 import com.firstone.greenjangteo.reserve.dto.request.AddReserveRequestDto;
-import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.reserve.model.CurrentReserve;
 import com.firstone.greenjangteo.reserve.model.entity.ReserveHistory;
 
 public class ReserveTestObjectFactory {
     public static AddReserveRequestDto createAddReserveRequestDto(String userId, int addedReserve) {
         return new AddReserveRequestDto(userId, addedReserve);
-    }
-
-    public static UseReserveRequestDto createUseReserveRequestDto(String userId, int usedReserve) {
-        return new UseReserveRequestDto(userId, usedReserve);
     }
 
     public static ReserveHistory createReserveHistory(Long userId, int addedReserve, CurrentReserve currentReserve) {

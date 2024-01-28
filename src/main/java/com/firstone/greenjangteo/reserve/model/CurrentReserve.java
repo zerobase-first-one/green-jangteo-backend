@@ -1,12 +1,9 @@
 package com.firstone.greenjangteo.reserve.model;
 
-import com.firstone.greenjangteo.reserve.exception.serious.InsufficientReserveException;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Objects;
 
-import static com.firstone.greenjangteo.reserve.exception.message.InsufficientExceptionMessage.*;
 import static com.firstone.greenjangteo.reserve.exception.message.InvalidExceptionMessage.INVALID_UPDATING_RESERVE_EXCEPTION;
 
 public class CurrentReserve {
@@ -19,18 +16,6 @@ public class CurrentReserve {
     public static CurrentReserve addReserve(CurrentReserve currentReserve, int addedReserve) {
         validateUpdatingReserve(addedReserve);
         int newCurrentReserve = currentReserve.getValue() + addedReserve;
-
-        return new CurrentReserve(newCurrentReserve);
-    }
-
-    public static CurrentReserve useReserve(CurrentReserve currentReserve, int usedReserve) {
-        currentReserve.validateCurrentReserve();
-        validateUpdatingReserve(usedReserve);
-
-        int currentReserveValue = currentReserve.getValue();
-        validateNewCurrentReserve(currentReserveValue, usedReserve);
-
-        int newCurrentReserve = currentReserveValue - usedReserve;
 
         return new CurrentReserve(newCurrentReserve);
     }
@@ -55,21 +40,6 @@ public class CurrentReserve {
     private static void validateUpdatingReserve(int updatingReserve) {
         if (updatingReserve < 0) {
             throw new IllegalArgumentException(INVALID_UPDATING_RESERVE_EXCEPTION + updatingReserve);
-        }
-    }
-
-    private void validateCurrentReserve() {
-        if (currentReserve < 0) {
-            throw new InsufficientReserveException(INSUFFICIENT_CURRENT_RESERVE_EXCEPTION + currentReserve);
-        }
-    }
-
-    private static void validateNewCurrentReserve(int currentReserve, int usedReserve) {
-        if (currentReserve - usedReserve < 0) {
-            throw new InsufficientReserveException(
-                    INSUFFICIENT_NEW_RESERVE_EXCEPTION1 + currentReserve
-                            + INSUFFICIENT_NEW_RESERVE_EXCEPTION2 + usedReserve
-            );
         }
     }
 
