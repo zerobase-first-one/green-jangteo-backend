@@ -37,7 +37,7 @@ public class CouponController {
     private static final String GET_COUPONS_DESCRIPTION
             = "회원 ID를 입력해 쿠폰 목록을 조회할 수 있습니다.";
 
-    private static final String COUPON_ID = "쿠폰 ID";
+    public static final String COUPON_ID = "쿠폰 ID";
     private static final String DELETE_COUPON = "쿠폰 삭제";
     private static final String DELETE_COUPON_FROM_ID_DESCRIPTION = "쿠폰 ID를 입력해 쿠폰 그룹을 삭제할 수 있습니다.";
 

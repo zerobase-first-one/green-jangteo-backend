@@ -125,7 +125,7 @@ class CouponTest {
         for (Coupon coupon : coupons) {
             assertThatThrownBy(() -> coupon.issueAndAddUser(user, ExpirationPeriod.of(EXPIRATION_PERIOD1)))
                     .isInstanceOf(AlreadyProvidedCouponException.class)
-                    .hasMessage(ALREADY_GIVEN_COUPON_EXCEPTION);
+                    .hasMessage(ALREADY_GIVEN_COUPON_EXCEPTION + user.getId());
         }
     }
 }
