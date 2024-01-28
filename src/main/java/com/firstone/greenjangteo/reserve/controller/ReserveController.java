@@ -37,6 +37,8 @@ public class ReserveController {
     private static final String GET_RESERVE_HISTORIES_DESCRIPTION
             = "회원 ID를 입력해 적립금의 적립, 사용 내역을 조회할 수 있습니다.";
 
+    private static final String GET_CURRENT_RESERVE = "현재 적립금 조회";
+    private static final String GET_CURRENT_RESERVE_DESCRIPTION = "회원 ID를 입력해 현재 적립금을 조회할 수 있습니다.";
 
     @ApiOperation(value = ADD_RESERVE, notes = ADD_RESERVE_DESCRIPTION)
     @PostMapping("/add")
@@ -72,5 +74,16 @@ public class ReserveController {
                 = reserveHistories.stream().map(ReserveResponseDto::from).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(reserveResponseDtos);
+    }
+
+    @ApiOperation(value = GET_CURRENT_RESERVE, notes = GET_CURRENT_RESERVE_DESCRIPTION)
+    @PreAuthorize(PRINCIPAL_POINTCUT)
+    @GetMapping("/current")
+    public ResponseEntity<ReserveResponseDto> getCurrentResolve
+            (@RequestParam(name = "userId") @ApiParam(value = USER_ID_VALUE, example = ID_EXAMPLE) String userId) {
+        InputFormatValidator.validateId(userId);
+
+        ReserveHistory reserveHistory = reserveService.getCurrentReserve(Long.parseLong(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(ReserveResponseDto.from(reserveHistory));
     }
 }

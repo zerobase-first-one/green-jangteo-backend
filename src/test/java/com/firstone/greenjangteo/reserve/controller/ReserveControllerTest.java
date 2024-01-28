@@ -111,4 +111,23 @@ class ReserveControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("현재 적립금을 조회할 수 있다.")
+    @Test
+    @WithMockUser
+    void getCurrentResolve() throws Exception {
+        // given
+        Long userId = Long.parseLong(BUYER_ID);
+
+        ReserveHistory reserveHistory
+                = ReserveTestObjectFactory.createReserveHistory(userId, RESERVE1, new CurrentReserve(RESERVE2));
+
+        when(reserveService.getCurrentReserve(userId)).thenReturn(reserveHistory);
+
+        // when, then
+        mockMvc.perform(get("/reserves/current")
+                        .with(csrf())
+                        .queryParam("userId", BUYER_ID))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }
