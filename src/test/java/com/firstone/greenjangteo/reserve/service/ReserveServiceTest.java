@@ -95,7 +95,7 @@ class ReserveServiceTest {
 
     @DisplayName("회원의 적립금을 차감할 수 있다.")
     @Test
-    void useReserve() {
+    void reduceReserve() {
         // given
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
@@ -117,6 +117,67 @@ class ReserveServiceTest {
                 = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).get();
 
         assertThat(currentReserveHistory.getCurrentReserve()).isEqualTo(new CurrentReserve(RESERVE2));
+    }
+
+    @DisplayName("회원의 적립금을 사용할 수 있다.")
+    @Test
+    void UseReserve() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        ReserveHistory firstReserveHistory
+                = ReserveTestObjectFactory.createReserveHistory(user.getId(), RESERVE1, new CurrentReserve(RESERVE2));
+        reserveHistoryRepository.save(firstReserveHistory);
+
+        UseReserveRequestDto useReserveRequestDto
+                = ReserveTestObjectFactory.createUseReserveRequestDto(user.getId().toString(), RESERVE1);
+
+        Long orderId = 1L;
+
+        // when
+        reserveService.useReserve(orderId, useReserveRequestDto);
+
+        // then
+        ReserveHistory currentReserveHistory
+                = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).get();
+
+        assertThat(currentReserveHistory.getCurrentReserve()).isEqualTo(new CurrentReserve(RESERVE2));
+    }
+
+    @DisplayName("회원이 사용한 적립금을 되돌릴 수 있다.")
+    @Test
+    void rollBackUsedReserve() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        ReserveHistory firstReserveHistory
+                = ReserveTestObjectFactory.createReserveHistory(user.getId(), RESERVE1, new CurrentReserve(RESERVE2));
+        reserveHistoryRepository.save(firstReserveHistory);
+
+        UseReserveRequestDto useReserveRequestDto
+                = ReserveTestObjectFactory.createUseReserveRequestDto(user.getId().toString(), RESERVE1);
+
+        Long orderId = 1L;
+
+        reserveService.useReserve(orderId, useReserveRequestDto);
+
+        AddReserveRequestDto addReserveRequestDto
+                = ReserveTestObjectFactory.createAddReserveRequestDto(user.getId().toString(), RESERVE1);
+
+        // when
+        reserveService.rollBackUsedReserve(orderId, addReserveRequestDto);
+
+        // then
+        ReserveHistory currentReserveHistory
+                = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).get();
+
+        assertThat(currentReserveHistory.getCurrentReserve()).isEqualTo(new CurrentReserve(RESERVE1 + RESERVE2));
     }
 
     @DisplayName("회원 ID를 통해 적립금 내역을 생성시간 오름차순으로 조회할 수 있다.")

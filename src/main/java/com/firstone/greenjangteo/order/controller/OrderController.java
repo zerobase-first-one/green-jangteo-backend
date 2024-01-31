@@ -7,6 +7,7 @@ import com.firstone.greenjangteo.order.dto.response.OrderResponseDto;
 import com.firstone.greenjangteo.order.dto.response.OrdersResponseDto;
 import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.service.OrderService;
+import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
 import com.firstone.greenjangteo.utility.RoleValidator;
@@ -56,6 +57,10 @@ public class OrderController {
     private static final String COUPON_USAGE_CANCEL = "쿠폰 적용 취소";
     private static final String COUPON_USAGE_CANCEL_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문에 쿠폰 적용을 취소할 수 있습니다.";
     private static final String COUPON_USAGE_CANCEL_FORM = "쿠폰 적용 취소 요청 양식";
+
+    private static final String RESERVE_USAGE = "적립금 적용";
+    private static final String RESERVE_USAGE_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문에 적립금을 적용할 수 있습니다.";
+    private static final String RESERVE_USAGE_FORM = "적립금 적용 요청 양식";
 
     private static final String DELETE_ORDER = "주문 삭제";
     private static final String DELETE_ORDER_DESCRIPTION = "주문 ID와 구매자 ID를 입력해 주문을 삭제할 수 있습니다.";
@@ -150,6 +155,24 @@ public class OrderController {
                 = orderService.cancelCoupon(Long.parseLong(orderId), Long.parseLong(couponId));
 
         return ResponseEntity.status(HttpStatus.OK).body(totalOrderPriceAfterCouponUsed);
+    }
+
+    @ApiOperation(value = RESERVE_USAGE, notes = RESERVE_USAGE_DESCRIPTION)
+    @PatchMapping("/{orderId}/reserve-usage")
+    public ResponseEntity<Integer> useReserve
+            (@PathVariable("orderId") @ApiParam(value = ORDER_ID, example = ID_EXAMPLE) String orderId,
+             @RequestBody @ApiParam(value = RESERVE_USAGE_FORM) UseReserveRequestDto useReserveRequestDto) {
+        String userId = useReserveRequestDto.getUserId();
+
+        InputFormatValidator.validateId(orderId);
+        InputFormatValidator.validateId(userId);
+
+        RoleValidator.checkAdminOrPrincipalAuthentication(userId);
+
+        int totalOrderPriceAfterReserveUsed
+                = orderService.useReserve(Long.parseLong(orderId), useReserveRequestDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(totalOrderPriceAfterReserveUsed);
     }
 
     @ApiOperation(value = DELETE_ORDER, notes = DELETE_ORDER_DESCRIPTION)

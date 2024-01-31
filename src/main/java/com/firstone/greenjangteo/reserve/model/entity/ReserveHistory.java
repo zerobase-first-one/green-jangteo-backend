@@ -61,6 +61,19 @@ public class ReserveHistory extends BaseEntity {
                 .build();
     }
 
+    public static ReserveHistory from
+            (UseReserveRequestDto useReserveRequestDto, CurrentReserve currentReserve, Long orderId) {
+        Long userId = Long.parseLong(useReserveRequestDto.getUserId());
+        int usedReserve = useReserveRequestDto.getUsedReserve();
+
+        return ReserveHistory.builder()
+                .userId(userId)
+                .orderId(orderId)
+                .usedReserve(usedReserve)
+                .currentReserve(CurrentReserve.useReserve(currentReserve, usedReserve))
+                .build();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

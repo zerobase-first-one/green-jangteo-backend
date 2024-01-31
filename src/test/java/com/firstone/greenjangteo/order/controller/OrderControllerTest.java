@@ -8,6 +8,7 @@ import com.firstone.greenjangteo.order.dto.request.UseCouponRequestDto;
 import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.service.OrderService;
 import com.firstone.greenjangteo.order.testutil.OrderTestObjectFactory;
+import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
 import com.firstone.greenjangteo.user.dto.request.UserIdRequestDto;
@@ -35,8 +36,7 @@ import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestCons
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
 import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -267,6 +267,23 @@ class OrderControllerTest {
         mockMvc.perform(patch("/orders/{orderId}/coupon-cancel", ORDER_ID)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(useCouponRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("주문에 적립금을 적용할 수 있다.")
+    @Test
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
+    void useReserve() throws Exception {
+        // given
+        UseReserveRequestDto useReserveRequestDto = new UseReserveRequestDto(BUYER_ID, PRICE1);
+        when(orderService.useReserve(anyLong(), eq(useReserveRequestDto))).thenReturn(PRICE2);
+
+        // when, then
+        mockMvc.perform(patch("/orders/{orderId}/reserve-usage", ORDER_ID)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(useReserveRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());

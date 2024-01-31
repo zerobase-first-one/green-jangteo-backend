@@ -10,6 +10,8 @@ import com.firstone.greenjangteo.order.model.entity.Order;
 import com.firstone.greenjangteo.order.repository.OrderRepository;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.service.ProductService;
+import com.firstone.greenjangteo.reserve.dto.request.AddReserveRequestDto;
+import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
 import com.firstone.greenjangteo.reserve.service.ReserveService;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
@@ -113,6 +115,24 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         return totalOrderPriceAfterCouponUsed;
+    }
+
+    @Override
+    public int useReserve(Long orderId, UseReserveRequestDto useReserveRequestDto) {
+        Order order = getOrder(orderId);
+        int previouslyUsedReserveAmount = order.getUsedReserveAmount();
+        if (previouslyUsedReserveAmount > 0) {
+            AddReserveRequestDto addReserveRequestDto
+                    = new AddReserveRequestDto(useReserveRequestDto.getUserId(), previouslyUsedReserveAmount);
+            reserveService.rollBackUsedReserve(orderId, addReserveRequestDto);
+        }
+
+        reserveService.useReserve(orderId, useReserveRequestDto);
+
+        int totalOrderPriceAfterReserveUsed = order.updateReserveAmount(useReserveRequestDto.getUsedReserve());
+        orderRepository.save(order);
+
+        return totalOrderPriceAfterReserveUsed;
     }
 
     @Override
