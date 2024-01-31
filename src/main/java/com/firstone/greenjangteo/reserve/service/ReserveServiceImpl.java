@@ -45,6 +45,28 @@ public class ReserveServiceImpl implements ReserveService {
     }
 
     @Override
+    public void useReserve(Long orderId, UseReserveRequestDto useReserveRequestDto) {
+        Long userId = Long.parseLong(useReserveRequestDto.getUserId());
+        ReserveHistory reserveHistory = getCurrentReserve(userId);
+
+        ReserveHistory newReserveHistory
+                = ReserveHistory.from(useReserveRequestDto, reserveHistory.getCurrentReserve(), orderId);
+
+        reserveHistoryRepository.save(newReserveHistory);
+    }
+
+    @Override
+    public void rollBackUsedReserve(Long orderId, AddReserveRequestDto addReserveRequestDto) {
+        Long userId = Long.parseLong(addReserveRequestDto.getUserId());
+        ReserveHistory reserveHistory = getCurrentReserve(userId);
+
+        ReserveHistory newReserveHistory
+                = ReserveHistory.from(addReserveRequestDto, reserveHistory.getCurrentReserve());
+
+        reserveHistoryRepository.save(newReserveHistory);
+    }
+
+    @Override
     public List<ReserveHistory> getReserveHistories(Long userId) {
         return reserveHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }

@@ -21,6 +21,11 @@ import com.firstone.greenjangteo.order.testutil.OrderTestObjectFactory;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
 import com.firstone.greenjangteo.product.service.ProductService;
+import com.firstone.greenjangteo.reserve.dto.request.UseReserveRequestDto;
+import com.firstone.greenjangteo.reserve.model.CurrentReserve;
+import com.firstone.greenjangteo.reserve.model.entity.ReserveHistory;
+import com.firstone.greenjangteo.reserve.repository.ReserveHistoryRepository;
+import com.firstone.greenjangteo.reserve.testutil.ReserveTestObjectFactory;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
 import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
@@ -37,6 +42,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
@@ -48,6 +54,8 @@ import static com.firstone.greenjangteo.order.excpeption.message.NotFoundExcepti
 import static com.firstone.greenjangteo.order.model.OrderStatus.BEFORE_PAYMENT;
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY1;
 import static com.firstone.greenjangteo.order.testutil.OrderTestConstant.QUANTITY2;
+import static com.firstone.greenjangteo.reserve.testutil.ReserveTestConstant.RESERVE1;
+import static com.firstone.greenjangteo.reserve.testutil.ReserveTestConstant.RESERVE2;
 import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
@@ -91,7 +99,13 @@ class OrderServiceTest {
     private CouponRepository couponRepository;
 
     @Autowired
+    private ReserveHistoryRepository reserveHistoryRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("주문 요청 양식을 전송해 주문을 생성한다.")
     @Test
@@ -488,6 +502,90 @@ class OrderServiceTest {
         // then
         assertThat(order.getUsedCouponAmount()).isZero();
         assertThat(couponToUse.getUsedOrderId()).isNull();
+    }
+
+    @DisplayName("주문 시 적립금을 적용할 수 있다.")
+    @Test
+    void useReserve() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        storeRepository.save(store);
+
+        entityManager.flush();
+
+        Order order = OrderTestObjectFactory.createOrder(store, buyer, PRICE1);
+        orderRepository.save(order);
+
+        Long buyerId = buyer.getId();
+
+        ReserveHistory firstReserveHistory
+                = ReserveTestObjectFactory.createReserveHistory(buyerId, RESERVE1, new CurrentReserve(RESERVE2));
+        reserveHistoryRepository.save(firstReserveHistory);
+
+        UseReserveRequestDto useReserveRequestDto
+                = ReserveTestObjectFactory.createUseReserveRequestDto(buyerId.toString(), RESERVE1);
+
+        // when
+        orderService.useReserve(order.getId(), useReserveRequestDto);
+
+        // then
+        ReserveHistory currentReserveHistory
+                = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(buyerId).get();
+
+        assertThat(order.getUsedReserveAmount()).isEqualTo(RESERVE1);
+        assertThat(currentReserveHistory.getOrderId()).isEqualTo(order.getId());
+    }
+
+    @DisplayName("주문 시 기존의 적립금을 대체하고 새로운 적립금을 적용할 수 있다.")
+    @Test
+    void useNewReserve() {
+        // given
+        User seller = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.name())
+        );
+        User buyer = UserTestObjectFactory.createUser(
+                EMAIL2, USERNAME2, PASSWORD2, passwordEncoder, FULL_NAME2, PHONE2, List.of(ROLE_BUYER.name())
+        );
+        userRepository.saveAll(List.of(seller, buyer));
+
+        Store store = StoreTestObjectFactory.createStore(seller.getId(), STORE_NAME1, DESCRIPTION1, IMAGE_URL1);
+        storeRepository.save(store);
+
+        entityManager.flush();
+
+        Order order = OrderTestObjectFactory.createOrder(store, buyer, PRICE1);
+        orderRepository.save(order);
+
+        Long buyerId = buyer.getId();
+
+        ReserveHistory firstReserveHistory
+                = ReserveTestObjectFactory.createReserveHistory(buyerId, RESERVE1, new CurrentReserve(RESERVE2));
+        reserveHistoryRepository.save(firstReserveHistory);
+
+        UseReserveRequestDto useReserveRequestDto1
+                = ReserveTestObjectFactory.createUseReserveRequestDto(buyerId.toString(), RESERVE1);
+        orderService.useReserve(order.getId(), useReserveRequestDto1);
+
+        UseReserveRequestDto useReserveRequestDto2
+                = ReserveTestObjectFactory.createUseReserveRequestDto(buyerId.toString(), RESERVE2);
+
+        // when
+        orderService.useReserve(order.getId(), useReserveRequestDto2);
+
+        // then
+        ReserveHistory currentReserveHistory
+                = reserveHistoryRepository.findFirstByUserIdOrderByCreatedAtDesc(buyerId).get();
+
+        assertThat(order.getUsedReserveAmount()).isEqualTo(RESERVE2);
+        assertThat(currentReserveHistory.getOrderId()).isEqualTo(order.getId());
     }
 
     @DisplayName("주문 ID와 구매자 ID를 전송해 주문을 삭제한다.")

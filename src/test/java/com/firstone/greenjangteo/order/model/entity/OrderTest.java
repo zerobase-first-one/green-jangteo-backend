@@ -160,6 +160,34 @@ class OrderTest {
         assertThat(order.getUsedCouponAmount()).isEqualTo(PRICE1 + PRICE2);
     }
 
+    @DisplayName("주문에 적립금을 적용할 수 있다.")
+    @Test
+    void updateReserveAmount() {
+        // given
+        Order order = OrderTestObjectFactory.createOrder(mock(Store.class), mock(User.class), PRICE3);
+
+        // when
+        order.updateReserveAmount(OrderTestConstant.PRICE1);
+
+        // then
+        assertThat(order.getUsedReserveAmount()).isEqualTo(PRICE1);
+    }
+
+    @DisplayName("주문에 새로운 적립금을 적용할 수 있다.")
+    @Test
+    void updateNewReserveAmount() {
+        // given
+        Order order = OrderTestObjectFactory.createOrder(mock(Store.class), mock(User.class), PRICE3);
+
+        order.updateReserveAmount(OrderTestConstant.PRICE1);
+
+        // when
+        order.updateReserveAmount(PRICE2);
+
+        // then
+        assertThat(order.getUsedReserveAmount()).isEqualTo(PRICE2);
+    }
+
     @DisplayName("적용된 쿠폰 가격이 총 주문 금액을 초과하면 IllegalArgumentException이 발생한다.")
     @Test
     void updateExceedingCouponAmount() {

@@ -11,6 +11,10 @@ public interface ReserveService {
 
     void reduceReserve(UseReserveRequestDto useReserveRequestDto);
 
+    void useReserve(Long orderId, UseReserveRequestDto useReserveRequestDto);
+
+    void rollBackUsedReserve(Long orderId, AddReserveRequestDto addReserveRequestDto);
+
     List<ReserveHistory> getReserveHistories(Long userId);
 
     ReserveHistory getCurrentReserve(Long userId);

@@ -105,4 +105,10 @@ public class Order extends BaseEntity {
 
         return totalOrderPrice.computeOrderPriceAfterUpdate(usedCouponAmount, usedReserveAmount);
     }
+
+    public int updateReserveAmount(int usedReserve) {
+        usedReserveAmount = usedReserve;
+
+        return totalOrderPrice.computeOrderPriceAfterUpdate(usedCouponAmount, usedReserveAmount);
+    }
 }
