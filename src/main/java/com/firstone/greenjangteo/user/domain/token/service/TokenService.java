@@ -13,6 +13,8 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+    static final String INVALID_TOKEN_EXCEPTION_MESSAGE = "유효하지 않은 리프레시 토큰입니다. 전송된 토큰: ";
+
     public String issueAccessToken(User user) {
         String accessToken
                 = jwtTokenProvider.generateAccessToken(String.valueOf(user.getId()), user.getRoles().toStrings());
@@ -26,5 +28,15 @@ public class TokenService {
         refreshTokenRepository.save(RefreshToken.from(user.getId(), user.getRoles().toStrings(), refreshToken));
 
         return refreshToken;
+    }
+
+    public String issueNewAccessToken(String refreshTokenValue) {
+        RefreshToken refreshToken = getRefreshToken(refreshTokenValue);
+        return refreshToken.createNewAccessToken(jwtTokenProvider);
+    }
+
+    private RefreshToken getRefreshToken(String refreshTokenValue) {
+        return refreshTokenRepository.findByToken(refreshTokenValue)
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_TOKEN_EXCEPTION_MESSAGE + refreshTokenValue));
     }
 }
