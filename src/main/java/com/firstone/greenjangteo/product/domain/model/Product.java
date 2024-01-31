@@ -1,7 +1,9 @@
 package com.firstone.greenjangteo.product.domain.model;
 
-import com.firstone.greenjangteo.product.domain.dto.ProductDto;
+import com.firstone.greenjangteo.product.domain.dto.search.ProductSaveRequest;
+import com.firstone.greenjangteo.product.form.AddProductForm;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
+import com.firstone.greenjangteo.product.domain.dto.ProductDto;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,50 +20,71 @@ import java.util.List;
 @Entity
 @Table(name = "product")
 public class Product {
-
     @Id
-    @Column(name = "product_id") //product_id
+    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id; //상품코드
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
     private Store store;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImage> productImages;
 
     @Column(nullable = false, length = 20)
-    private String name; //상품명
+    private String name;
 
-    @Column(name = "price", nullable = false)
-    private int price; //가격
+    @Column(nullable = false)
+    private int price;
 
+    @Column(nullable = false)
     private String description;
+
     private int averageScore;
 
     @Column(nullable = false)
-    private int inventory; //재고
+    private int inventory;
 
-    @Column(nullable = false)
-    private int salesRate; //할인율
+    private int salesRate;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @CreatedDate
+    @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
-    public static Product addProduct(ProductDto productDto, Store store) {
+    public static Product of(ProductSaveRequest productSaveRequest, Store store) {
         return Product.builder()
                 .store(store)
-                .name(productDto.getName())
-                .averageScore(productDto.getAverageScore())
-                .description(productDto.getDescription())
-                .price(productDto.getPrice())
-                .inventory(productDto.getInventory())
-                .salesRate(productDto.getSalesRate())
+                .name(productSaveRequest.getName())
+                .description(productSaveRequest.getDescription())
+                .price(productSaveRequest.getPrice())
+                .averageScore(builder().averageScore)
+                .inventory(productSaveRequest.getInventory())
+                .category(Category.builder().id(productSaveRequest.getCategoryId()).build())
+                .salesRate(builder().salesRate)
                 .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Product addProductRequestDtoToProduct(AddProductForm addProductForm, Store store) {
+        return Product.builder()
+                .store(store)
+                .name(addProductForm.getProductName())
+                .description(addProductForm.getDescription())
+                .price(addProductForm.getPrice())
+                .category(Category.builder().id(addProductForm.getCategoryId()).build())
+                .inventory(addProductForm.getInventory())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
     }
 
@@ -69,20 +92,7 @@ public class Product {
         this.name = productDto.getName();
         this.price = productDto.getPrice();
         this.inventory = productDto.getInventory();
-        this.salesRate = productDto.getSalesRate();
-        this.averageScore = productDto.getAverageScore();
         this.description = productDto.getDescription();
-    }
-
-    public void subCount(int demand) throws Exception {
-        int curCount = this.inventory - demand;
-        if (curCount < 0) {
-            throw new Exception("상품 재고가 부족합니다. (현 재고량 : " + this.inventory + ")");
-        }
-        this.inventory = curCount;
-    }
-
-    public void addCount(int supply) {
-        this.inventory += supply;
+        this.modifiedAt = productDto.getModifiedAt();
     }
 }

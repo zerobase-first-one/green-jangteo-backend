@@ -1,8 +1,18 @@
 package com.firstone.greenjangteo.user.service;
 
+import com.firstone.greenjangteo.coupon.model.entity.Coupon;
+import com.firstone.greenjangteo.coupon.model.entity.CouponGroup;
+import com.firstone.greenjangteo.coupon.repository.CouponGroupRepository;
+import com.firstone.greenjangteo.coupon.repository.CouponRepository;
+import com.firstone.greenjangteo.coupon.testutil.CouponTestObjectFactory;
+import com.firstone.greenjangteo.product.domain.model.Category;
+import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.product.repository.CategoryRepository;
+import com.firstone.greenjangteo.product.repository.ProductRepository;
 import com.firstone.greenjangteo.user.domain.store.model.StoreName;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.repository.StoreRepository;
+import com.firstone.greenjangteo.user.domain.store.testutil.StoreTestObjectFactory;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -18,7 +28,7 @@ import com.firstone.greenjangteo.user.model.Role;
 import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.repository.UserRepository;
-import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,18 +39,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.firstone.greenjangteo.user.domain.store.testutil.TestConstant.STORE_NAME1;
+import static com.firstone.greenjangteo.coupon.testutil.CouponTestConstant.*;
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_NAME;
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_QUANTITY;
+import static com.firstone.greenjangteo.user.domain.store.testutil.StoreTestConstant.*;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.IncorrectPasswordExceptionMessage.INCORRECT_PASSWORD_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.*;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -58,7 +73,22 @@ class AuthenticationServiceTest {
     private StoreRepository storeRepository;
 
     @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CouponGroupRepository couponGroupRepository;
+
+    @Autowired
+    private CouponRepository couponRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @DisplayName("올바른 회원 가입 양식을 전송하면 회원 가입을 할 수 있다.")
     @ParameterizedTest
@@ -70,7 +100,7 @@ class AuthenticationServiceTest {
     void signUpUser(String email, String username, String password, String fullName,
                     String phone, String role) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, password, fullName, phone, List.of(role));
 
         // when
@@ -95,7 +125,7 @@ class AuthenticationServiceTest {
     void signUpUserWithMultipleRoles(String email, String username, String password, String fullName,
                                      String phone, String role1, String role2) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, password, fullName, phone, List.of(role1, role2));
 
         // when
@@ -121,7 +151,7 @@ class AuthenticationServiceTest {
     void signUpUserWithEncodingPassword(String email, String username, String password, String fullName,
                                         String phone, Role role1, Role role2) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, password, fullName, phone, List.of(role1.toString(), role2.toString()));
 
         // when
@@ -143,7 +173,7 @@ class AuthenticationServiceTest {
     void signUpUserWithWrongPasswordConfirm(String email, String username, String password, String passwordConfirm,
                                             String fullName, String phone, Role role1, Role role2) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
                 (email, username, password, passwordConfirm,
                         fullName, phone, List.of(role1.toString(), role2.toString()));
 
@@ -157,12 +187,12 @@ class AuthenticationServiceTest {
     @Test
     void signUpUserByDuplicateEmail() {
         // given
-        SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm1 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME2,
+        SignUpForm signUpForm2 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME2,
                 PASSWORD2, PASSWORD2, FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -175,12 +205,12 @@ class AuthenticationServiceTest {
     @Test
     void signUpUserByDuplicatePhone() {
         // given
-        SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm1 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME2,
+        SignUpForm signUpForm2 = UserTestObjectFactory.enterUserForm(EMAIL2, USERNAME2,
                 PASSWORD2, PASSWORD2, FULL_NAME2, PHONE1, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -193,12 +223,12 @@ class AuthenticationServiceTest {
     @Test
     void signUpUserByDuplicateUsername() {
         // given
-        SignUpForm signUpForm1 = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm1 = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm1);
 
-        SignUpForm signUpForm2 = TestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, PASSWORD2,
+        SignUpForm signUpForm2 = UserTestObjectFactory.enterUserForm(EMAIL2, USERNAME1, PASSWORD2, PASSWORD2,
                 FULL_NAME2, PHONE2, List.of(ROLE_SELLER.toString()));
 
         // when, then
@@ -209,9 +239,9 @@ class AuthenticationServiceTest {
 
     @DisplayName("판매자가 회원 가입하면 가게가 함께 생성된다.")
     @Test
-    void createStore() {
+    void createStoreWhenSellerSignedUp() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
 
@@ -226,11 +256,44 @@ class AuthenticationServiceTest {
         assertThat(store.get().getStoreName()).isEqualTo(enteredStoreName);
     }
 
+    @DisplayName("구매자가 회원 가입하면 신규회원 할인 쿠폰이 3장 지급된다.")
+    @Test
+    @Transactional
+    void provideCouponsToSignedUpBuyer() {
+        // given
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
+                EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        CouponGroup couponGroup = CouponTestObjectFactory.createCouponGroup(
+                NEW_MEMBER_DISCOUNT_COUPON_NAME, AMOUNT, DESCRIPTION, ISSUE_QUANTITY3, tomorrow, EXPIRATION_PERIOD1
+        );
+
+        List<Coupon> coupons = CouponTestObjectFactory.createCoupons(couponGroup);
+        couponGroupRepository.save(couponGroup);
+        couponRepository.saveAll(coupons);
+
+        // when
+        User user = authenticationService.signUpUser(signUpForm);
+        entityManager.flush();
+        entityManager.refresh(user);
+
+        // then
+        List<Coupon> providedCoupons = user.getCoupons();
+        assertThat(providedCoupons.size()).isEqualTo(NEW_MEMBER_DISCOUNT_COUPON_QUANTITY);
+
+        for (Coupon providedCoupon : providedCoupons) {
+            assertThat(providedCoupon.getUser()).isEqualTo(user);
+            assertThat(providedCoupon.getCouponGroup().getCouponName()).isEqualTo(NEW_MEMBER_DISCOUNT_COUPON_NAME);
+        }
+    }
+
     @DisplayName("가입된 이메일 주소 또는 사용자 이름과 올바른 비밀번호를 전송하면 로그인을 할 수 있다.")
     @Test
     void signInUser() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
@@ -251,7 +314,7 @@ class AuthenticationServiceTest {
     @Test
     void signInUserWithNonExistentEmailOrUsername() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
@@ -273,7 +336,7 @@ class AuthenticationServiceTest {
     @Test
     void signInUserWithWrongPassword() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(EMAIL1, USERNAME1,
                 PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         authenticationService.signUpUser(signUpForm);
@@ -295,7 +358,7 @@ class AuthenticationServiceTest {
     @Test
     void updateEmail() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -317,7 +380,7 @@ class AuthenticationServiceTest {
     @Test
     void updateEmailWithWrongPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -340,7 +403,7 @@ class AuthenticationServiceTest {
     })
     void updateEmailWithInvalidEmail(String email) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -360,7 +423,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePhone() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -382,7 +445,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePhoneWithWrongPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -405,7 +468,7 @@ class AuthenticationServiceTest {
     })
     void updatePhoneWithInvalidPhone(String phone) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -421,11 +484,11 @@ class AuthenticationServiceTest {
                 .hasMessage(INVALID_PHONE_EXCEPTION);
     }
 
-    @DisplayName("현재 비밀번호와 변경할 비밀번호를 입력해 비밀번호를 변경할 수 있다.")
+    @DisplayName("현재 비밀번호와 변경할 비밀번호, 변경할 비밀번호 확인을 입력해 비밀번호를 변경할 수 있다.")
     @Test
     void updatePassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -433,6 +496,7 @@ class AuthenticationServiceTest {
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD1)
                 .passwordToChange(PASSWORD2)
+                .passwordToChangeConfirm(PASSWORD2)
                 .build();
 
         // when
@@ -447,7 +511,7 @@ class AuthenticationServiceTest {
     @Test
     void updatePasswordWithWrongCurrentPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -455,6 +519,7 @@ class AuthenticationServiceTest {
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD2)
                 .passwordToChange(PASSWORD2)
+                .passwordToChangeConfirm(PASSWORD2)
                 .build();
 
         // when, then
@@ -463,14 +528,14 @@ class AuthenticationServiceTest {
                 .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
     }
 
-    @DisplayName("유효하지 비밃번호를 통해 비밀번호를 변경하려 하면 IllegalArgumentException이 발생한다.")
+    @DisplayName("유효하지 않은 비밃번호를 통해 비밀번호를 변경하려 하면 IllegalArgumentException이 발생한다.")
     @ParameterizedTest
     @CsvSource({
             "abcD1!", "1234!abcde", "AbCdE12345", "!@1234ABCDE"
     })
     void updatePasswordWithInvalidPassword(String password) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -478,6 +543,7 @@ class AuthenticationServiceTest {
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
                 .currentPassword(PASSWORD1)
                 .passwordToChange(password)
+                .passwordToChangeConfirm(password)
                 .build();
 
         // when, then
@@ -486,19 +552,40 @@ class AuthenticationServiceTest {
                 .hasMessage(INVALID_PASSWORD_EXCEPTION);
     }
 
+    @DisplayName("일치하지 않는 비밀번호 확인을 통해 비밀번호를 변경하려 하면 IncorrectPasswordException이 발생한다.")
+    @Test
+    void updatePasswordWithWrongPasswordConfirm() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
+        );
+        userRepository.save(user);
+
+        PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
+                .currentPassword(PASSWORD1)
+                .passwordToChange(PASSWORD2)
+                .passwordToChangeConfirm(PASSWORD3)
+                .build();
+
+        // when, then
+        assertThatThrownBy(() -> authenticationService.updatePassword(user.getId(), passwordUpdateRequestDto))
+                .isInstanceOf(IncorrectPasswordException.class)
+                .hasMessage(INCORRECT_PASSWORD_EXCEPTION);
+    }
+
     @DisplayName("비밀번호 인증을 통해 회원을 탈퇴할 수 있다.")
     @ParameterizedTest
     @CsvSource({
             "abcd@abc.com, person1, Abcd1234!, 홍길동, 01012345678, ROLE_BUYER",
-            "abcd@abcd.com, person2, Abcd12345!, 고길동, 01012345679, ROLE_SELLER",
-            "abcd@abcde.com, person3, Abcd123456!, 김길동, 01012345680, ROLE_ADMIN"
+            "abcd@abcd.com, person2, Abcd12345!, 고길동, 01012345679, ROLE_ADMIN",
+            "abcd@abcde.com, person3, Abcd123456!, 김길동, 01012345680, ROLE_BUYER"
     })
     void deleteUser(
             String email, String username, String password,
             String fullName, String phone, String role
     ) {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 email, username, password, passwordEncoder, fullName, phone, List.of(role)
         );
         userRepository.save(user);
@@ -519,7 +606,7 @@ class AuthenticationServiceTest {
     @Test
     void deleteUserByNonExistentId() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -539,7 +626,7 @@ class AuthenticationServiceTest {
     @Test
     void deleteUserWithWrongPassword() {
         // given
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
         userRepository.save(user);
@@ -559,15 +646,29 @@ class AuthenticationServiceTest {
     @Test
     void deleteStore() {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
         User user = authenticationService.signUpUser(signUpForm);
+        Store store = storeRepository.findById(user.getId()).get();
+
+        createProductsAndCategory(store);
 
         // when
         authenticationService.deleteUser(user.getId(), new DeleteRequestDto(PASSWORD1));
 
         // then
         assertThat(storeRepository.findById(user.getId()).isPresent()).isFalse();
+    }
+
+    private void createProductsAndCategory(Store store) {
+        Product product1 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME1, PRICE1, INVENTORY1);
+        Product product2 = StoreTestObjectFactory.createProduct(store, PRODUCT_NAME2, PRICE2, INVENTORY2);
+        Category category = StoreTestObjectFactory.createCategory(product1);
+        productRepository.saveAll(List.of(product1, product2));
+        categoryRepository.save(category);
+
+        entityManager.flush();
+        entityManager.refresh(store);
     }
 }

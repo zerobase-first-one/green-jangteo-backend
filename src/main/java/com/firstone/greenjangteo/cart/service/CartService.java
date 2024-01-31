@@ -1,102 +1,112 @@
 package com.firstone.greenjangteo.cart.service;
 
-import com.firstone.greenjangteo.cart.domain.dto.CartProductDto;
+import com.firstone.greenjangteo.cart.domain.dto.request.AddCartProductRequestDto;
+import com.firstone.greenjangteo.cart.domain.dto.request.CartProductRequestDto;
+import com.firstone.greenjangteo.cart.domain.dto.request.UpdateCartProductRequestDto;
+import com.firstone.greenjangteo.cart.domain.dto.response.AddCartProductResponseDto;
+import com.firstone.greenjangteo.cart.domain.dto.response.CartProductListResponseDto;
 import com.firstone.greenjangteo.cart.domain.model.Cart;
 import com.firstone.greenjangteo.cart.domain.model.CartProduct;
+import com.firstone.greenjangteo.cart.exception.CartException;
+import com.firstone.greenjangteo.cart.exception.ErrorCode;
+import com.firstone.greenjangteo.cart.form.DeleteSelectCartProductForm;
 import com.firstone.greenjangteo.cart.repository.CartProductRepository;
 import com.firstone.greenjangteo.cart.repository.CartRepository;
 import com.firstone.greenjangteo.product.domain.model.Product;
+import com.firstone.greenjangteo.product.domain.model.ProductImage;
+import com.firstone.greenjangteo.product.service.ProductImageService;
 import com.firstone.greenjangteo.product.service.ProductService;
 import com.firstone.greenjangteo.user.model.entity.User;
-import com.firstone.greenjangteo.user.service.AuthenticationServiceImpl;
-import lombok.RequiredArgsConstructor;
+import com.firstone.greenjangteo.user.service.UserServiceImpl;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@AllArgsConstructor
+@Slf4j
 public class CartService {
-
     private final CartRepository cartRepository;
     private final CartProductRepository cartProductRepository;
-    private final AuthenticationServiceImpl authenticationService;
+    private final UserServiceImpl userService;
     private final ProductService productService;
+    private final ProductImageService productImageService;
 
-    public Map<String, Object> addCart(Long userId, CartProductDto cartProductDto) {
-        User user = (User) authenticationService.loadUserByUsername(userId.toString());
-        Cart cart = cartRepository.findByUserId(userId);
+    public AddCartProductResponseDto addCart(AddCartProductRequestDto addCartProductRequestDto) throws Exception {
+        User user = userService.getUser(addCartProductRequestDto.getUserId());
+        Optional<Cart> addCart = cartRepository.findByUserId(addCartProductRequestDto.getUserId());
 
-        if (cart == null) {
-            cart = Cart.createCart(user);
-            cartRepository.save(cart);
+        if (!addCart.isPresent()) {
+            Cart curCart = Cart.createCart(user);
+            cartRepository.save(curCart);
         }
 
-        Long productId = cartProductDto.getProductId();
-        int inputValue = cartProductDto.getCartProductQuantity();
-        Product product = productService.getProductDetail(productId).getProduct();
+        Product product = productService.getProduct(addCartProductRequestDto.getCartProduct().getProductId());
+        Optional<Cart> cart = cartRepository.findByUserId(addCartProductRequestDto.getUserId());
+        Optional<CartProduct> cartProduct = cartProductRepository.findByCartIdAndProductId(cart.get().getId(), product.getId());
 
-        CartProduct savedCartProduct = cartProductRepository.findCartProductByCartAndProduct(cart.getId(), product.getId());
-        CartProduct cartProduct = null;
-        Map<String, Object> result = new HashMap<>();
-        result.put("productId", product.getId());
-
-        if (savedCartProduct != null) {
-            cartProduct = CartProductDto.cartProductModifiedOf(savedCartProduct.getCart(), savedCartProduct.getProduct(), savedCartProduct.getQuantity() + inputValue);
-            result.put("modifiedAt", cartProduct.getModifiedAt());
+        int quantity = addCartProductRequestDto.getCartProduct().getQuantity();
+        CartProduct addCartProduct = null;
+        if (!cartProduct.isPresent()) {
+            addCartProduct = CartProduct.cartProductCreatedOf(cart.get(), product, quantity);
         } else {
-            cartProduct = cartProductRepository.save(CartProductDto.cartProductCreatedOf(cart, product, inputValue));
-            result.put("createdAt", cartProduct.getCreatedAt());
+            quantity += cartProduct.get().getQuantity();
+            addCartProduct = CartProduct.cartProductModifiedOf(cartProduct.get(), quantity);
         }
 
-        cartProductRepository.save(cartProduct);
-
-        return result;
+        cartProductRepository.save(addCartProduct);
+        return AddCartProductResponseDto.of(addCartProduct.getCart().getId(), addCartProduct.getId(), addCartProduct.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
-    public List<CartProductDto> getCartList(Long userId) {
-        List<CartProductDto> cartProductList = new ArrayList<>();
+    public List<CartProductListResponseDto> getCartList(Long userId) {
+        List<CartProductListResponseDto> cartProductList = new ArrayList<>();
 
-        User user = (User) authenticationService.loadUserByUsername(userId.toString());
-        Cart cart = cartRepository.findByUserId(user.getId());
-        if (cart != null) {
-            List<CartProduct> cartProducts = cartProductRepository.findCartProductsByCartId(cart.getId());
-            for (CartProduct cartProduct : cartProducts) {
-                cartProductList.add(CartProductDto.of(cartProduct));
+        if (userService.getUser(userId) != null) {
+            Optional<Cart> cart = cartRepository.findByUserId(userId);
+            if (cart.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            List<CartProduct> cartProducts = cartProductRepository.findCartProductsByCartId(cart.get().getId());
+            for (CartProduct curCartProduct : cartProducts) {
+                List<ProductImage> imageDto = productImageService.getProductImages(curCartProduct.getProduct().getId());
+                cartProductList.add(CartProductListResponseDto.of(curCartProduct.getId(), curCartProduct.getProduct(), curCartProduct.getQuantity(), imageDto.get(0).getUrl()));
             }
         }
 
         return cartProductList;
     }
 
-    public void updateCartProduct(Long userId, Long cartProductId, int quantity) {
-        Cart cart = cartRepository.findByUserId(userId);
-        CartProduct cartProduct = cartProductRepository.findCartProductByCartAndProduct(cart.getId(), cartProductId);
-        cartProduct = CartProductDto.cartProductModifiedOf(cartProduct, quantity);
-        cartProductRepository.save(cartProduct);
+    public void updateCartProduct(UpdateCartProductRequestDto updateCartProductRequestDto) {
+        Optional<Cart> cart = cartRepository.findByUserId(updateCartProductRequestDto.getUserId());
+        Optional<CartProduct> cartProduct = cartProductRepository.findByCartIdAndProductId(cart.get().getId(),
+                updateCartProductRequestDto.getCartProduct().getProductId());
+        CartProduct updateCartProductDto = CartProduct.cartProductModifiedOf(cartProduct.get(),
+                updateCartProductRequestDto.getCartProduct().getQuantity());
+        cartProductRepository.save(updateCartProductDto);
     }
 
 
-    public void deleteCartList(Long userId, Long productId) {
-        Cart cart = cartRepository.findByUserId(userId);
-        CartProduct cartProduct = cartProductRepository.findCartProductByCartAndProduct(cart.getId(), productId);
-        cartProductRepository.deleteById(cartProduct.getId());
-    }
-
-    public void deleteCartProductList(Long userId, List<CartProductDto> cartProductDtoList) {
-        Cart cart = cartRepository.findByUserId(userId);
-        for (CartProductDto cartProductDto : cartProductDtoList) {
-            Long productId = cartProductDto.getProductId();
-            CartProduct cartProduct = cartProductRepository.findCartProductByCartAndProduct(cart.getId(), productId);
-            cartProductRepository.deleteById(cartProduct.getId());
+    public void deleteCartProductList(DeleteSelectCartProductForm deleteSelectCartProductForm) {
+        for (CartProductRequestDto cartProductDto : deleteSelectCartProductForm.getCartProducts()) {
+            Optional<CartProduct> cartProduct = cartProductRepository.findById(cartProductDto.getCartProductId());
+            cartProductRepository.deleteById(cartProduct.get().getId());
         }
     }
 
     public void deleteCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId);
-        cartRepository.deleteById(cart.getId());
+        Optional<Cart> cart = cartRepository.findByUserId(userId);
+        List<CartProduct> cartProduct = cartProductRepository.findAll();
+        if (!cartProduct.isEmpty()) {
+            throw new CartException(ErrorCode.CART_PRODUCT_IS_NOT_EMPTY.getDescription());
+        }
+
+        cart.get().setUser(null);
+        cartRepository.deleteById(cart.get().getId());
     }
 }

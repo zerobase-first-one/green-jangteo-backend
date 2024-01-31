@@ -53,12 +53,23 @@ public class Address {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return Objects.equals(city, address.city) && Objects.equals(street, address.street) && Objects.equals(zipcode, address.zipcode) && Objects.equals(detailedAddress, address.detailedAddress);
+        return Objects.equals(city, address.city) && Objects.equals(street, address.street)
+                && Objects.equals(zipcode, address.zipcode)
+                && Objects.equals(detailedAddress, address.detailedAddress);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(city, street, zipcode, detailedAddress);
+    }
+
+    public AddressDto toDto() {
+        return AddressDto.builder()
+                .city(city)
+                .street(street)
+                .zipcode(zipcode)
+                .detailedAddress(detailedAddress)
+                .build();
     }
 
     private static void validate(String city, String street, String zipcode, String detailedAddress) {
@@ -127,14 +138,5 @@ public class Address {
         if (!detailedAddress.matches(DETAILED_ADDRESS_PATTERN)) {
             throw new IllegalArgumentException(INVALID_DETAILED_ADDRESS_EXCEPTION);
         }
-    }
-
-    public AddressDto toDto() {
-        return AddressDto.builder()
-                .city(city)
-                .street(street)
-                .zipcode(zipcode)
-                .detailedAddress(detailedAddress)
-                .build();
     }
 }

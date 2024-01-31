@@ -4,6 +4,7 @@ import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtAuthenticationFilter;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,9 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    @Value("${spring.frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -37,9 +41,11 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
                 .and()
                 .authorizeHttpRequests()
                 .antMatchers("/", "/swagger-ui/**", "/v2/api-docs", "/swagger-resources/**",
-                        "/**/signup", "/**/login", "/users")
+                        "/**/signup", "/**/login", "/users", "/token")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/users/{userId}").permitAll()
+                .antMatchers(HttpMethod.GET, "/products/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/reviews/products/{productId}").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter

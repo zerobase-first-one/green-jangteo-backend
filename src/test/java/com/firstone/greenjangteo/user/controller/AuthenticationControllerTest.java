@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firstone.greenjangteo.user.domain.token.service.TokenService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -11,7 +12,7 @@ import com.firstone.greenjangteo.user.model.entity.User;
 import com.firstone.greenjangteo.user.security.CustomAuthenticationEntryPoint;
 import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
-import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,10 @@ import java.util.List;
 
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
 import static com.firstone.greenjangteo.user.model.Role.ROLE_SELLER;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
-import static com.firstone.greenjangteo.user.testutil.TestObjectFactory.enterUserForm;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestObjectFactory.enterUserForm;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -49,6 +51,9 @@ class AuthenticationControllerTest {
     private AuthenticationService authenticationService;
 
     @MockBean
+    private TokenService tokenService;
+
+    @MockBean
     private PasswordEncoder passwordEncoder;
 
     @MockBean
@@ -66,9 +71,7 @@ class AuthenticationControllerTest {
                 EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1,
                 PHONE1, java.util.List.of(ROLE_BUYER.toString()));
 
-        User user = TestObjectFactory.createUser(
-                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
-        );
+        User user = mock(User.class);
 
         when(authenticationService.signUpUser(any(SignUpForm.class))).thenReturn(user);
 
@@ -86,21 +89,18 @@ class AuthenticationControllerTest {
     @WithMockUser
     void signInUser() throws Exception {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm
-                (EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1,
-                        PHONE1, List.of(ROLE_SELLER.toString()));
+        SignInForm signInForm = new SignInForm(EMAIL1, PASSWORD1);
 
-        User user = TestObjectFactory.createUser(
+        User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
         );
 
         when(authenticationService.signInUser(any(SignInForm.class)))
                 .thenReturn(user);
-
         // when, then
         mockMvc.perform(post("/users/login")
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(signUpForm))
+                        .content(objectMapper.writeValueAsString(signInForm))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -111,7 +111,7 @@ class AuthenticationControllerTest {
     @WithMockUser
     void updateEmail() throws Exception {
         // given
-        User user = TestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
+        User user = UserTestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
                 FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         EmailRequestDto emailRequestDto = EmailRequestDto.builder()
@@ -133,7 +133,7 @@ class AuthenticationControllerTest {
     @WithMockUser
     void updatePhone() throws Exception {
         // given
-        User user = TestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
+        User user = UserTestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
                 FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         PhoneRequestDto phoneRequestDto = PhoneRequestDto.builder()
@@ -155,7 +155,7 @@ class AuthenticationControllerTest {
     @WithMockUser
     void updatePassword() throws Exception {
         // given
-        User user = TestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
+        User user = UserTestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
                 FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         PasswordUpdateRequestDto passwordUpdateRequestDto = PasswordUpdateRequestDto.builder()
@@ -177,7 +177,7 @@ class AuthenticationControllerTest {
     @WithMockUser
     void deleteUser() throws Exception {
         // given
-        User user = TestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
+        User user = UserTestObjectFactory.createUser(1L, EMAIL1, USERNAME1, PASSWORD1, passwordEncoder,
                 FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString()));
 
         DeleteRequestDto deleteRequestDto = new DeleteRequestDto(PASSWORD1);

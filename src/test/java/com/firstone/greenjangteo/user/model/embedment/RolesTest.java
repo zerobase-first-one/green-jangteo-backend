@@ -88,7 +88,7 @@ class RolesTest {
 
     @DisplayName("사용자가 판매자의 권한을 갖고 있는지 여부를 확인한다.")
     @Test
-    void checkIsSeller() {
+    void checkContainSeller() {
         // given
         String admin = ROLE_ADMIN.toString();
         String seller = ROLE_SELLER.toString();
@@ -98,7 +98,23 @@ class RolesTest {
         Roles roles2 = Roles.from(List.of(admin, buyer));
 
         // when, then
-        assertThat(roles1.checkIsSeller()).isTrue();
-        assertThat(roles2.checkIsSeller()).isFalse();
+        assertThat(roles1.containSeller()).isTrue();
+        assertThat(roles2.containSeller()).isFalse();
+    }
+
+    @DisplayName("사용자가 구매자의 권한을 갖고 있는지 여부를 확인한다.")
+    @Test
+    void checkContainBuyer() {
+        // given
+        String admin = ROLE_ADMIN.toString();
+        String seller = ROLE_SELLER.toString();
+        String buyer = ROLE_BUYER.toString();
+
+        Roles roles1 = Roles.from(List.of(seller, buyer));
+        Roles roles2 = Roles.from(List.of(admin, seller));
+
+        // when, then
+        assertThat(roles1.containBuyer()).isTrue();
+        assertThat(roles2.containBuyer()).isFalse();
     }
 }

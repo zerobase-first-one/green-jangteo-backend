@@ -8,28 +8,20 @@ import org.springframework.data.annotation.LastModifiedBy;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * `id`	BIGINT	NOT NULL,
- * 	`user_id`	BIGINT	NOT NULL,
- * 	`order_Id`	BIGINT	NOT NULL,
- * 	`created_at`	DATETIME	NOT NULL,
- * 	`modified_at`	DATETIME	NOT NULL
- * );
- * */
-
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity(name="cart")
+@Entity
+@Table(name = "cart")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "cart_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="user_id")
     private User user;
 
@@ -42,9 +34,10 @@ public class Cart {
     private LocalDateTime modifiedAt;
 
     public static Cart createCart(User user){
-        Cart cart = new Cart();
-        cart.setUser(user);
-
-        return cart;
+        return Cart.builder()
+                .user(user)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
     }
 }

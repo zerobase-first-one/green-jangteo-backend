@@ -4,11 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.EMAIL_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_EMAIL_EXCEPTION;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.EMAIL1;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.EMAIL2;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.EMAIL1;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.EMAIL2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -38,23 +40,13 @@ class EmailTest {
     }
 
     @DisplayName("이메일 주소를 전송하지 않으면 IllegalArgumentException이 발생한다.")
-    @Test
-    void ofBlankValue() {
-        // given
-        String email1 = null;
-        String email2 = "";
-        String email3 = " ";
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void ofBlankValue(String email) {
 
-        // when, then
-        assertThatThrownBy(() -> Email.of(email1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(EMAIL_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> Email.of(email2))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(EMAIL_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> Email.of(email3))
+        // given, when, then
+        assertThatThrownBy(() -> Email.of(email))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(EMAIL_NO_VALUE_EXCEPTION);
     }

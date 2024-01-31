@@ -1,0 +1,49 @@
+# 엔티티 저장
+POST http://localhost:8080/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+< ./Products.json
+
+###
+
+# 엔티티를 document로 전환해서 ES에 저장
+POST http://localhost:8080/productDocuments
+Authorization: Bearer {{token}}
+###
+
+# 제품 검색
+GET http://localhost:8080/products/keyword?keyword=ㅊㅎㄱㅅㅍㄱ
+
+###
+
+# 카테고리 검색
+GET http://localhost:8080/products/category?category=전자제품
+
+
+###
+
+# 조건 검색
+GET http://localhost:8080/products/auto-complete?keyword=솦
+
+###
+
+# 테스트 #GET or POST
+POST http://localhost:9200/products/_search?pretty=true
+Content-Type: application/json
+
+{
+  "query" : {
+    "match_all" : { }
+  }
+}
+
+###
+
+
+
+
+
+
+

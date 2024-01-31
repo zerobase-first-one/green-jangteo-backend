@@ -1,6 +1,8 @@
 package com.firstone.greenjangteo.user.service;
 
 
+import com.firstone.greenjangteo.coupon.dto.request.ProvideCouponsToUserRequestDto;
+import com.firstone.greenjangteo.coupon.service.CouponService;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
@@ -28,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_NAME;
+import static com.firstone.greenjangteo.coupon.utility.CouponInformationConstant.NEW_MEMBER_DISCOUNT_COUPON_QUANTITY;
 import static com.firstone.greenjangteo.user.excpeption.message.DuplicateExceptionMessage.*;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.EMAIL_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.NotFoundExceptionMessage.USERNAME_NOT_FOUND_EXCEPTION;
@@ -42,6 +46,7 @@ import static org.springframework.transaction.annotation.Isolation.*;
 public class AuthenticationServiceImpl implements AuthenticationService, UserDetailsService {
     private final UserService userService;
     private final StoreService storeService;
+    private final CouponService couponService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -60,8 +65,12 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
         User savedUser = userRepository.save(user);
 
-        if (user.getRoles().checkIsSeller()) {
+        if (user.getRoles().containSeller()) {
             storeService.createStore(savedUser.getId(), signUpForm.getStoreName());
+        }
+
+        if (user.getRoles().containBuyer()) {
+            provideNewMemberDiscountCoupons(savedUser);
         }
 
         return savedUser;
@@ -79,8 +88,8 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
     @Override
     @Transactional(isolation = REPEATABLE_READ, timeout = 10)
-    public void updateEmail(Long id, EmailRequestDto emailRequestDto) {
-        User user = userService.getUser(id);
+    public void updateEmail(Long userId, EmailRequestDto emailRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), emailRequestDto.getPassword());
         checkEmail(emailRequestDto.getEmail());
@@ -90,8 +99,8 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
     @Override
     @Transactional(isolation = REPEATABLE_READ, timeout = 10)
-    public void updatePhone(Long id, PhoneRequestDto phoneRequestDto) {
-        User user = userService.getUser(id);
+    public void updatePhone(Long userId, PhoneRequestDto phoneRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), phoneRequestDto.getPassword());
         checkPhone(phoneRequestDto.getPhone());
@@ -100,23 +109,31 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     }
 
     @Override
-    public void updatePassword(Long id, PasswordUpdateRequestDto passwordUpdateRequestDto) {
-        User user = userService.getUser(id);
+    public void updatePassword(Long userId, PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), passwordUpdateRequestDto.getCurrentPassword());
         user.updatePassword(passwordUpdateRequestDto.getPasswordToChange(), passwordEncoder);
+
+        validatePassword(user.getPassword(), passwordUpdateRequestDto.getPasswordToChangeConfirm());
     }
 
     @Override
-    public void deleteUser(long id, DeleteRequestDto deleteRequestDto) {
-        User user = userService.getUser(id);
+    public void deleteUser(long userId, DeleteRequestDto deleteRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), deleteRequestDto.getPassword());
 
-        if (user.getRoles().checkIsSeller()) {
-            storeService.deleteStore(id);
+        if (user.getRoles().containSeller()) {
+            storeService.deleteStore(userId);
         }
         userRepository.delete(user);
+    }
+
+    private void validatePassword(Password certifiedPassword, String enteredPassword) {
+        if (!certifiedPassword.matchOriginalPassword(passwordEncoder, enteredPassword)) {
+            throw new IncorrectPasswordException();
+        }
     }
 
     private void validateNotDuplicateUser(String username, String email, String phone) {
@@ -143,6 +160,13 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
         }
     }
 
+    private void provideNewMemberDiscountCoupons(User user) {
+        ProvideCouponsToUserRequestDto provideCouponsToUserRequestDto = new ProvideCouponsToUserRequestDto(
+                user, NEW_MEMBER_DISCOUNT_COUPON_NAME, NEW_MEMBER_DISCOUNT_COUPON_QUANTITY
+        );
+        couponService.provideCouponsToUser(provideCouponsToUserRequestDto);
+    }
+
     private User getUserFromEmailOrUsername(String emailOrUsername) {
         return emailOrUsername.contains("@")
                 ? userRepository.findByEmail(Email.of(emailOrUsername))
@@ -151,11 +175,5 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
                 : userRepository.findByUsername(Username.of(emailOrUsername))
                 .orElseThrow(() -> new EntityNotFoundException
                         (USERNAME_NOT_FOUND_EXCEPTION + emailOrUsername));
-    }
-
-    private void validatePassword(Password certifiedPassword, String enteredPassword) {
-        if (!certifiedPassword.matchOriginalPassword(passwordEncoder, enteredPassword)) {
-            throw new IncorrectPasswordException();
-        }
     }
 }

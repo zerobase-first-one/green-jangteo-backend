@@ -43,13 +43,13 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void deleteStore(long id) {
-        if (storeRepository.existsById(id)) {
-            storeRepository.deleteById(id);
+    public void deleteStore(Long userId) {
+        if (storeRepository.existsById(userId)) {
+            storeRepository.deleteById(userId);
             return;
         }
 
-        throw new EntityNotFoundException(STORE_NOT_FOUND_EXCEPTION + id);
+        throw new EntityNotFoundException(STORE_NOT_FOUND_EXCEPTION + userId);
     }
 
     private void validateNotDuplicateStoreName(String storeName) {

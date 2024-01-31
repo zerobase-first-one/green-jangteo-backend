@@ -23,14 +23,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(isolation = READ_COMMITTED, readOnly = true, timeout = 10)
-    public User getUser(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(USER_ID_NOT_FOUND_EXCEPTION + id));
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_ID_NOT_FOUND_EXCEPTION + userId));
     }
 
     @Override
-    public void updateAddress(Long id, AddressDto addressDto) {
-        User user = getUser(id);
+    public void updateAddress(Long userId, AddressDto addressDto) {
+        User user = getUser(userId);
 
         user.updateAddress(addressDto);
     }

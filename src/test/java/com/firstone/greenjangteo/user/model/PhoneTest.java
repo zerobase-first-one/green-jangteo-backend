@@ -4,11 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMessage.PHONE_NO_VALUE_EXCEPTION;
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_PHONE_EXCEPTION;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.PHONE1;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.PHONE2;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.PHONE1;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.PHONE2;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -38,23 +40,12 @@ class PhoneTest {
     }
 
     @DisplayName("전화번호를 전송하지 않으면 IllegalArgumentException이 발생한다.")
-    @Test
-    void ofBlankValue() {
-        // given
-        String phone1 = null;
-        String phone2 = "";
-        String phone3 = " ";
-
-        // when, then
-        assertThatThrownBy(() -> Phone.of(phone1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(PHONE_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> Phone.of(phone2))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(PHONE_NO_VALUE_EXCEPTION);
-
-        assertThatThrownBy(() -> Phone.of(phone3))
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void ofBlankValue(String phone) {
+        // given, when, then
+        assertThatThrownBy(() -> Phone.of(phone))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(PHONE_NO_VALUE_EXCEPTION);
     }

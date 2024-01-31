@@ -16,13 +16,12 @@ import java.util.List;
 @Builder
 @Getter
 public class UserResponseDto {
-    private Long userId;
     private String email;
     private String username;
     private String fullName;
     private String phone;
     private AddressDto addressDto;
-    private List<String> roles;
+    private List<String> roleDescriptions;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -31,11 +30,4 @@ public class UserResponseDto {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedAt;
-
-    public static UserResponseDto of(Long userId, LocalDateTime createdAt) {
-        return UserResponseDto.builder()
-                .userId(userId)
-                .createdAt(createdAt)
-                .build();
-    }
 }

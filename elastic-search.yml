@@ -1,0 +1,34 @@
+version: '1.0'
+services:
+  es:
+    build:
+      context: .
+    container_name: es
+    environment:
+      - ELASTIC_PASSWORD=elastic
+      - node.name=single-node
+      - cluster.name=greenjangteo
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - es-bridge
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.15.1
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_HOSTS: http://es:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - es
+    networks:
+      - es-bridge
+
+
+networks:
+  es-bridge:
+    driver: bridge

@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.model.embedment;
 
 import com.firstone.greenjangteo.user.model.Role;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import static com.firstone.greenjangteo.user.excpeption.message.BlankExceptionMe
 import static com.firstone.greenjangteo.user.excpeption.message.InvalidExceptionMessage.INVALID_ROLE_EXCEPTION;
 
 @Embeddable
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Roles {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
@@ -40,6 +41,10 @@ public class Roles {
         return roles.stream().map(Role::toString).collect(Collectors.toList());
     }
 
+    public List<String> toDescriptions() {
+        return roles.stream().map(Role::getDescription).collect(Collectors.toList());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,9 +62,19 @@ public class Roles {
         return roles.get(index);
     }
 
-    public boolean checkIsSeller() {
+    public boolean containSeller() {
         for (Role role : roles) {
             if (role.isSeller()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean containBuyer() {
+        for (Role role : roles) {
+            if (role.isBuyer()) {
                 return true;
             }
         }

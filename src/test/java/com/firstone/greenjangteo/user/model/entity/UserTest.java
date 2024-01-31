@@ -6,7 +6,7 @@ import com.firstone.greenjangteo.user.model.FullName;
 import com.firstone.greenjangteo.user.model.Phone;
 import com.firstone.greenjangteo.user.model.Username;
 import com.firstone.greenjangteo.user.model.embedment.Roles;
-import com.firstone.greenjangteo.user.testutil.TestObjectFactory;
+import com.firstone.greenjangteo.user.testutil.UserTestObjectFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,13 +14,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static com.firstone.greenjangteo.user.model.Role.ROLE_BUYER;
-import static com.firstone.greenjangteo.user.testutil.TestConstant.*;
+import static com.firstone.greenjangteo.user.testutil.UserTestConstant.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class UserTest {
     @Autowired
@@ -36,7 +38,7 @@ class UserTest {
     void from(String email, String username, String password, String fullName,
               String phone, String role) {
         // given
-        SignUpForm signUpForm = TestObjectFactory.enterUserForm(
+        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm(
                 email, username, password, password, fullName, phone, List.of(role)
         );
 
@@ -56,11 +58,11 @@ class UserTest {
     @Test
     void fromSameValue() {
         // given, when
-        User user1 = TestObjectFactory.createUser(
+        User user1 = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
-        User user2 = TestObjectFactory.createUser(
+        User user2 = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
@@ -73,11 +75,11 @@ class UserTest {
     @Test
     void fromDifferentValue() {
         // given, when
-        User user1 = TestObjectFactory.createUser(
+        User user1 = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.toString())
         );
 
-        User user2 = TestObjectFactory.createUser(
+        User user2 = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME2, PHONE1, List.of(ROLE_BUYER.toString())
         );
 

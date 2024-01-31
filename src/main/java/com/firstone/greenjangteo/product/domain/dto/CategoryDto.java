@@ -1,9 +1,8 @@
 package com.firstone.greenjangteo.product.domain.dto;
 
-import com.firstone.greenjangteo.product.domain.model.Product;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.firstone.greenjangteo.product.domain.model.Category;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -11,13 +10,15 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CategoryDto {
-    private Product product;
-    private List<String> category;
+    @JsonProperty("firstCategory")
+    private String firstCategory;
+    @JsonProperty("secondCategory")
+    private String secondCategory;
 
-    public static CategoryDto of(Product product, List<String> category) {
+    public static CategoryDto of(Category category){
         return CategoryDto.builder()
-                .product(product)
-                .category(category)
+                .firstCategory(category.getFirstCategory())
+                .secondCategory(category.getSecondCategory())
                 .build();
     }
 }

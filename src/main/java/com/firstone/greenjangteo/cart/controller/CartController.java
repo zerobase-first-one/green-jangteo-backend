@@ -1,8 +1,11 @@
 package com.firstone.greenjangteo.cart.controller;
 
-import com.firstone.greenjangteo.cart.domain.dto.CartProductDto;
+import com.firstone.greenjangteo.cart.domain.dto.request.AddCartProductRequestDto;
+import com.firstone.greenjangteo.cart.domain.dto.request.DeleteCartProductRequestDto;
+import com.firstone.greenjangteo.cart.domain.dto.request.UpdateCartProductRequestDto;
+import com.firstone.greenjangteo.cart.domain.dto.response.CartProductListResponseDto;
+import com.firstone.greenjangteo.cart.form.DeleteSelectCartProductForm;
 import com.firstone.greenjangteo.cart.service.CartService;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Controller
@@ -20,68 +21,50 @@ import java.util.Map;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping(value = "/carts") // 장바구니 화면에서 장바구니에 추가하는 요청(개수 변경)과 상품 화면에서 추가하는 요청(1씩 증가)
-    public @ResponseBody ResponseEntity<Object> addCart(
-            @RequestParam Long userId,
-            @RequestBody CartProductDto cartProductDto,
+    @PostMapping(value = "/carts")
+    public ResponseEntity addCart(
+            @RequestBody AddCartProductRequestDto addCartProductRequestDto,
             BindingResult bindingResult
     ) throws Exception {
         if (bindingResult.hasErrors()) {
             throw new Exception(HttpStatus.BAD_REQUEST.toString());
         }
-
-        Map<String, Object> result = new HashMap<>();
-        try {
-            result = cartService.addCart(userId, cartProductDto);
-        } catch (Exception e) {
-            throw new Exception(HttpStatus.BAD_REQUEST.toString());
-        }
-
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addCart(addCartProductRequestDto));
     }
 
     @GetMapping(value = "/carts")
-    public ResponseEntity<List<CartProductDto>> cartListAll(
+    public ResponseEntity<List<CartProductListResponseDto>> cartListAll(
             @RequestParam Long userId
     ) {
-        List<CartProductDto> cartProductList = cartService.getCartList(userId);
-        return ResponseEntity.ok().body(cartProductList);
+        List<CartProductListResponseDto> cartProductList = cartService.getCartList(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(cartProductList);
     }
 
     @PutMapping(value = "/carts/cart-products/{cartProductId}")
     public ResponseEntity<Object> updateCartProductList(
-            @RequestParam Long userId,
-            @PathVariable("cartProductId") Long cartProductId,
-            @RequestParam int quantity
-    ) {
-        cartService.updateCartProduct(userId, cartProductId, quantity);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping(value = "/carts/cart-products/{cartProductId}")
-    public ResponseEntity<Object> deleteCartProduct(
-            @RequestParam Long userId,
-            @PathVariable("cartProductId") Long cartProductId
-    ) {
-        cartService.deleteCartList(userId, cartProductId);
-        return ResponseEntity.noContent().build();
+            @RequestBody UpdateCartProductRequestDto updateCartProductRequestDto,
+            BindingResult bindingResult
+    ) throws Exception {
+        if (bindingResult.hasErrors()) {
+            throw new Exception(HttpStatus.BAD_REQUEST.toString());
+        }
+        cartService.updateCartProduct(updateCartProductRequestDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping(value = "/carts/selects")
-    public ResponseEntity<Object> deleteSelectCartProductList(
-            @RequestParam Long userId,
-            @Parameter List<CartProductDto> cartProductDtoList
+    public ResponseEntity<Void> deleteSelectCartProductList(
+            @RequestBody DeleteSelectCartProductForm deleteSelectCartProductForm
     ) {
-        // delete service
-        cartService.deleteCartProductList(userId, cartProductDtoList);
-        return ResponseEntity.noContent().build();
+        cartService.deleteCartProductList(deleteSelectCartProductForm);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping(value = "/carts")
-    public ResponseEntity<Object> deleteCart(
+    public ResponseEntity<Void> deleteCart(
             @RequestParam Long userId
     ) {
         cartService.deleteCart(userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

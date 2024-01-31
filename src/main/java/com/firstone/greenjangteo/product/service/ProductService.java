@@ -1,27 +1,33 @@
 package com.firstone.greenjangteo.product.service;
 
-import com.firstone.greenjangteo.product.domain.dto.ProductDto;
-import com.firstone.greenjangteo.product.domain.dto.ProductListDto;
+import com.firstone.greenjangteo.product.domain.dto.*;
+import com.firstone.greenjangteo.product.domain.dto.response.AddProductResponseDto;
+import com.firstone.greenjangteo.product.domain.dto.response.ProductDetailResponseDto;
+import com.firstone.greenjangteo.product.domain.dto.response.ProductsResponseDto;
+import com.firstone.greenjangteo.product.domain.dto.response.ReviewsResponseDto;
 import com.firstone.greenjangteo.product.domain.model.Category;
 import com.firstone.greenjangteo.product.domain.model.Product;
 import com.firstone.greenjangteo.product.domain.model.ProductImage;
+import com.firstone.greenjangteo.product.domain.model.Review;
 import com.firstone.greenjangteo.product.exception.ErrorCode;
-import com.firstone.greenjangteo.product.exception.ProductException;
+import com.firstone.greenjangteo.product.exception.ProductRelatedException;
+import com.firstone.greenjangteo.product.form.AddProductForm;
+import com.firstone.greenjangteo.product.form.UpdateProductForm;
 import com.firstone.greenjangteo.product.repository.CategoryRepository;
 import com.firstone.greenjangteo.product.repository.ProductImageRepository;
 import com.firstone.greenjangteo.product.repository.ProductRepository;
+import com.firstone.greenjangteo.product.repository.ProductReviewRepository;
 import com.firstone.greenjangteo.user.domain.store.model.entity.Store;
 import com.firstone.greenjangteo.user.domain.store.service.StoreService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -29,42 +35,43 @@ import java.util.Map;
 public class ProductService {
 
     private final ProductImageService productImageService;
-    private final CategoryService categoryService;
     private final StoreService storeService;
 
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductReviewRepository productReviewRepository;
 
-    public Map<String, Object> saveProduct(ProductDto productDto, List<String> productImageUrlList, String productImageLocation) throws Exception {
-        Store store = storeService.getStore(productDto.getSellerId());
-        Product product = Product.addProduct(productDto, store);
-
-        for (int i = 0; i < productImageUrlList.size(); i++) {
-            ProductImage productImage = ProductImage.saveProductImage(product, productImageUrlList.get(i), i);
-            productImageService.saveProductImage(product, productImage, productImageUrlList.get(i), i, productImageLocation);
-        }
-
+    public AddProductResponseDto saveProduct(AddProductForm addProductForm) {
+        Store store = storeService.getStore(addProductForm.getUserId());
+        Product product = Product.addProductRequestDtoToProduct(addProductForm, store);
         productRepository.save(product);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("productId", product.getId());
-        result.put("createdAt", product.getCreatedAt());
+        List<ProductImageDto> imageList = addProductForm.getImages();
 
-        return result;
+        for (int i = 0; i < imageList.size(); i++) {
+            productImageService.saveProductImage(product, imageList.get(i).getUrl(), i);
+        }
+
+        return AddProductResponseDto.of(product);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductListDto> getProductList() {
+    public Product getProduct(Long productId) {
+        return productRepository.findById(productId).orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductsResponseDto> getProductList(int page, int size) {
         if (productRepository.findAll().isEmpty()) {
-            return new ArrayList<>();
+            throw new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription());
         }
 
-        List<Product> products = productRepository.findAll();
-        ProductListDto productListDto = new ProductListDto();
-        List<ProductListDto> productList = new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Product> productList = productRepository.findAll(pageRequest);
+        List<ProductsResponseDto> products = new ArrayList<>();
 
-        for (Product product : products) {
+        for (Product product : productList) {
             Long curProductId = product.getId();
 
             List<ProductImage> productImage = productImageRepository.findByProductId(curProductId);
@@ -73,58 +80,54 @@ public class ProductService {
                 urlList.add(image.getUrl());
             }
 
-            List<Category> category = categoryRepository.findByProductId(curProductId);
-            List<String> categoryList = new ArrayList<>();
-            for (Category value : category) {
-                categoryList.add(value.getCategoryName());
-            }
-
-            productList.add(productListDto.of(product, urlList, categoryList));
+            products.add(ProductsResponseDto.of(product, urlList.get(0), CategoryDto.of(product.getCategory())));
         }
-        return productList;
+        return products;
     }
 
     @Transactional(readOnly = true)
-    public ProductListDto getProductDetail(Long productId) {
-        Product products = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
-        ProductListDto productListDto = new ProductListDto();
+    public ProductDetailResponseDto getProductDescription(Long productId) {
+        Product products = productRepository.findById(productId).orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
+
+        Optional<Category> category = categoryRepository.findById(products.getCategory().getId());
+        CategoryDto categoryDetailDto = CategoryDto.of(category.get());
 
         List<ProductImage> productImage = productImageRepository.findByProductId(productId);
-        List<String> urlList = new ArrayList<>();
+        List<ImageDto> urlList = new ArrayList<>();
         for (ProductImage image : productImage) {
-            urlList.add(image.getUrl());
+            urlList.add(ImageDto.toImageDto(image));
         }
 
-        List<Category> category = categoryRepository.findByProductId(productId);
-        List<String> categoryList = new ArrayList<>();
-        for (Category value : category) {
-            categoryList.add(value.getCategoryName());
-        }
-
-        return productListDto.of(products, urlList, categoryList);
+        return ProductDetailResponseDto.descriptionOf(products, categoryDetailDto, urlList);
     }
 
-    public ResponseEntity updateProduct(Long productId, ProductDto productDto, List<String> productImageUrlList, List<String> categoryList, String productImageLocation) throws Exception {
-        //product
-        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
-        product.setModifiedAt(LocalDateTime.now());
+    @Transactional(readOnly = true)
+    public ProductDetailResponseDto getProductReviews(Long productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isEmpty()) throw new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription());
+        List<Review> reviews = productReviewRepository.findAllByProduct(product.get());
+        List<ReviewsResponseDto> reviewsResponseDtoList = new ArrayList<>();
+        for (Review review : reviews) {
+            reviewsResponseDtoList.add(ReviewsResponseDto.from(review));
+        }
+        return ProductDetailResponseDto.reviewsOf(reviewsResponseDtoList);
+    }
+
+    public void updateProduct(UpdateProductForm updateProductForm) {
+        Product product = productRepository.findById(updateProductForm.getProductId())
+                .orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
+        ProductDto productDto = ProductDto.updateProductRequestDtoToProductDto(product, updateProductForm);
         product.updateProduct(productDto);
-
-        //image
-        productImageService.updateProductImage(productId, product, productImageUrlList, productImageLocation);
-
-        //category
-        categoryService.updateCategory(productId, product, categoryList);
-        return ResponseEntity.noContent().build();
+        productImageService.updateProductImage(product.getId(), updateProductForm.getImages());
     }
 
-    public ResponseEntity removeProduct(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+    public void removeProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductRelatedException(ErrorCode.PRODUCT_IS_NOT_FOUND.getDescription()));
 
-        categoryRepository.deleteByProductId(product.getId());
+        product.setStore(null);
+
         productImageRepository.deleteByProductId(product.getId());
         productRepository.deleteById(product.getId());
-
-        return ResponseEntity.noContent().build();
     }
 }

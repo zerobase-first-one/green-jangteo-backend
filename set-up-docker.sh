@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 # check if docker is already installed
 if ! command -v docker &> /dev/null; then
     echo "Docker is not installed. Installing..."
@@ -67,6 +69,39 @@ if [ ! "$(docker ps -a | grep redis-container)" ]; then
     sudo docker run -d --name redis-container --network=docker-network \
     -e REDIS_PASSWORD=$REDIS_PASSWORD \
     redis:latest
+fi
+
+# pull ElasticSearch image if not exists
+if [ ! "$(docker images -q docker.elastic.co/elasticsearch/elasticsearch:7.15.1)" ]; then
+    echo "Pulling ElasticSearch Docker image..."
+    sudo docker pull docker.elastic.co/elasticsearch/elasticsearch:7.15.1
+fi
+
+# run ElasticSearch container if not exists
+if [ ! "$(docker ps -a | grep es-container)" ]; then
+    echo "Starting Elasticsearch container..."
+
+    sudo docker run -d \
+        -p 9200:9200 -p 9300:9300 \
+        -e "discovery.type=single-node" \
+        -e "node.name=single-node" \
+        -e "cluster.name=green-jangteo-backend" \
+        -e "ELASTIC_PASSWORD=elastic" \
+        -e "ES_JAVA_OPTS=-Xms128m -Xmx128m" \
+        --name es-container \
+        --network=docker-network \
+        docker.elastic.co/elasticsearch/elasticsearch:7.15.1
+
+    docker exec -it es-container \
+         elasticsearch-plugin install analysis-nori \
+         https://github.com/skyer9/elasticsearch-jaso-analyzer/releases/download/v7.15.1/jaso-analyzer-plugin-7.15.1-plugin.zip
+
+    sudo docker stop es-container
+
+    sudo docker start es-container
+
+else
+    echo "Elasticsearch container already exists."
 fi
 
 echo "Docker setup complete."
