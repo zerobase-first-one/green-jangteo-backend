@@ -24,14 +24,16 @@ public class SignInResponseDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private final LocalDateTime loggedInAt;
 
-    private final String token;
+    private final String accessToken;
+    private final String refreshToken;
 
-    public static SignInResponseDto from(User user, String token) {
+    public static SignInResponseDto from(User user, String accessToken, String refreshToken) {
         return SignInResponseDto.builder()
                 .userId(user.getId())
                 .roleDescriptions(user.getRoles().toDescriptions())
                 .loggedInAt(user.getLastLoggedInAt())
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }

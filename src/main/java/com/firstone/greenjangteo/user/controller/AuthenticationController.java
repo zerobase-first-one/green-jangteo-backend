@@ -1,5 +1,6 @@
 package com.firstone.greenjangteo.user.controller;
 
+import com.firstone.greenjangteo.user.domain.token.service.TokenService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -9,7 +10,6 @@ import com.firstone.greenjangteo.user.dto.response.SignUpResponseDto;
 import com.firstone.greenjangteo.user.form.SignInForm;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.entity.User;
-import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import com.firstone.greenjangteo.user.service.AuthenticationService;
 import com.firstone.greenjangteo.utility.InputFormatValidator;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +34,7 @@ import static com.firstone.greenjangteo.web.ApiConstant.*;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     private static final String SIGN_UP = "회원 가입";
     private static final String SIGN_UP_DESCRIPTION = "회원 가입 양식을 입력해 회원 가입을 할 수 있습니다.";
@@ -77,9 +77,10 @@ public class AuthenticationController {
     public ResponseEntity<SignInResponseDto> signInUser
             (@RequestBody @ApiParam(value = SIGN_IN_FORM) SignInForm signInForm) {
         User user = authenticationService.signInUser(signInForm);
-        String token = jwtTokenProvider.generateToken(String.valueOf(user.getId()), user.getRoles().toStrings());
+        String accessToken = tokenService.issueAccessToken(user);
+        String refreshToken = tokenService.issueRefreshToken(user);
 
-        return ResponseEntity.status(HttpStatus.OK).body(SignInResponseDto.from(user, token));
+        return ResponseEntity.status(HttpStatus.OK).body(SignInResponseDto.from(user, accessToken, refreshToken));
     }
 
     @ApiOperation(value = UPDATE_EMAIL, notes = UPDATE_UPDATE_EMAIL_DESCRIPTION)
