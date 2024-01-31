@@ -41,7 +41,7 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
                 .and()
                 .authorizeHttpRequests()
                 .antMatchers("/", "/swagger-ui/**", "/v2/api-docs", "/swagger-resources/**",
-                        "/**/signup", "/**/login", "/users")
+                        "/**/signup", "/**/login", "/users", "/token")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/users/{userId}").permitAll()
                 .antMatchers(HttpMethod.GET, "/products/**").permitAll()

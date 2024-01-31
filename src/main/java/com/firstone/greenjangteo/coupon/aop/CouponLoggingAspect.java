@@ -24,21 +24,21 @@ public class CouponLoggingAspect {
     private static final String CREATE_COUPONS_START
             = "Beginning to '{}.{}' task by couponName: '{}'";
     private static final String CREATE_COUPONS_END
-            = "'{}.{}' task was executed successfully by 'couponName: {}', ";
+            = "'{}.{}' task was executed successfully by couponName: '{}', ";
 
     private static final String PROVIDE_COUPONS_TO_USER_POINTCUT
             = "execution(* com.firstone.greenjangteo.coupon.service.*.*(..)) && args(provideCouponsToUserRequestDto)";
     private static final String PROVIDE_COUPONS_TO_USER_START
             = "Beginning to '{}.{}' task by couponName: '{}', userId: '{}'";
     private static final String PROVIDE_COUPONS_TO_USER_END
-            = "'{}.{}' task was executed successfully by 'couponName: {}', userId: '{}', ";
+            = "'{}.{}' task was executed successfully by couponName: '{}', userId: '{}', ";
 
     private static final String PROVIDE_COUPONS_TO_USERS_POINTCUT
             = "execution(* com.firstone.greenjangteo.coupon.service.*.*(..)) && args(provideCouponsToUsersRequestDto)";
     private static final String PROVIDE_COUPONS_TO_USERS_START
             = "Beginning to '{}.{}' task by couponGroupId: '{}'";
     private static final String PROVIDE_COUPONS_TO_USERS_END
-            = "'{}.{}' task was executed successfully by 'couponGroupId: {}', ";
+            = "'{}.{}' task was executed successfully by couponGroupId: '{}', ";
 
     @Around(CREATE_COUPONS_POINTCUT)
     public Object logAroundForIssueCouponsRequestDto(ProceedingJoinPoint joinPoint,

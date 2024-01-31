@@ -88,8 +88,8 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
     @Override
     @Transactional(isolation = REPEATABLE_READ, timeout = 10)
-    public void updateEmail(Long id, EmailRequestDto emailRequestDto) {
-        User user = userService.getUser(id);
+    public void updateEmail(Long userId, EmailRequestDto emailRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), emailRequestDto.getPassword());
         checkEmail(emailRequestDto.getEmail());
@@ -99,8 +99,8 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
 
     @Override
     @Transactional(isolation = REPEATABLE_READ, timeout = 10)
-    public void updatePhone(Long id, PhoneRequestDto phoneRequestDto) {
-        User user = userService.getUser(id);
+    public void updatePhone(Long userId, PhoneRequestDto phoneRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), phoneRequestDto.getPassword());
         checkPhone(phoneRequestDto.getPhone());
@@ -109,8 +109,8 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     }
 
     @Override
-    public void updatePassword(Long id, PasswordUpdateRequestDto passwordUpdateRequestDto) {
-        User user = userService.getUser(id);
+    public void updatePassword(Long userId, PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), passwordUpdateRequestDto.getCurrentPassword());
         user.updatePassword(passwordUpdateRequestDto.getPasswordToChange(), passwordEncoder);
@@ -119,13 +119,13 @@ public class AuthenticationServiceImpl implements AuthenticationService, UserDet
     }
 
     @Override
-    public void deleteUser(long id, DeleteRequestDto deleteRequestDto) {
-        User user = userService.getUser(id);
+    public void deleteUser(long userId, DeleteRequestDto deleteRequestDto) {
+        User user = userService.getUser(userId);
 
         validatePassword(user.getPassword(), deleteRequestDto.getPassword());
 
         if (user.getRoles().containSeller()) {
-            storeService.deleteStore(id);
+            storeService.deleteStore(userId);
         }
         userRepository.delete(user);
     }

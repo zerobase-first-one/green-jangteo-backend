@@ -23,14 +23,14 @@ public class PostLoggingAspect {
     private static final String CREATE_POST_START
             = "Beginning to '{}.{}' task by userId: '{}', subject: '{}'";
     private static final String CREATE_POST_END
-            = "'{}.{}' task was executed successfully by 'userId: {}', subject: '{}', ";
+            = "'{}.{}' task was executed successfully by userId: '{}', subject: '{}', ";
 
     private static final String GET_ALL_POSTS_POINTCUT
             = "execution(* com.firstone.greenjangteo.post.service.*.*(..)) && args(pageable)";
     private static final String GET_ALL_POSTS_START
             = "Beginning to '{}.{}' task by page: '{}'";
     private static final String GET_ALL_POSTS_END
-            = "'{}.{}' task was executed successfully by 'page: {}', ";
+            = "'{}.{}' task was executed successfully by page: '{}', ";
 
     @Around(CREATE_POST_POINTCUT)
     public Object logAroundForPostRequestDto(ProceedingJoinPoint joinPoint,

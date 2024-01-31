@@ -113,6 +113,8 @@ public class PostServiceImpl implements PostService {
             return;
         }
 
-        throw new EntityNotFoundException(POST_NOT_FOUND_EXCEPTION + postId + POSTED_USER_ID_NOT_FOUND_EXCEPTION + userId);
+        throw new EntityNotFoundException(
+                POST_NOT_FOUND_EXCEPTION + postId + POSTED_USER_ID_NOT_FOUND_EXCEPTION + userId
+        );
     }
 }

@@ -23,14 +23,14 @@ public class UserLoggingAspect {
     private static final String SIGN_UP_START
             = "Beginning to '{}.{}' task by email: '{}', username: '{}'";
     private static final String SIGN_UP_END
-            = "'{}.{}' task was executed successfully by 'email: {}', 'username: {}', ";
+            = "'{}.{}' task was executed successfully by email: '{}', username: '{}', ";
 
     private static final String SIGN_IN_POINTCUT
             = "execution(* com.firstone.greenjangteo.user.service.*.*(..)) && args(signInForm)";
     private static final String SIGN_IN_START
             = "Beginning to '{}.{}' task by email or username: '{}'";
     private static final String SIGN_IN_END
-            = "'{}.{}' task was executed successfully by 'email or username: {}', ";
+            = "'{}.{}' task was executed successfully by email or username: '{}', ";
 
     @Around(SIGN_UP_POINTCUT)
     public Object logAroundForSignUpForm(ProceedingJoinPoint joinPoint, SignUpForm signUpForm) throws Throwable {

@@ -367,9 +367,9 @@ class PostServiceTest {
     @DisplayName("게시글 ID와 회원 ID를 전송해 게시글을 삭제할 수 있다.")
     @ParameterizedTest
     @CsvSource({
-            "abc, 안녕하세요?, 안뇽하세요?",
-            "12345, abcde, 가나다라abc마바 123454321 aBc 가나다 ab 123",
-            "가나다, 가나다라 12345 aBc 가나다 ab 123, 안냥하세요?"
+            "abc, 안녕하세요?",
+            "12345, 가나다라abc마바 123454321 aBc 가나다 ab 123",
+            "가나다, 가나다라 12345 aBc 가나다 ab 123"
     })
     void deletePost(String subject, String content) {
         // given
@@ -394,5 +394,34 @@ class PostServiceTest {
         // then
         assertThat(postRepository.findById(postId)).isNotPresent();
         assertThat(imageRepository.findAllByPostIdOrderByIdAsc(postId)).isEmpty();
+    }
+
+    @DisplayName("일치하지 않는 게시글 ID 또는 회원 ID를 전송해 게시글을 삭제하려 하면 EntityNotFoundException이 발생한다.")
+    @Test
+    void deletePostWithWrongPostOrUserId() {
+        // given
+        User user = UserTestObjectFactory.createUser(
+                EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_BUYER.name())
+        );
+        userRepository.save(user);
+
+        Post post = PostTestObjectFactory.createPost(SUBJECT1, CONTENT1, user);
+        postRepository.save(post);
+
+        Long postId = post.getId();
+        Long userId = user.getId();
+
+        // when, then
+        assertThatThrownBy(() -> postService.deletePost(postId + 1, userId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(POST_NOT_FOUND_EXCEPTION + (postId + 1) + POSTED_USER_ID_NOT_FOUND_EXCEPTION + userId);
+        assertThatThrownBy(() -> postService.deletePost(postId, userId + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(POST_NOT_FOUND_EXCEPTION + postId + POSTED_USER_ID_NOT_FOUND_EXCEPTION + (userId + 1));
+        assertThatThrownBy(() -> postService.deletePost(postId + 1, userId + 1))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(
+                        POST_NOT_FOUND_EXCEPTION + (postId + 1) + POSTED_USER_ID_NOT_FOUND_EXCEPTION + (userId + 1)
+                );
     }
 }

@@ -26,9 +26,9 @@ public class LoggingAspect {
             = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(longValue, ..)";
 
     private static final String START
-            = "Beginning to '{}.{}' task by '{}: {}'";
+            = "Beginning to '{}.{}' task by {}: '{}'";
     private static final String END
-            = "'{}.{}' task was executed successfully by '{}: {}', ";
+            = "'{}.{}' task was executed successfully by {}: '{}', ";
 
     private static final String NO_VALUE_POINTCUT
             = "execution(* com.firstone.greenjangteo..service.*.*())";
@@ -40,16 +40,16 @@ public class LoggingAspect {
     private static final String USER_ID_REQUEST_DTO_POINTCUT
             = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(userIdRequestDto)";
     private static final String USER_ID_REQUEST_DTO_START
-            = "Beginning to '{}.{}' task by 'userId: {}', ";
+            = "Beginning to '{}.{}' task by userId: '{}', ";
     private static final String USER_ID_REQUEST_DTO_END
-            = "'{}.{}' task was executed successfully by 'userId: {}', ";
+            = "'{}.{}' task was executed successfully by userId: '{}', ";
 
     private static final String PAGEABLE_AND_ID_POINTCUT
             = "execution(* com.firstone.greenjangteo..service.*.*(..)) && args(pageable, longValue)";
     private static final String PAGEABLE_AND_ID_START
-            = "Beginning to '{}.{}' task by 'page: {}', '{}: {}'";
+            = "Beginning to '{}.{}' task by page: '{}', {}: '{}'";
     private static final String PAGEABLE_AND_ID_END
-            = "'{}.{}' task was executed successfully by 'page: {}', '{}: {}', ";
+            = "'{}.{}' task was executed successfully by page: '{}', {}: '{}', ";
 
     @Around(STRING_VALUE_POINTCUT)
     public Object logAroundForStringValue(ProceedingJoinPoint joinPoint, String stringValue) throws Throwable {

@@ -23,7 +23,6 @@ import static com.firstone.greenjangteo.post.domain.comment.exception.message.In
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.InconsistentExceptionMessage.INCONSISTENT_COMMENT_EXCEPTION_POST_ID;
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENTED_USER_ID_NOT_FOUND_EXCEPTION;
 import static com.firstone.greenjangteo.post.domain.comment.exception.message.NotFoundExceptionMessage.COMMENT_NOT_FOUND_EXCEPTION;
-import static com.firstone.greenjangteo.post.exception.message.NotFoundExceptionMessage.POSTED_USER_ID_NOT_FOUND_EXCEPTION;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
 
