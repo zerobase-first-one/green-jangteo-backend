@@ -13,7 +13,7 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private static final String INVALID_TOKEN_EXCEPTION_MESSAGE = "유효하지 않은 리프레시 토큰입니다. 전송된 토큰: ";
+    static final String INVALID_TOKEN_EXCEPTION_MESSAGE = "유효하지 않은 리프레시 토큰입니다. 전송된 토큰: ";
 
     public String issueAccessToken(User user) {
         String accessToken
