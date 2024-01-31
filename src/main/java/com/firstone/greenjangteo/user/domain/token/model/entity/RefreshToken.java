@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.domain.token.model.entity;
 
 
+import com.firstone.greenjangteo.user.security.JwtTokenProvider;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -34,5 +35,13 @@ public class RefreshToken {
 
     public static RefreshToken from(Long id, List<String> roles, String token) {
         return new RefreshToken(id, roles, token);
+    }
+
+    public String getTokenValue() {
+        return token;
+    }
+
+    public String createNewAccessToken(JwtTokenProvider jwtTokenProvider) {
+        return jwtTokenProvider.generateAccessToken(String.valueOf(userId), roles);
     }
 }
