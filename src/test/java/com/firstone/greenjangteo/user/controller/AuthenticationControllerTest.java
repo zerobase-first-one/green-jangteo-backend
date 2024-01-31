@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firstone.greenjangteo.user.domain.token.service.TokenService;
 import com.firstone.greenjangteo.user.dto.request.DeleteRequestDto;
 import com.firstone.greenjangteo.user.dto.request.EmailRequestDto;
 import com.firstone.greenjangteo.user.dto.request.PasswordUpdateRequestDto;
@@ -48,6 +49,9 @@ class AuthenticationControllerTest {
 
     @MockBean
     private AuthenticationService authenticationService;
+
+    @MockBean
+    private TokenService tokenService;
 
     @MockBean
     private PasswordEncoder passwordEncoder;
