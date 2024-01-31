@@ -22,7 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     private static final String KEY_ROLES = "roles";
-    private static final long LOGIN_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 2;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 2;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
     private final UserDetailsService userDetailsService;
 
     @Value("${spring.jwt.secret}")
@@ -33,13 +34,29 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String generateToken(String userId, List<String> roles) {
+    public String generateAccessToken(String userId, List<String> roles) {
 
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put(KEY_ROLES, roles);
 
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + LOGIN_TOKEN_EXPIRATION_TIME);
+        Date expirationDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION_TIME);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
+    public String generateRefreshToken(String userId, List<String> roles) {
+
+        Claims claims = Jwts.claims().setSubject(userId);
+        claims.put(KEY_ROLES, roles);
+
+        Date now = new Date();
+        Date expirationDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_TIME);
 
         return Jwts.builder()
                 .setClaims(claims)
