@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.firstone.greenjangteo.audit.BaseEntity;
 import com.firstone.greenjangteo.coupon.model.entity.Coupon;
+import com.firstone.greenjangteo.post.model.entity.Post;
 import com.firstone.greenjangteo.user.dto.AddressDto;
 import com.firstone.greenjangteo.user.form.SignUpForm;
 import com.firstone.greenjangteo.user.model.Email;
@@ -75,6 +76,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.LAZY)
     private List<Coupon> coupons;
+
+    @OneToMany(mappedBy = "user", cascade = REMOVE, fetch = FetchType.LAZY)
+    private List<Post> posts;
 
 
     @Builder

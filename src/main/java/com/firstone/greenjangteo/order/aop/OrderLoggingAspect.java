@@ -23,14 +23,14 @@ public class OrderLoggingAspect {
     private static final String ORDER_START
             = "Beginning to '{}.{}' task by sellerId: '{}', buyerId: '{}'";
     private static final String ORDER_END
-            = "'{}.{}' task was executed successfully by 'sellerId: {}', 'buyerId: {}', ";
+            = "'{}.{}' task was executed successfully by sellerId: '{}', buyerId: '{}', ";
 
     private static final String CART_ORDER_POINTCUT
             = "execution(* com.firstone.greenjangteo.order.service.*.*(..)) && args(cartOrderRequestDto)";
     private static final String CART_ORDER_START
             = "Beginning to '{}.{}' task by buyerId: '{}', cartId: '{}'";
     private static final String CART_ORDER_END
-            = "'{}.{}' task was executed successfully by 'buyerId: {}', 'cartId: {}', ";
+            = "'{}.{}' task was executed successfully by buyerId: '{}', cartId: '{}', ";
 
     @Around(ORDER_POINTCUT)
     public Object logAroundForOrderRequestDto(ProceedingJoinPoint joinPoint,

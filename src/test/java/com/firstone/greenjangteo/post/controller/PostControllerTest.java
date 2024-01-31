@@ -1,6 +1,7 @@
 package com.firstone.greenjangteo.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firstone.greenjangteo.post.domain.comment.service.CommentService;
 import com.firstone.greenjangteo.post.domain.image.dto.ImageRequestDto;
 import com.firstone.greenjangteo.post.domain.image.testutil.ImageTestObjectFactory;
 import com.firstone.greenjangteo.post.domain.view.model.entity.View;
@@ -54,6 +55,9 @@ class PostControllerTest {
 
     @MockBean
     private PostService postService;
+
+    @MockBean
+    private CommentService commentService;
 
     @MockBean
     private ViewService viewService;
@@ -178,7 +182,7 @@ class PostControllerTest {
 
     @DisplayName("게시글 ID와 회원 ID를 전송해 게시글을 수정할 수 있다.")
     @Test
-    @WithMockUser
+    @WithMockUser(username = BUYER_ID, roles = {"BUYER"})
     void updatePost() throws Exception {
         // given
         User user = mock(User.class);

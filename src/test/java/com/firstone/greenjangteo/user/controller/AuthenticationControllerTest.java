@@ -89,9 +89,7 @@ class AuthenticationControllerTest {
     @WithMockUser
     void signInUser() throws Exception {
         // given
-        SignUpForm signUpForm = UserTestObjectFactory.enterUserForm
-                (EMAIL1, USERNAME1, PASSWORD1, PASSWORD1, FULL_NAME1,
-                        PHONE1, List.of(ROLE_SELLER.toString()));
+        SignInForm signInForm = new SignInForm(EMAIL1, PASSWORD1);
 
         User user = UserTestObjectFactory.createUser(
                 EMAIL1, USERNAME1, PASSWORD1, passwordEncoder, FULL_NAME1, PHONE1, List.of(ROLE_SELLER.toString())
@@ -99,11 +97,10 @@ class AuthenticationControllerTest {
 
         when(authenticationService.signInUser(any(SignInForm.class)))
                 .thenReturn(user);
-
         // when, then
         mockMvc.perform(post("/users/login")
                         .with(csrf())
-                        .content(objectMapper.writeValueAsString(signUpForm))
+                        .content(objectMapper.writeValueAsString(signInForm))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());

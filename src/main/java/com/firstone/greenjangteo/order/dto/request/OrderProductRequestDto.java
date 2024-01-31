@@ -15,7 +15,7 @@ import static com.firstone.greenjangteo.web.ApiConstant.ID_EXAMPLE;
 public class OrderProductRequestDto {
     private static final String PRODUCT_ID_VALUE = "상품 ID";
     private static final String QUANTITY_VALUE = "주문 수량";
-    static final String QUANTITY_EXAMPLE = "5";
+    private static final String QUANTITY_EXAMPLE = "5";
 
     @ApiModelProperty(value = PRODUCT_ID_VALUE, example = ID_EXAMPLE)
     private String productId;
