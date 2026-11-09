@@ -1,8 +1,11 @@
 package com.firstone.greenjangteo.configuration;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.LazyInitializationExcludeFilter;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper;
 
 /**
@@ -17,6 +20,15 @@ public class SwaggerDocumentationInitializer implements SmartLifecycle {
     private final DocumentationPluginsBootstrapper documentationPluginsBootstrapper;
 
     private volatile boolean running;
+
+    /**
+     * Springfox는 RequestMappingHandlerAdapter가 만들어질 때 ObjectMapper를 전달받는다.
+     * 지연 초기화로 어댑터가 첫 요청에야 만들어지면 문서 스캔 때 ObjectMapper가 없어 Swagger 모델이 비므로 제외한다.
+     */
+    @Bean
+    static LazyInitializationExcludeFilter handlerAdapterEagerInitialization() {
+        return LazyInitializationExcludeFilter.forBeanTypes(RequestMappingHandlerAdapter.class);
+    }
 
     @Override
     public void start() {
