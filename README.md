@@ -25,7 +25,7 @@
 
 - [First One 팀 노션](https://elite-aletopelta-3ca.notion.site/1-FirstOne-d25c8b51a07643d98b349e7a64e70280?pvs=4)
 - [그린장터 API 서버](https://green-jangteo.duckdns.org/swagger-ui/index.html)
-- [그린장터 CI/CD 파이프라인](http://my-jenkins.duckdns.org:8080/job/green-jangteo)
+- [그린장터 CI/CD 파이프라인](https://hyobin-jenkins.duckdns.org/job/green-jangteo)
 - [서버 테스트 목록(419개)](https://ddipddipddip.s3.ap-northeast-2.amazonaws.com/test/greenjangteo/Test+results+-+Test+Summary.html)
 - [Test Line Coverage(70%)](https://ddipddipddip.s3.ap-northeast-2.amazonaws.com/test/greenjangteo/green-jangteo.html)
 <br>
